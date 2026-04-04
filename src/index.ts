@@ -21,12 +21,21 @@ server.setRequestHandler("tools/list", async () => {
 server.setRequestHandler("tools/call", async (request) => {
   const { name, arguments: args } = request.params;
   const result = handleToolCall(name, (args ?? {}) as Record<string, unknown>);
+  const payload =
+    result ??
+    ({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "No response returned by tool handler.",
+        retryable: true
+      }
+    } as const);
 
   return {
     content: [
       {
         type: "text",
-        text: JSON.stringify(result ?? { error: "INTERNAL_ERROR" })
+        text: JSON.stringify(payload)
       }
     ]
   };

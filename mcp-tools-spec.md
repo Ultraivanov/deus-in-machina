@@ -57,6 +57,25 @@ type SkillLevel = "beginner" | "intermediate" | "advanced"
 type AssistantType = "codex" | "claude_code" | "cursor" | "other"
 ```
 
+### Monetization context (optional)
+All tools may accept these optional fields for server-side gating and soft paywalls:
+```ts
+type SubscriptionSnapshot = {
+  user_id: string
+  plan: "free" | "pro"
+  status: "active" | "past_due" | "canceled" | "paused"
+  sessions_used: number
+  project_count: number
+}
+
+type MonetizationContext = {
+  user_id?: string
+  subscription?: SubscriptionSnapshot
+}
+```
+
+Tools may return `_meta` with `plan`, `features`, `subscription`, and `upgrade_hint` for UI guidance.
+
 ### Error envelope
 All tools should return structured errors in this shape:
 ```json
@@ -84,6 +103,11 @@ All tools should return structured errors in this shape:
 - `STATE_CONFLICT`
 - `UNSUPPORTED_ASSISTANT`
 - `INTERNAL_ERROR`
+- `PROJECT_LIMIT_REACHED`
+- `SESSION_LIMIT_REACHED`
+- `FEATURE_NOT_AVAILABLE`
+- `SUBSCRIPTION_NOT_FOUND`
+- `INVALID_PLAN_STATE`
 
 ---
 

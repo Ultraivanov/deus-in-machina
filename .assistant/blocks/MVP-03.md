@@ -24,7 +24,7 @@ Core tools write and read `.assistant/` files deterministically without crashing
 | MVP-03-T3 | Add basic read/merge logic         | done    | engine reads current active block/task state  |
 | MVP-03-T4 | SQLite storage layer               | done    | CRUD works for project/phase/block/task/session + user/subscription |
 | MVP-03-T5 | End-to-end happy path demo         | done    | initialize → next_step → prompt → submit → validate → complete |
-| MVP-03-T6 | Monetization middleware            | pending | tool gating + limits enforced at server layer |
+| MVP-03-T6 | Monetization middleware            | done    | tool gating + limits enforced at server layer |
 
 > New tasks are added here as the block progresses via `init-task`.
 
@@ -36,7 +36,7 @@ Core tools write and read `.assistant/` files deterministically without crashing
 |-----------|------------------------|
 | Task ID   | MVP-03-T6              |
 | Title     | Monetization middleware |
-| Status    | pending                |
+| Status    | done                   |
 | Done When | tool gating + limits enforced at server layer |
 
 ---
@@ -127,6 +127,29 @@ Low. Demo-only script, no production logic changes.
 
 ---
 
+### MVP-03-T6 — Monetization middleware
+
+**Files to modify:**
+- `src/tools.ts` — wrap tool calls with monetization gate and add context schema
+- `src/index.ts` — normalize empty tool responses
+- `mcp-tools-spec.md` — document monetization context and error codes
+
+**Files to create:**
+- `src/monetization/policy.ts` — plan and feature definitions
+- `src/monetization/enforce.ts` — enforcement + upgrade hints
+- `monetization-spec.md` — monetization rules and plan definitions
+
+**Files NOT touched:**
+- `src/engine.ts` (no behavior changes yet)
+
+**Approach:**
+Add a monetization gate that blocks project/session limits, adds soft upgrade hints for free users, and exposes plan metadata in responses. Keep it independent of storage wiring for now.
+
+**Risks:**
+Medium. Must not break the core loop for free users.
+
+---
+
 ## Refactor Backlog
 
 > Spotted during this block. Do not touch until a dedicated refactor block.
@@ -146,6 +169,7 @@ Low. Demo-only script, no production logic changes.
 | 2026-04-04 | MVP-03-T3 | done        | Read Active Block/Task from `.assistant/` |
 | 2026-04-04 | MVP-03-T4 | done        | Added SQLite schema + CRUD for core entities |
 | 2026-04-04 | MVP-03-T5 | done        | Added happy path demo script and README doc |
+| 2026-04-04 | MVP-03-T6 | done        | Added monetization gate and policy definitions |
 
 ---
 
