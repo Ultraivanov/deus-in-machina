@@ -111,6 +111,10 @@ Answers: `docs/faq.md`.
 
 Guide: `docs/packaging-guide.md`.
 
+## Hosted Deployment
+
+Outline: `docs/hosted-deployment.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
