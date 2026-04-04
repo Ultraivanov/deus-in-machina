@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | R-02                       |
-| Title      | Docs + onboarding |
+| Block ID   | R-03                       |
+| Title      | Packaging + hosted deployment |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/R-02.md` |
+| File       | `.assistant/blocks/R-03.md` |
 
 ---
 
@@ -62,8 +62,8 @@
 | ID   | Block                          | Status  |
 |------|--------------------------------|---------|
 | R-01 | Security + privacy review      | done |
-| R-02 | Docs + onboarding              | in-progress |
-| R-03 | Packaging + hosted deployment  | pending |
+| R-02 | Docs + onboarding              | done |
+| R-03 | Packaging + hosted deployment  | in-progress |
 
 ---
 
