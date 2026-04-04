@@ -73,6 +73,10 @@ Examples:
 - `templates/saas-landing.json`
 - `templates/auth-dashboard.json`
 
+## Security
+
+Release checklist: `docs/security-checklist.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
