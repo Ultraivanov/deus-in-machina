@@ -69,6 +69,35 @@ body {
   margin: 0 0 12px;
 }
 
+.state-list {
+  display: grid;
+  gap: 8px;
+}
+
+.state-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--line);
+  padding-bottom: 6px;
+}
+
+.state-row:last-child {
+  border-bottom: none;
+}
+
+.state-label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.state-value {
+  font-weight: 600;
+}
+
+.state-summary {
+  margin-top: 16px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
