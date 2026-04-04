@@ -38,6 +38,10 @@ npm run dev
 
 This starts a minimal MCP server over stdio with stub handlers for the MVP tools.
 
+## Codex Integration Example
+
+See `examples/codex-client.md` for a full, runnable tool-call sequence.
+
 ## Happy Path Demo
 
 Runs a full loop: initialize → next_step → prompt → submit → validate → complete.
