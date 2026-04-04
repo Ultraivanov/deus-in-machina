@@ -14,6 +14,7 @@ tags: [codex, starter, home]
 - [[04_Structure]]
 - [[05_Migration_Update]]
 - [[06_FAQ]]
+- [[07_Templates]]
 
 ## Внешние ссылки
 
