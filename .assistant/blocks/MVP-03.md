@@ -22,7 +22,7 @@ Core tools write and read `.assistant/` files deterministically without crashing
 | MVP-03-T1 | Create state file writer helpers   | done    | Helpers write PHASES/blocks/SNAPSHOT safely   |
 | MVP-03-T2 | Wire file writes into tool flows   | done    | initialize/start/complete update `.assistant/`|
 | MVP-03-T3 | Add basic read/merge logic         | done    | engine reads current active block/task state  |
-| MVP-03-T4 | SQLite storage layer               | pending | CRUD works for project/phase/block/task/session + user/subscription |
+| MVP-03-T4 | SQLite storage layer               | done    | CRUD works for project/phase/block/task/session + user/subscription |
 | MVP-03-T5 | End-to-end happy path demo         | pending | initialize → next_step → prompt → submit → validate → complete |
 | MVP-03-T6 | Monetization middleware            | pending | tool gating + limits enforced at server layer |
 
@@ -34,10 +34,10 @@ Core tools write and read `.assistant/` files deterministically without crashing
 
 | Field     | Value                  |
 |-----------|------------------------|
-| Task ID   | MVP-03-T4              |
-| Title     | SQLite storage layer |
+| Task ID   | MVP-03-T5              |
+| Title     | End-to-end happy path demo |
 | Status    | pending                |
-| Done When | CRUD works for project/phase/block/task/session + user/subscription |
+| Done When | initialize → next_step → prompt → submit → validate → complete |
 
 ---
 
@@ -86,6 +86,28 @@ Moderate. Markdown parsing can be brittle; keep it limited to the known template
 
 ---
 
+### MVP-03-T4 — SQLite storage layer
+
+**Files to modify:**
+- `package.json` — add SQLite dependency + types
+- `src/state.ts` — add User + Subscription types
+- `state-model-spec.md` — add User/Subscription schema + SQLite mirror
+
+**Files to create:**
+- `src/storage/schema.sql` — SQLite schema for core tables
+- `src/storage/sqlite.ts` — CRUD helpers for project/phase/block/task/session + user/subscription
+
+**Files NOT touched:**
+- `src/engine.ts`, `src/tools.ts`, `src/state-files.ts` (no wiring yet)
+
+**Approach:**
+Add a minimal SQLite schema and a storage helper class that can create/read/update/delete the core entities. Keep it independent from the in-memory store so wiring can happen later.
+
+**Risks:**
+Low. Schema and CRUD are isolated; runtime integration happens in a later task.
+
+---
+
 ## Refactor Backlog
 
 > Spotted during this block. Do not touch until a dedicated refactor block.
@@ -103,6 +125,7 @@ Moderate. Markdown parsing can be brittle; keep it limited to the known template
 | 2026-04-04 | MVP-03-T1 | done        | Added file helpers for `.assistant/` writes |
 | 2026-04-04 | MVP-03-T2 | done        | Wrote PHASES/SNAPSHOT on key transitions |
 | 2026-04-04 | MVP-03-T3 | done        | Read Active Block/Task from `.assistant/` |
+| 2026-04-04 | MVP-03-T4 | done        | Added SQLite schema + CRUD for core entities |
 
 ---
 

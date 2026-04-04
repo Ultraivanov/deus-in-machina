@@ -55,11 +55,39 @@ Compact session summary:
 
 ## 3. Server State Model (DB Mirror)
 
+### User
+```ts
+type User = {
+  id: string
+  email?: string
+  name?: string
+  status: "active" | "paused" | "disabled"
+  created_at: string
+  updated_at: string
+}
+```
+
+### Subscription
+```ts
+type Subscription = {
+  id: string
+  user_id: string
+  plan: "free" | "pro" | "enterprise"
+  status: "trialing" | "active" | "past_due" | "canceled" | "paused"
+  current_period_start?: string
+  current_period_end?: string
+  limits?: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+```
+
 ### Project
 ```ts
 type Project = {
   id: string
-  name: string
+  user_id?: string
+  name?: string
   summary: string
   repo_url?: string
   status: "active" | "paused" | "done"
@@ -133,6 +161,7 @@ type Session = {
 - `PHASES.md` → Phase + Block status + active block pointer
 - `blocks/<ID>.md` → Block goal/DoD + Task list + Change Plans
 - `SNAPSHOT.md` → Session summary
+- User + Subscription live in DB only (server-level enforcement).
 
 DB is updated after file writes. If a write fails, DB must not advance.
 
@@ -177,7 +206,7 @@ Confidence is a qualitative measure derived from:
 
 MVP:
 - Write `.assistant/` files on every state change.
-- Optional in-memory DB mirror.
+- SQLite mirror for resumability + monetization state.
 
 Post‑MVP:
 - SQLite/Postgres mirror for analytics and resumability.

@@ -2,6 +2,9 @@ export type ProjectStatus = "active" | "paused" | "done";
 export type NodeStatus = "not_started" | "ready" | "in_progress" | "review" | "done" | "blocked";
 export type SessionStatus = "started" | "submitted" | "validated" | "rejected";
 export type AssistantType = "codex" | "claude_code" | "cursor" | "other";
+export type UserStatus = "active" | "paused" | "disabled";
+export type SubscriptionPlan = "free" | "pro" | "enterprise";
+export type SubscriptionStatus = "trialing" | "active" | "past_due" | "canceled" | "paused";
 
 export type Project = {
   id: string;
@@ -49,6 +52,23 @@ export type Session = {
   result_summary?: string;
   changed_files?: string[];
   status: SessionStatus;
+};
+
+export type User = {
+  id: string;
+  email?: string;
+  name?: string;
+  status: UserStatus;
+};
+
+export type Subscription = {
+  id: string;
+  user_id: string;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  current_period_start?: string;
+  current_period_end?: string;
+  limits?: Record<string, unknown>;
 };
 
 export class InMemoryStore {
