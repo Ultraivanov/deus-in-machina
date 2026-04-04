@@ -37,3 +37,14 @@ npm run dev
 ```
 
 This starts a minimal MCP server over stdio with stub handlers for the MVP tools.
+
+## Happy Path Demo
+
+Runs a full loop: initialize → next_step → prompt → submit → validate → complete.
+
+```
+npm install
+./node_modules/.bin/tsx scripts/happy-path-demo.ts
+```
+
+The demo writes file-first state into `.assistant/` (PHASES + SNAPSHOT).

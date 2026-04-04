@@ -23,7 +23,7 @@ Core tools write and read `.assistant/` files deterministically without crashing
 | MVP-03-T2 | Wire file writes into tool flows   | done    | initialize/start/complete update `.assistant/`|
 | MVP-03-T3 | Add basic read/merge logic         | done    | engine reads current active block/task state  |
 | MVP-03-T4 | SQLite storage layer               | done    | CRUD works for project/phase/block/task/session + user/subscription |
-| MVP-03-T5 | End-to-end happy path demo         | pending | initialize → next_step → prompt → submit → validate → complete |
+| MVP-03-T5 | End-to-end happy path demo         | done    | initialize → next_step → prompt → submit → validate → complete |
 | MVP-03-T6 | Monetization middleware            | pending | tool gating + limits enforced at server layer |
 
 > New tasks are added here as the block progresses via `init-task`.
@@ -34,10 +34,10 @@ Core tools write and read `.assistant/` files deterministically without crashing
 
 | Field     | Value                  |
 |-----------|------------------------|
-| Task ID   | MVP-03-T5              |
-| Title     | End-to-end happy path demo |
+| Task ID   | MVP-03-T6              |
+| Title     | Monetization middleware |
 | Status    | pending                |
-| Done When | initialize → next_step → prompt → submit → validate → complete |
+| Done When | tool gating + limits enforced at server layer |
 
 ---
 
@@ -108,6 +108,25 @@ Low. Schema and CRUD are isolated; runtime integration happens in a later task.
 
 ---
 
+### MVP-03-T5 — End-to-end happy path demo
+
+**Files to modify:**
+- `README.md` — document the demo command and purpose
+
+**Files to create:**
+- `scripts/happy-path-demo.ts` — run initialize → next_step → prompt → submit → validate → complete
+
+**Files NOT touched:**
+- `src/` (no behavior changes)
+
+**Approach:**
+Create a simple script that uses the existing engine APIs to run the full loop and print outputs for inspection.
+
+**Risks:**
+Low. Demo-only script, no production logic changes.
+
+---
+
 ## Refactor Backlog
 
 > Spotted during this block. Do not touch until a dedicated refactor block.
@@ -126,6 +145,7 @@ Low. Schema and CRUD are isolated; runtime integration happens in a later task.
 | 2026-04-04 | MVP-03-T2 | done        | Wrote PHASES/SNAPSHOT on key transitions |
 | 2026-04-04 | MVP-03-T3 | done        | Read Active Block/Task from `.assistant/` |
 | 2026-04-04 | MVP-03-T4 | done        | Added SQLite schema + CRUD for core entities |
+| 2026-04-04 | MVP-03-T5 | done        | Added happy path demo script and README doc |
 
 ---
 
