@@ -1,169 +1,212 @@
 # Workflow Engine Spec
-## Project: Buildrail
+## Project: Buildrail — AI Project Companion for Structured Vibe Coding
+### File: `workflow-engine-spec.md`
 ### Version: MVP v0.1
 
 ---
 
 ## 1. Purpose
 
-The workflow engine enforces deterministic progress for AI-assisted coding. It is the source of truth for:
-- what step is next
-- what the agent is allowed to do
-- whether a task is complete
-- how progress advances
+Defines the deterministic execution engine that:
+- controls progression through tasks
+- enforces constraints
+- calculates progress
+- handles drift and validation
+- restores state across sessions
 
-It must be strict, predictable, and auditable.
-
----
-
-## 2. Core Principles (Enforced)
-
-1. **One task per session**
-2. **Change Plan approval before code**
-3. **No scope expansion without approval**
-4. **Progress only after DoD validation**
-5. **File-first state is canonical** (`.assistant/`)
+This is the **core logic layer** of the product.
 
 ---
 
-## 3. Engine Responsibilities
+## 2. Core Responsibilities
 
-- Generate phases/blocks/tasks from a project idea
-- Select the next actionable task
-- Assemble bounded prompts and scope
-- Validate changed files against allowed scope
-- Validate Definition of Done (DoD)
-- Advance task/block/phase status
-- Write updates to `.assistant/` state files
+The workflow engine must:
 
----
-
-## 4. State Inputs
-
-The engine reads from:
-- `.assistant/PHASES.md`
-- `.assistant/blocks/<ID>.md`
-- `.assistant/SNAPSHOT.md`
-- Server DB mirror (optional)
-
-The file system is canonical. DB is a cache/mirror.
+1. Maintain a valid project graph (Phase → Block → Task)
+2. Ensure only valid transitions occur
+3. Enforce single active task
+4. Track session lifecycle
+5. Validate completion (DoD)
+6. Detect and handle drift
+7. Calculate progress
+8. Enable resumability
 
 ---
 
-## 5. State Machine
+## 3. State Graph
 
-### Task transitions
-```
+### Task lifecycle
+```text
 not_started → ready → in_progress → review → done
                           ↘ blocked
 ```
 
-### Block transitions
-```
-not_started → in_progress → review → done
-                          ↘ blocked
-```
-
-### Phase transitions
-```
-not_started → in_progress → done
-                       ↘ blocked
-```
-
-### Session transitions
-```
+### Session lifecycle
+```text
 started → submitted → validated
                   ↘ rejected
 ```
 
 ---
 
-## 6. Task Selection Logic
+## 4. Core Invariants
 
-### `get_next_step`
-1. Load Active Block from `.assistant/PHASES.md`.
-2. Load block file `.assistant/blocks/<ID>.md`.
-3. If Active Task is `in_progress`, return it.
-4. Else return first task with status `pending`/`ready`.
-5. If none remain, recommend `done` for block.
-
----
-
-## 7. Change Plan Gate
-
-### `start_session`
-The engine must reject if:
-- task is not `ready`
-- another task is `in_progress`
-- `change_plan_approved` is not true
-
-On success:
-- mark task as `in_progress`
-- write Change Plan under `Change Plans` in block file
+1. Only one task can be `in_progress` at a time
+2. A task must be `ready` before it can be executed
+3. A session must belong to exactly one task
+4. A task cannot be marked `done` without DoD validation
+5. Progress cannot increase without validation
+6. Drift must block automatic completion
+7. Change Plan must be approved before code
+8. File-first state under `.assistant/` is canonical
 
 ---
 
-## 8. Scope Validation
+## 5. Task Activation Logic
 
-### `validate_scope`
-- Compare `changed_files` to task’s allowed files
-- If unexpected files exist → `needs_approval`
-- If scope is clean → `passed`
-- Scope failure prevents auto-completion
+### Rule
+A task becomes `ready` only if:
+- all previous tasks in the block are `done`
+- no blocking dependency exists
 
----
-
-## 9. DoD Validation
-
-### `complete_task`
-- Accept client-submitted DoD checks
-- If any check fails → task stays `review`
-- If all checks pass → task moves to `done`
-- Update block and phase status if all tasks/blocks complete
-
----
-
-## 10. Block Completion
-
-### `done`
-- Only allowed when all tasks in block are `done`
-- Updates block status to `done`
-- Select next block as active (or ask user)
-- Write summary into `.assistant/SNAPSHOT.md`
+### Activation algorithm
+```ts
+function activateNextTask(block):
+  for task in block.tasks ordered:
+    if task.status == "not_started":
+      if all previous tasks are done:
+        task.status = "ready"
+        return task
+```
 
 ---
 
-## 11. Progress Calculation
+## 6. Session Flow Logic
 
-Progress is **validated** work only:
-- % tasks done in current phase
-- % blocks done overall
-- Confidence derived from scope validation and DoD pass rates
+### Start session
+```ts
+if task.status == "ready" and change_plan_approved:
+  task.status = "in_progress"
+create session(status="started")
+```
+
+### Submit result
+```ts
+session.status = "submitted"
+task.status = "review"
+```
+
+### Validate session
+```ts
+if scope_ok and DoD_met:
+  session.status = "validated"
+  task.status = "done"
+else:
+  session.status = "submitted"
+  task.status = "review"
+```
 
 ---
 
-## 12. Concurrency Rules
+## 7. Scope Enforcement
 
-- Exactly one task may be `in_progress` at any time
-- Sessions must attach to a task
-- `init-block` must reject if another block is `in_progress`
+### Allowed scope
+Defined per task:
+- allowed_files
+- constraints
+
+### Drift detection
+```ts
+unexpected_files = changed_files - allowed_files
+
+if unexpected_files.length > 0:
+  return "needs_approval"
+```
+
+### Handling drift
+- block auto-completion
+- require explicit approval
+- flag to user
 
 ---
 
-## 13. Error Conditions
+## 8. Definition of Done (DoD)
 
-- `TASK_NOT_READY` if task not ready for work
-- `STATE_CONFLICT` if another task is in progress
-- `SCOPE_VIOLATION` on unexpected files without approval
-- `DOD_NOT_MET` when DoD checks fail
+### Structure
+```ts
+type DoD = {
+  id: string
+  description: string
+  check_type: "boolean" | "file_presence" | "manual"
+}
+```
+
+### Validation
+```ts
+function validateDoD(task, checks):
+  for condition in task.DoD:
+    if checks[condition.id] != true:
+      return false
+return true
+```
 
 ---
 
-## 14. File Writes
+## 9. Progress Calculation
 
-The engine must update:
-- `.assistant/PHASES.md` (phase/block status)
-- `.assistant/blocks/<ID>.md` (task list, Change Plans, Session Log)
-- `.assistant/SNAPSHOT.md` (session summary)
+### Inputs
+- total tasks
+- completed tasks
+- blocked tasks
 
-All writes should be atomic. If any write fails, reject the operation.
+### Formula
+```ts
+progress = (completed_tasks / total_tasks) * 100
+```
+
+### Rules
+- only validated tasks count
+- blocked tasks do not increase progress
+- partial work does not count
+
+---
+
+## 10. Phase Progress
+
+### Calculation
+```ts
+phase_progress = done_tasks_in_phase / total_tasks_in_phase
+```
+
+### Display logic
+- show current phase
+- show % completion
+- show next milestone
+
+---
+
+## 11. Resume Logic
+
+### On project resume
+System must reconstruct:
+
+```ts
+return {
+  current_phase,
+  current_block,
+  current_task,
+  last_session_summary,
+  next_step
+}
+```
+
+---
+
+## 12. File-First Persistence
+
+On every state change, write to `.assistant/`:
+- `PHASES.md`
+- `blocks/<ID>.md`
+- `SNAPSHOT.md`
+
+If file write fails, do not advance state.
