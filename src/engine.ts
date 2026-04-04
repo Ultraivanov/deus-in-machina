@@ -1,5 +1,14 @@
 import { InMemoryStore, Project, Phase, Block, Task, Session } from "./state.js";
-import { buildPhasesMarkdown, buildSnapshotMarkdown, writePhases, writeSnapshot } from "./state-files.js";
+import {
+  buildPhasesMarkdown,
+  buildSnapshotMarkdown,
+  readActiveBlock,
+  readActiveTaskFromBlock,
+  readBlockTasksFromFile,
+  resolveBlockFilePath,
+  writePhases,
+  writeSnapshot
+} from "./state-files.js";
 
 export type InitProjectInput = {
   idea: string;
@@ -103,13 +112,31 @@ export class WorkflowEngine {
     const block = project.current_block_id ? this.store.blocks.get(project.current_block_id) : undefined;
     const task = project.current_task_id ? this.store.tasks.get(project.current_task_id) : undefined;
 
+    const repoRoot = process.cwd();
+    const activeBlock = readActiveBlock(repoRoot);
+    const currentBlock = activeBlock
+      ? { id: activeBlock.id, title: activeBlock.title, status: activeBlock.status }
+      : block;
+    let currentTask: any = task;
+    if (activeBlock) {
+      const blockFilePath = resolveBlockFilePath(repoRoot, activeBlock.file, activeBlock.id);
+      const activeTask = readActiveTaskFromBlock(repoRoot, blockFilePath);
+      if (activeTask) {
+        currentTask = {
+          id: activeTask.id,
+          title: activeTask.title,
+          status: activeTask.status
+        };
+      }
+    }
+
     return {
       project_id: project.id,
       project_status: project.status,
       state_path: ".assistant/",
       current_phase: phase,
-      current_block: block,
-      current_task: task,
+      current_block: currentBlock,
+      current_task: currentTask,
       progress: {
         mvp_progress_percent: 0,
         steps_completed: 0,
@@ -123,6 +150,37 @@ export class WorkflowEngine {
     const project = this.store.projects.get(project_id);
     if (!project || !project.current_task_id) return null;
     const task = this.store.tasks.get(project.current_task_id);
+
+    const repoRoot = process.cwd();
+    const activeBlock = readActiveBlock(repoRoot);
+    if (activeBlock) {
+      const blockFilePath = resolveBlockFilePath(repoRoot, activeBlock.file, activeBlock.id);
+      const activeTask = readActiveTaskFromBlock(repoRoot, blockFilePath);
+      if (activeTask && activeTask.status === "in-progress") {
+        return {
+          task_id: activeTask.id,
+          title: activeTask.title,
+          user_explanation: "Continue the current task.",
+          why_now: "This task is already in progress.",
+          expected_result: activeTask.doneWhen,
+          estimated_change_scope: []
+        };
+      }
+
+      const tasks = readBlockTasksFromFile(repoRoot, blockFilePath);
+      const next = tasks.find((t) => t.status === "pending" || t.status === "ready");
+      if (next) {
+        return {
+          task_id: next.id,
+          title: next.title,
+          user_explanation: "Next pending task from the active block.",
+          why_now: "This keeps the block moving sequentially.",
+          expected_result: next.doneWhen,
+          estimated_change_scope: []
+        };
+      }
+    }
+
     if (!task) return null;
 
     return {

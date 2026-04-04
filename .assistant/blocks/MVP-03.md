@@ -21,7 +21,7 @@ Core tools write and read `.assistant/` files deterministically without crashing
 |-----------|------------------------------------|---------|-----------------------------------------------|
 | MVP-03-T1 | Create state file writer helpers   | done    | Helpers write PHASES/blocks/SNAPSHOT safely   |
 | MVP-03-T2 | Wire file writes into tool flows   | done    | initialize/start/complete update `.assistant/`|
-| MVP-03-T3 | Add basic read/merge logic         | pending | engine reads current active block/task state  |
+| MVP-03-T3 | Add basic read/merge logic         | done    | engine reads current active block/task state  |
 | MVP-03-T4 | SQLite storage layer               | pending | CRUD works for project/phase/block/task/session |
 | MVP-03-T5 | End-to-end happy path demo         | pending | initialize → next_step → prompt → submit → validate → complete |
 
@@ -33,10 +33,10 @@ Core tools write and read `.assistant/` files deterministically without crashing
 
 | Field     | Value                  |
 |-----------|------------------------|
-| Task ID   | MVP-03-T3              |
-| Title     | Add basic read/merge logic |
+| Task ID   | MVP-03-T4              |
+| Title     | SQLite storage layer |
 | Status    | pending                |
-| Done When | engine reads current active block/task state |
+| Done When | CRUD works for project/phase/block/task/session |
 
 ---
 
@@ -65,6 +65,26 @@ Low. File I/O errors should not crash; failures should return error responses.
 
 ---
 
+### MVP-03-T3 — Add basic read/merge logic
+
+**Files to modify:**
+- `src/state-files.ts` — add read helpers + minimal parsers
+- `src/engine.ts` — read `.assistant/` for active block/task
+
+**Files to create:**
+- none
+
+**Files NOT touched:**
+- everything else in scope
+
+**Approach:**
+Add minimal read helpers and markdown parsing for Active Block/Active Task/Tasks table. Use these for `getProjectState` and `getNextStep`, with fallback to in-memory state.
+
+**Risks:**
+Moderate. Markdown parsing can be brittle; keep it limited to the known templates.
+
+---
+
 ## Refactor Backlog
 
 > Spotted during this block. Do not touch until a dedicated refactor block.
@@ -81,6 +101,7 @@ Low. File I/O errors should not crash; failures should return error responses.
 |------------|-----------|-------------|------|
 | 2026-04-04 | MVP-03-T1 | done        | Added file helpers for `.assistant/` writes |
 | 2026-04-04 | MVP-03-T2 | done        | Wrote PHASES/SNAPSHOT on key transitions |
+| 2026-04-04 | MVP-03-T3 | done        | Read Active Block/Task from `.assistant/` |
 
 ---
 
