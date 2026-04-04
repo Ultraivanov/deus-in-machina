@@ -646,12 +646,24 @@ export class WorkflowEngine {
   }
 
   validateScope(session_id: string, allowed_files: string[], changed_files: string[]) {
-    const unexpected = changed_files.filter((f) => !allowed_files.includes(f));
     const session = this.store.sessions.get(session_id);
+    const task = session ? this.store.tasks.get(session.task_id) : undefined;
+    const inferredAllowed =
+      allowed_files && allowed_files.length > 0 ? allowed_files : task?.allowed_files ?? [];
+    const unexpected = changed_files.filter((f) => !inferredAllowed.includes(f));
     if (session) {
       session.scope_ok = unexpected.length === 0;
       session.unexpected_files = unexpected;
       this.upsertSession(session);
+    }
+    if (inferredAllowed.length === 0) {
+      return {
+        session_id,
+        scope_ok: false,
+        validation_status: "needs_approval",
+        unexpected_files: changed_files,
+        message: "No allowlist available. Please approve the scope manually."
+      };
     }
     if (unexpected.length > 0) {
       return {

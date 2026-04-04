@@ -111,7 +111,7 @@ export const tools = [
         allowed_files: { type: "array", items: { type: "string" } },
         changed_files: { type: "array", items: { type: "string" } }
       },
-      required: ["session_id", "allowed_files", "changed_files"]
+      required: ["session_id", "changed_files"]
     }
   },
   {

@@ -476,6 +476,8 @@ Checks whether the reported file changes remain inside allowed task scope.
 
 ### Behavior
 - compare `changed_files` against task `allowed_files`
+- if `allowed_files` is omitted, the server uses the stored allowlist for the task
+- if no allowlist exists, return `needs_approval` with a manual approval message
 - if extras exist, return `needs_approval`
 - do not auto-complete task on scope mismatch
 
