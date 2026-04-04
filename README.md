@@ -66,6 +66,11 @@ See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 7. `explain_changes`
 8. `complete_task`
 
+## Workflow Templates
+
+Templates live in `templates/` as JSON (phases → blocks → tasks).
+Example: `templates/saas-landing.json`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo

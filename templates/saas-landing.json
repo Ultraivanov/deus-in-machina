@@ -1,0 +1,95 @@
+{
+  "id": "template_saas_landing",
+  "title": "SaaS Landing MVP",
+  "description": "Launch-ready landing page with basic conversion flow.",
+  "phases": [
+    {
+      "id": "phase_mvp",
+      "title": "MVP",
+      "goal": "Ship a clear, conversion-ready landing surface.",
+      "blocks": [
+        {
+          "id": "block_foundation",
+          "title": "Foundation",
+          "goal": "Create the initial structure and layout.",
+          "tasks": [
+            {
+              "id": "task_layout",
+              "title": "Define landing page structure",
+              "user_value": "Gives the product a visible entry point.",
+              "technical_goal": "Create the main layout and section order.",
+              "definition_of_done": [
+                "Layout structure exists",
+                "Sections are scaffolded"
+              ]
+            },
+            {
+              "id": "task_hero",
+              "title": "Build hero section",
+              "user_value": "Clarifies the core value proposition.",
+              "technical_goal": "Add headline, subhead, and primary CTA.",
+              "definition_of_done": [
+                "Hero renders",
+                "CTA is visible"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "block_trust",
+          "title": "Trust + Proof",
+          "goal": "Add credibility and conversion proof.",
+          "tasks": [
+            {
+              "id": "task_social",
+              "title": "Add social proof strip",
+              "user_value": "Increases credibility quickly.",
+              "technical_goal": "Add logo row or testimonial strip.",
+              "definition_of_done": [
+                "Social proof section renders",
+                "Responsive layout"
+              ]
+            },
+            {
+              "id": "task_features",
+              "title": "Add feature highlights",
+              "user_value": "Explains why the product works.",
+              "technical_goal": "Add 3-4 feature blocks.",
+              "definition_of_done": [
+                "Feature grid renders",
+                "Content is readable"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "block_conversion",
+          "title": "Conversion",
+          "goal": "Drive the user to a decision.",
+          "tasks": [
+            {
+              "id": "task_cta",
+              "title": "Add final CTA section",
+              "user_value": "Creates a clear next step.",
+              "technical_goal": "Add end-of-page CTA block.",
+              "definition_of_done": [
+                "CTA renders",
+                "Button is visible"
+              ]
+            },
+            {
+              "id": "task_footer",
+              "title": "Add footer essentials",
+              "user_value": "Completes the landing page.",
+              "technical_goal": "Add footer with links and legal.",
+              "definition_of_done": [
+                "Footer renders",
+                "Links are present"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
