@@ -103,6 +103,10 @@ Report: `docs/dependency-audit.md`.
 
 Checklist: `docs/onboarding-checklist.md`.
 
+## FAQ
+
+Answers: `docs/faq.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
