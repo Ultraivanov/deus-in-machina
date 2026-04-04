@@ -81,6 +81,10 @@ Release checklist: `docs/security-checklist.md`.
 
 Notes: `docs/privacy-notes.md`.
 
+## Dependency Audit
+
+Report: `docs/dependency-audit.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
