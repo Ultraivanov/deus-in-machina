@@ -22,6 +22,8 @@ Core tools write and read `.assistant/` files deterministically without crashing
 | MVP-03-T1 | Create state file writer helpers   | done    | Helpers write PHASES/blocks/SNAPSHOT safely   |
 | MVP-03-T2 | Wire file writes into tool flows   | done    | initialize/start/complete update `.assistant/`|
 | MVP-03-T3 | Add basic read/merge logic         | pending | engine reads current active block/task state  |
+| MVP-03-T4 | SQLite storage layer               | pending | CRUD works for project/phase/block/task/session |
+| MVP-03-T5 | End-to-end happy path demo         | pending | initialize → next_step → prompt → submit → validate → complete |
 
 > New tasks are added here as the block progresses via `init-task`.
 
