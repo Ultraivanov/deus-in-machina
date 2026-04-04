@@ -88,6 +88,8 @@ All tools should return structured errors in this shape:
 }
 ```
 
+All error responses should follow this shape. Tool handlers must not return bare strings or ad-hoc error objects.
+
 ### Standard error codes
 - `INVALID_INPUT`
 - `PROJECT_NOT_FOUND`

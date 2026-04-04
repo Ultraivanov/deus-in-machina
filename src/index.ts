@@ -6,6 +6,7 @@ import { WorkflowEngine } from "./engine.js";
 import { initSqliteStore } from "./storage/index.js";
 import type { SqliteStore } from "./storage/sqlite.js";
 import { buildRepoIndex } from "./repo/indexer.js";
+import { makeError, ensureErrorShape } from "./errors.js";
 
 const server = new Server(
   {
@@ -45,21 +46,15 @@ server.setRequestHandler("tools/list", async () => {
 server.setRequestHandler("tools/call", async (request) => {
   const { name, arguments: args } = request.params;
   const result = handleToolCall(name, (args ?? {}) as Record<string, unknown>);
-  const payload =
-    result ??
-    ({
-      error: {
-        code: "INTERNAL_ERROR",
-        message: "No response returned by tool handler.",
-        retryable: true
-      }
-    } as const);
+  const payload = result ?? makeError("INTERNAL_ERROR", "No response returned by tool handler.", true);
+  const safePayload =
+    payload && typeof payload === "object" ? payload : ensureErrorShape(payload);
 
   return {
     content: [
       {
         type: "text",
-        text: JSON.stringify(payload)
+        text: JSON.stringify(safePayload)
       }
     ]
   };

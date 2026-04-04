@@ -1,6 +1,7 @@
 import { WorkflowEngine } from "./engine.js";
 import { applyMonetization } from "./monetization/enforce.js";
 import type { SqliteStore } from "./storage/sqlite.js";
+import { makeError } from "./errors.js";
 
 const monetizationContextSchema = {
   user_id: { type: "string" },
@@ -167,7 +168,10 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
     : undefined;
 
   const handleToolCall = (name: string, args: Record<string, unknown>) => {
-    return applyMonetization(name, args, () => {
+    return applyMonetization(
+      name,
+      args,
+      () => {
       switch (name) {
         case "initialize_project":
           return engine.initializeProject(args as any);
@@ -182,7 +186,9 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             args.assistant as string
           );
         case "start_session":
-          if (!args.change_plan_approved) return { error: "CHANGE_PLAN_NOT_APPROVED" };
+          if (!args.change_plan_approved) {
+            return makeError("CHANGE_PLAN_NOT_APPROVED", "Change Plan approval is required.", false);
+          }
           return engine.startSession(
             args.project_id as string,
             args.task_id as string,
@@ -221,9 +227,11 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             args.reason as string | undefined
           );
         default:
-          return { error: "UNKNOWN_TOOL" };
+          return makeError("UNKNOWN_TOOL", `Unknown tool: ${name}`, false);
       }
-    }, { loadSubscription });
+      },
+      { loadSubscription }
+    );
   };
 
   return { tools, handleToolCall };
