@@ -13,7 +13,7 @@ tags: [codex, workflow]
 Запускается cold start:
 
 - проверка миграции/апгрейда,
-- загрузка контекста,
+- загрузка контекста из файлов,
 - проверка версии фреймворка.
 
 ## Finish
@@ -32,5 +32,15 @@ tags: [codex, workflow]
 
 - software: `.codex/SNAPSHOT.md`, `.codex/BACKLOG.md`, `.codex/ARCHITECTURE.md`
 - content: `.codex/content/SNAPSHOT.md`, `.codex/content/BACKLOG.md`, `.codex/content/ARCHITECTURE.md`
+
+## Команды уровня Phase/Block/Task
+
+- `init-phases` — черновик `PHASES.md` из текущего контекста
+- `init-block <ID>` — создать файл блока в `.codex/blocks/`
+- `init-task` — Change Plan для следующей задачи
+- `done` — закрыть задачу/блок после проверки Done When
+- `pause` — поставить задачу на паузу
+
+Подробнее: [[09_Phase_Block_Task]]
 
 Дальше: [[04_Structure]]
