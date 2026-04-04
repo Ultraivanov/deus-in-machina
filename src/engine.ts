@@ -315,6 +315,20 @@ export class WorkflowEngine {
     };
   }
 
+  approveScopeOverride(session_id: string, approved_files: string[], reason?: string) {
+    const session = this.store.sessions.get(session_id);
+    if (!session) return null;
+    session.scope_ok = true;
+    session.unexpected_files = approved_files;
+    return {
+      session_id,
+      scope_ok: true,
+      approved_files,
+      reason: reason ?? null,
+      message: "Scope override approved. You may proceed to complete the task."
+    };
+  }
+
   completeTask(task_id: string, session_id: string, checks: Record<string, boolean>, repo_root?: string) {
     const task = this.store.tasks.get(task_id);
     const session = this.store.sessions.get(session_id);

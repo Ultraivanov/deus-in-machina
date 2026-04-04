@@ -123,6 +123,7 @@ All tools should return structured errors in this shape:
 7. `validate_scope`
 8. `explain_changes`
 9. `complete_task`
+10. `approve_scope_override`
 
 ### Optional tools for v0.2
 - `resume_project`
@@ -579,7 +580,41 @@ Marks task complete only if validation has passed and DoD is satisfied.
 
 ---
 
-## 14. End-to-End Happy Path
+## 14. Tool: `approve_scope_override`
+
+### Purpose
+Allows a user to explicitly approve out-of-scope files for a session.
+
+### Input schema
+```json
+{
+  "session_id": "sess_789",
+  "approved_files": ["lib/auth.ts"],
+  "reason": "Needed a small auth change to render the hero."
+}
+```
+
+### Output schema
+```json
+{
+  "session_id": "sess_789",
+  "scope_ok": true,
+  "approved_files": ["lib/auth.ts"],
+  "reason": "Needed a small auth change to render the hero.",
+  "message": "Scope override approved. You may proceed to complete the task."
+}
+```
+
+### Behavior
+- marks scope as approved for the session
+- records approved files and reason
+
+### Errors
+- `SESSION_NOT_FOUND`
+
+---
+
+## 15. End-to-End Happy Path
 
 1. `initialize_project`
 2. `get_next_step`
@@ -589,10 +624,11 @@ Marks task complete only if validation has passed and DoD is satisfied.
 6. `validate_scope`
 7. `explain_changes`
 8. `complete_task`
+9. `approve_scope_override` (only when needed)
 
 ---
 
-## 15. State Transition Rules
+## 16. State Transition Rules
 
 ### Task transitions
 ```text
@@ -615,7 +651,7 @@ started → submitted → validated
 
 ---
 
-## 16. Logging and Persistence
+## 17. Logging and Persistence
 
 The server should persist:
 - project record
@@ -632,6 +668,6 @@ Canonical state lives in `.assistant/` in the repo; DB mirrors are optional for 
 
 ---
 
-## 17. One-line Summary
+## 18. One-line Summary
 
 **These tools turn a coding assistant into a bounded, stateful execution flow rather than a free-form chat that rewrites the project unpredictably.**

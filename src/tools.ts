@@ -140,6 +140,20 @@ export const tools = [
       },
       required: ["task_id", "session_id", "definition_of_done_checks"]
     }
+  },
+  {
+    name: "approve_scope_override",
+    description: "Explicitly approve out-of-scope files for a session.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ...monetizationContextSchema,
+        session_id: { type: "string" },
+        approved_files: { type: "array", items: { type: "string" } },
+        reason: { type: "string" }
+      },
+      required: ["session_id", "approved_files"]
+    }
   }
 ];
 
@@ -189,6 +203,12 @@ export function handleToolCall(name: string, args: Record<string, unknown>) {
           args.session_id as string,
           (args.definition_of_done_checks as Record<string, boolean>) ?? {},
           args.repo_root as string | undefined
+        );
+      case "approve_scope_override":
+        return engine.approveScopeOverride(
+          args.session_id as string,
+          (args.approved_files as string[]) ?? [],
+          args.reason as string | undefined
         );
       default:
         return { error: "UNKNOWN_TOOL" };

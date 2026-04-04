@@ -21,7 +21,7 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 |-----------|---------------------------------------|---------|----------|
 | MVP-04-T1 | Persist scope validation outcome      | done    | Session records include scope_ok + unexpected_files and show in explain_changes |
 | MVP-04-T2 | Enforce DoD pipeline + block progress | done    | complete_task checks validation status and updates task/block status |
-| MVP-04-T3 | Scope override tool                   | pending | approve_scope_override tool exists and requires explicit approval |
+| MVP-04-T3 | Scope override tool                   | done    | approve_scope_override tool exists and requires explicit approval |
 
 > New tasks are added here as the block progresses via `init-task`.
 
@@ -33,7 +33,7 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 |-----------|----------------------------|
 | Task ID   | MVP-04-T3                  |
 | Title     | Scope override tool |
-| Status    | pending                    |
+| Status    | done                       |
 | Done When | approve_scope_override tool exists and requires explicit approval |
 
 ---
@@ -83,6 +83,27 @@ Medium. Must avoid completing tasks when scope validation is missing.
 
 ---
 
+### MVP-04-T3 — Scope override tool
+
+**Files to modify:**
+- `src/tools.ts` — add `approve_scope_override` tool
+- `src/engine.ts` — add scope override handler
+- `mcp-tools-spec.md` — document tool behavior
+
+**Files to create:**
+- none
+
+**Files NOT touched:**
+- `src/index.ts`, `src/storage/*`
+
+**Approach:**
+Expose a tool that lets the user explicitly approve out-of-scope files for a session, then continue completion flow.
+
+**Risks:**
+Low. Explicit approval required.
+
+---
+
 ## Refactor Backlog
 
 > Spotted during this block. Do not touch until a dedicated refactor block.
@@ -99,6 +120,7 @@ Medium. Must avoid completing tasks when scope validation is missing.
 |------------|-----------|--------|------|
 | 2026-04-04 | MVP-04-T1 | done   | Stored scope validation in session + surfaced in explain_changes |
 | 2026-04-04 | MVP-04-T2 | done   | Enforced scope validation and updated block completion logic |
+| 2026-04-04 | MVP-04-T3 | done   | Added explicit scope override tool |
 
 ---
 
