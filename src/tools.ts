@@ -171,12 +171,15 @@ export const tools = [
 export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteStore) => {
   const loadSubscription = sqliteStore
     ? (args: Record<string, unknown>) => {
+        const subscriptionArg =
+          (args.subscription as Record<string, unknown> | undefined) ?? {};
+        const subscriptionUser =
+          typeof subscriptionArg.user_id === "string" ? subscriptionArg.user_id : undefined;
         const userId =
           (typeof args.user_id === "string" && args.user_id) ||
-          (typeof (args.subscription as Record<string, unknown>)?.user_id === "string" &&
-            (args.subscription as Record<string, unknown>).user_id) ||
+          subscriptionUser ||
           "anon";
-        return sqliteStore.getSubscriptionSnapshot(userId);
+        return sqliteStore.getSubscriptionSnapshot(String(userId));
       }
     : undefined;
 

@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import type { Database as DatabaseType } from "better-sqlite3";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -118,13 +119,13 @@ export const openSqlite = (dbPath: string) => {
   return db;
 };
 
-export const applySchema = (db: Database, schemaSql?: string) => {
+export const applySchema = (db: DatabaseType, schemaSql?: string) => {
   const sql = schemaSql ?? fs.readFileSync(getSchemaPath(), "utf-8");
   db.exec(sql);
 };
 
 export class SqliteStore {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseType) {}
 
   init() {
     applySchema(this.db);
@@ -271,7 +272,13 @@ export class SqliteStore {
     });
   }
 
-  getSubscriptionSnapshot(user_id: string) {
+  getSubscriptionSnapshot(user_id: string): {
+    user_id: string;
+    plan: "free" | "pro";
+    status: SubscriptionStatus;
+    sessions_used: number;
+    project_count: number;
+  } {
     const subscription = this.ensureSubscription(user_id);
     const usage = getUsageFromLimits(subscription.limits);
     return {
@@ -567,11 +574,19 @@ export class SqliteStore {
       .prepare(`SELECT * FROM task WHERE block_id = ? ORDER BY order_index ASC, created_at ASC`)
       .all(block_id) as Array<Record<string, unknown>>;
     return rows.map((row) => ({
-      ...row,
+      id: row.id as string,
+      block_id: row.block_id as string,
+      title: row.title as string,
+      user_value: row.user_value as string,
+      technical_goal: row.technical_goal as string,
       definition_of_done: fromJson(row.definition_of_done_json as string, []),
       constraints: fromJson(row.constraints_json as string, []),
-      allowed_files: fromJson(row.allowed_files_json as string, [])
-    })) as TaskRecord[];
+      allowed_files: fromJson(row.allowed_files_json as string, []),
+      order_index: Number(row.order_index ?? 0),
+      status: row.status as Task["status"],
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
+    }));
   }
 
   updateTask(input: Partial<TaskRecord> & { id: string }) {
@@ -647,13 +662,20 @@ export class SqliteStore {
       .prepare(`SELECT * FROM session WHERE task_id = ? ORDER BY created_at ASC`)
       .all(task_id) as Array<Record<string, unknown>>;
     return rows.map((row) => ({
-      ...row,
+      id: row.id as string,
+      task_id: row.task_id as string,
+      assistant: row.assistant as Session["assistant"],
+      prompt_snapshot: row.prompt_snapshot as string,
       change_plan: fromJson(row.change_plan_json as string, null),
+      result_summary: row.result_summary as string | null | undefined,
       changed_files: fromJson(row.changed_files_json as string, null),
       scope_ok:
         row.scope_ok === null || row.scope_ok === undefined ? undefined : (row.scope_ok as number) === 1,
-      unexpected_files: fromJson(row.unexpected_files_json as string, null)
-    })) as SessionRecord[];
+      unexpected_files: fromJson(row.unexpected_files_json as string, null),
+      status: row.status as Session["status"],
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
+    }));
   }
 
   updateSession(input: Partial<SessionRecord> & { id: string }) {

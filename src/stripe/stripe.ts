@@ -4,7 +4,7 @@ import type { SqliteStore } from "../storage/sqlite.js";
 const getStripe = () => {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key, { apiVersion: "2023-10-16" });
+  return new Stripe(key, { apiVersion: "2024-06-20" });
 };
 
 export const createCheckoutSession = async (input: {

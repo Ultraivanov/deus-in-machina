@@ -507,19 +507,16 @@ export class WorkflowEngine {
       const tasks = readBlockTasksFromFile(repoRoot, blockFilePath);
       const next = tasks.find((t) => t.status === "pending" || t.status === "ready");
       if (next) {
-        if (!next.allowed_files || next.allowed_files.length === 0) {
-          const derived = inferAllowedFiles({
-            repoIndex: this.repoIndex,
-            taskTitle: next.title,
-            technicalGoal: ""
-          });
-          if (derived.length > 0) {
-            next.allowed_files = derived;
-            const stored = this.store.tasks.get(next.id);
-            if (stored) {
-              stored.allowed_files = derived;
-              this.upsertTask(stored);
-            }
+        const derivedAllowlist = inferAllowedFiles({
+          repoIndex: this.repoIndex,
+          taskTitle: next.title,
+          technicalGoal: ""
+        });
+        if (derivedAllowlist.length > 0) {
+          const stored = this.store.tasks.get(next.id);
+          if (stored && stored.allowed_files.length === 0) {
+            stored.allowed_files = derivedAllowlist;
+            this.upsertTask(stored);
           }
         }
         return {
@@ -528,7 +525,7 @@ export class WorkflowEngine {
           user_explanation: "Next pending task from the active block.",
           why_now: "This keeps the block moving sequentially.",
           expected_result: next.doneWhen,
-          estimated_change_scope: next.allowed_files ?? []
+          estimated_change_scope: derivedAllowlist
         };
       }
     }
