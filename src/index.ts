@@ -6,7 +6,7 @@ import { WorkflowEngine } from "./engine.js";
 import { initSqliteStore } from "./storage/index.js";
 import type { SqliteStore } from "./storage/sqlite.js";
 import { buildRepoIndex } from "./repo/indexer.js";
-import { makeError, ensureErrorShape } from "./errors.js";
+import { makeError, ensureErrorShape, logError } from "./errors.js";
 import { setTelemetrySink } from "./telemetry.js";
 
 const server = new Server(
@@ -51,8 +51,14 @@ server.setRequestHandler("tools/list", async () => {
 
 server.setRequestHandler("tools/call", async (request) => {
   const { name, arguments: args } = request.params;
-  const result = handleToolCall(name, (args ?? {}) as Record<string, unknown>);
-  const payload = result ?? makeError("INTERNAL_ERROR", "No response returned by tool handler.", true);
+  let payload: unknown;
+  try {
+    const result = handleToolCall(name, (args ?? {}) as Record<string, unknown>);
+    payload = result ?? makeError("INTERNAL_ERROR", "No response returned by tool handler.", true);
+  } catch (err) {
+    logError(err, { tool: name }, { sampleRate: 1 });
+    payload = makeError("INTERNAL_ERROR", "Unhandled tool error.", true);
+  }
   const safePayload =
     payload && typeof payload === "object" ? payload : ensureErrorShape(payload);
 
