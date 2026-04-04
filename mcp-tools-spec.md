@@ -1,5 +1,5 @@
 # MCP Tools Spec
-## Project: AI Project Companion for Structured Vibe Coding
+## Project: Buildrail — AI Project Companion for Structured Vibe Coding
 ### File: `mcp-tools-spec.md`
 ### Version: MVP v0.1
 

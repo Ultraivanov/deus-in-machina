@@ -1,4 +1,4 @@
-# AI Project Companion
+# Buildrail
 
 Deterministic execution layer for AI-assisted coding. It keeps projects **structured, scoped, and resumable** across sessions.
 
@@ -23,6 +23,17 @@ Repo / .assistant state files
 ## Specs
 - `ai-project-companion-spec.md`
 - `mcp-tools-spec.md`
+- `workflow-engine-spec.md`
+- `state-model-spec.md`
 
 ## Repo Status
 Private MVP v0.1
+
+## MCP Server (Skeleton)
+
+```
+npm install
+npm run dev
+```
+
+This starts a minimal MCP server over stdio with stub handlers for the MVP tools.

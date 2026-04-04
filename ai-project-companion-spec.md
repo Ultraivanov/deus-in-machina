@@ -1,6 +1,6 @@
 # Assistant-agnostic Product Spec
-## Project: AI Project Companion for Structured Vibe Coding
-### Working title: Flowguard / Buildrail / Stepwise
+## Project: Buildrail — AI Project Companion for Structured Vibe Coding
+### Working title: Buildrail
 ### Format: Markdown, implementation-oriented
 ### Version: MVP v0.1
 
