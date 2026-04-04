@@ -1,5 +1,6 @@
 import { WorkflowEngine } from "./engine.js";
 import { applyMonetization } from "./monetization/enforce.js";
+import type { SqliteStore } from "./storage/sqlite.js";
 
 const monetizationContextSchema = {
   user_id: { type: "string" },
@@ -153,7 +154,18 @@ export const tools = [
   }
 ];
 
-export const createToolRouter = (engine: WorkflowEngine) => {
+export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteStore) => {
+  const loadSubscription = sqliteStore
+    ? (args: Record<string, unknown>) => {
+        const userId =
+          (typeof args.user_id === "string" && args.user_id) ||
+          (typeof (args.subscription as Record<string, unknown>)?.user_id === "string" &&
+            (args.subscription as Record<string, unknown>).user_id) ||
+          "anon";
+        return sqliteStore.getSubscriptionSnapshot(userId);
+      }
+    : undefined;
+
   const handleToolCall = (name: string, args: Record<string, unknown>) => {
     return applyMonetization(name, args, () => {
       switch (name) {
@@ -177,7 +189,8 @@ export const createToolRouter = (engine: WorkflowEngine) => {
             args.assistant as string,
             args.prompt_snapshot as string,
             (args.change_plan as Record<string, unknown>) ?? {},
-            args.repo_root as string | undefined
+            args.repo_root as string | undefined,
+            args.user_id as string | undefined
           );
         case "submit_agent_result":
           return engine.submitAgentResult(
@@ -210,7 +223,7 @@ export const createToolRouter = (engine: WorkflowEngine) => {
         default:
           return { error: "UNKNOWN_TOOL" };
       }
-    });
+    }, { loadSubscription });
   };
 
   return { tools, handleToolCall };

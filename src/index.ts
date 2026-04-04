@@ -26,7 +26,7 @@ try {
   sqliteStore = undefined;
 }
 const engine = new WorkflowEngine(memoryStore, sqliteStore);
-const { tools, handleToolCall } = createToolRouter(engine);
+const { tools, handleToolCall } = createToolRouter(engine, sqliteStore);
 
 server.setRequestHandler("tools/list", async () => {
   return { tools };

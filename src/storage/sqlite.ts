@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,6 +26,8 @@ export type SubscriptionRecord = {
   current_period_start?: string;
   current_period_end?: string;
   limits?: Record<string, unknown>;
+  sessions_used?: number;
+  project_count?: number;
   created_at: string;
   updated_at: string;
 };
@@ -70,6 +73,28 @@ const fromJson = <T>(value: string | null | undefined, fallback: T): T => {
     return fallback;
   }
 };
+
+const toNumber = (value: unknown, fallback: number) => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) {
+    return Number(value);
+  }
+  return fallback;
+};
+
+const getUsageFromLimits = (limits: Record<string, unknown> | null | undefined) => ({
+  sessions_used: toNumber(limits?.sessions_used, 0),
+  project_count: toNumber(limits?.project_count, 0)
+});
+
+const mergeUsageIntoLimits = (
+  limits: Record<string, unknown> | null | undefined,
+  usage: { sessions_used: number; project_count: number }
+) => ({
+  ...(limits ?? {}),
+  sessions_used: usage.sessions_used,
+  project_count: usage.project_count
+});
 
 const nowIso = () => new Date().toISOString();
 
@@ -164,9 +189,28 @@ export class SqliteStore {
   getSubscription(id: string): SubscriptionRecord | null {
     const row = this.db.prepare(`SELECT * FROM subscription WHERE id = ?`).get(id);
     if (!row) return null;
+    const limits = fromJson<Record<string, unknown> | null>(row.limits_json, null);
+    const usage = getUsageFromLimits(limits);
     return {
       ...row,
-      limits: fromJson(row.limits_json, null)
+      limits,
+      sessions_used: usage.sessions_used,
+      project_count: usage.project_count
+    } as SubscriptionRecord;
+  }
+
+  getSubscriptionByUserId(user_id: string): SubscriptionRecord | null {
+    const row = this.db
+      .prepare(`SELECT * FROM subscription WHERE user_id = ? ORDER BY created_at DESC LIMIT 1`)
+      .get(user_id);
+    if (!row) return null;
+    const limits = fromJson<Record<string, unknown> | null>(row.limits_json, null);
+    const usage = getUsageFromLimits(limits);
+    return {
+      ...row,
+      limits,
+      sessions_used: usage.sessions_used,
+      project_count: usage.project_count
     } as SubscriptionRecord;
   }
 
@@ -195,6 +239,77 @@ export class SqliteStore {
 
   deleteSubscription(id: string) {
     this.db.prepare(`DELETE FROM subscription WHERE id = ?`).run(id);
+  }
+
+  ensureUser(id: string) {
+    const existing = this.getUser(id);
+    if (existing) return existing;
+    return this.createUser({
+      id,
+      status: "active"
+    });
+  }
+
+  ensureSubscription(user_id: string, plan: SubscriptionPlan = "free") {
+    this.ensureUser(user_id);
+    const existing = this.getSubscriptionByUserId(user_id);
+    if (existing) return existing;
+    const now = nowIso();
+    return this.createSubscription({
+      id: `sub_${randomUUID()}`,
+      user_id,
+      plan,
+      status: "active",
+      limits: mergeUsageIntoLimits(null, { sessions_used: 0, project_count: 0 }),
+      created_at: now,
+      updated_at: now
+    });
+  }
+
+  getSubscriptionSnapshot(user_id: string) {
+    const subscription = this.ensureSubscription(user_id);
+    const usage = getUsageFromLimits(subscription.limits);
+    return {
+      user_id: subscription.user_id,
+      plan: subscription.plan === "pro" ? "pro" : "free",
+      status: subscription.status,
+      sessions_used: usage.sessions_used,
+      project_count: usage.project_count
+    };
+  }
+
+  incrementProjectCount(user_id: string, amount = 1) {
+    const subscription = this.ensureSubscription(user_id);
+    const usage = getUsageFromLimits(subscription.limits);
+    const next = {
+      sessions_used: usage.sessions_used,
+      project_count: usage.project_count + amount
+    };
+    return this.updateSubscription({
+      id: subscription.id,
+      plan: subscription.plan,
+      status: subscription.status,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      limits: mergeUsageIntoLimits(subscription.limits, next)
+    });
+  }
+
+  incrementSessionsUsed(user_id: string, amount = 1) {
+    const subscription = this.ensureSubscription(user_id);
+    const usage = getUsageFromLimits(subscription.limits);
+    const next = {
+      sessions_used: usage.sessions_used + amount,
+      project_count: usage.project_count
+    };
+    return this.updateSubscription({
+      id: subscription.id,
+      plan: subscription.plan,
+      status: subscription.status,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      limits: mergeUsageIntoLimits(subscription.limits, next)
+    });
   }
 
   createProject(input: Omit<ProjectRecord, "created_at" | "updated_at"> & Partial<Pick<ProjectRecord, "created_at" | "updated_at">>) {

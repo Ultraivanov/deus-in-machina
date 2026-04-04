@@ -18,6 +18,7 @@ export type InitProjectInput = {
   skill_level?: string;
   constraints?: string[];
   repo_root?: string;
+  user_id?: string;
 };
 
 export class WorkflowEngine {
@@ -36,13 +37,14 @@ export class WorkflowEngine {
     }
   }
 
-  private upsertProject(project: Project, repo_url?: string) {
+  private upsertProject(project: Project, repo_url?: string, user_id?: string) {
     this.withSqlite((db) => {
       const existing = db.getProject(project.id);
       const now = this.nowIso();
       if (!existing) {
         db.createProject({
           id: project.id,
+          user_id: user_id ?? "anon",
           summary: project.summary,
           repo_url,
           status: project.status,
@@ -56,7 +58,7 @@ export class WorkflowEngine {
       }
       db.updateProject({
         id: project.id,
-        user_id: existing.user_id,
+        user_id: user_id ?? existing.user_id,
         name: existing.name,
         summary: project.summary,
         repo_url: repo_url ?? existing.repo_url,
@@ -67,6 +69,26 @@ export class WorkflowEngine {
         updated_at: now
       });
     });
+  }
+
+  private incrementProjectCount(user_id?: string) {
+    if (!this.sqlite) return;
+    const resolved = user_id ?? "anon";
+    try {
+      this.sqlite.incrementProjectCount(resolved, 1);
+    } catch {
+      // best-effort
+    }
+  }
+
+  private incrementSessionCount(user_id?: string) {
+    if (!this.sqlite) return;
+    const resolved = user_id ?? "anon";
+    try {
+      this.sqlite.incrementSessionsUsed(resolved, 1);
+    } catch {
+      // best-effort
+    }
   }
 
   private upsertPhase(phase: Phase) {
@@ -268,10 +290,11 @@ export class WorkflowEngine {
       writePhases(input.repo_root, phasesMd).catch(() => undefined);
     }
 
-    this.upsertProject(project, input.repo_url);
+    this.upsertProject(project, input.repo_url, input.user_id);
     this.upsertPhase(phase);
     this.upsertBlock(block);
     this.upsertTask(task);
+    this.incrementProjectCount(input.user_id);
 
     return {
       project_id,
@@ -402,7 +425,15 @@ export class WorkflowEngine {
     };
   }
 
-  startSession(project_id: string, task_id: string, assistant: string, prompt_snapshot: string, change_plan: Record<string, unknown>, repo_root?: string) {
+  startSession(
+    project_id: string,
+    task_id: string,
+    assistant: string,
+    prompt_snapshot: string,
+    change_plan: Record<string, unknown>,
+    repo_root?: string,
+    user_id?: string
+  ) {
     const project = this.store.projects.get(project_id);
     const task = this.store.tasks.get(task_id);
     if (!project || !task) return null;
@@ -422,6 +453,7 @@ export class WorkflowEngine {
     this.store.sessions.set(session_id, session);
     this.upsertTask(task);
     this.upsertSession(session);
+    this.incrementSessionCount(user_id);
 
     if (repo_root) {
       const snapshot = buildSnapshotMarkdown(`Started task ${task.id}: ${task.title}`);

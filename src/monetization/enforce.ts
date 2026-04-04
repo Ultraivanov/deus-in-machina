@@ -18,6 +18,8 @@ export type MonetizationDecision =
   | { ok: true; context: MonetizationContext; upgrade_hint?: string }
   | { ok: false; error: MonetizationError };
 
+export type SubscriptionLoader = (args: Record<string, unknown>) => SubscriptionSnapshot | null;
+
 const toNumber = (value: unknown, fallback: number) => {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && value.trim() !== "" && Number.isFinite(Number(value))) {
@@ -55,8 +57,13 @@ export const buildSubscription = (args: Record<string, unknown>): SubscriptionSn
   };
 };
 
-export const enforceMonetization = (toolName: string, args: Record<string, unknown>): MonetizationDecision => {
-  const subscription = buildSubscription(args);
+export const enforceMonetization = (
+  toolName: string,
+  args: Record<string, unknown>,
+  options?: { loadSubscription?: SubscriptionLoader }
+): MonetizationDecision => {
+  const loaded = options?.loadSubscription?.(args);
+  const subscription = loaded ?? buildSubscription(args);
   const plan = getPlan(subscription.plan);
 
   if (toolName === "initialize_project") {
@@ -137,9 +144,10 @@ export const attachMonetizationMeta = <T>(
 export const applyMonetization = <T>(
   toolName: string,
   args: Record<string, unknown>,
-  handler: () => T
+  handler: () => T,
+  options?: { loadSubscription?: SubscriptionLoader }
 ): T | MonetizationError => {
-  const decision = enforceMonetization(toolName, args);
+  const decision = enforceMonetization(toolName, args, options);
   if (!decision.ok) return decision.error;
 
   const result = handler();
