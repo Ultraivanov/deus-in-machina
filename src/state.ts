@@ -51,6 +51,8 @@ export type Session = {
   change_plan?: Record<string, unknown>;
   result_summary?: string;
   changed_files?: string[];
+  scope_ok?: boolean;
+  unexpected_files?: string[];
   status: SessionStatus;
 };
 

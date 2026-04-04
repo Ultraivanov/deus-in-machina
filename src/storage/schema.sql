@@ -86,6 +86,8 @@ CREATE TABLE IF NOT EXISTS session (
   change_plan_json TEXT,
   result_summary TEXT,
   changed_files_json TEXT,
+  scope_ok INTEGER,
+  unexpected_files_json TEXT,
   status TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,

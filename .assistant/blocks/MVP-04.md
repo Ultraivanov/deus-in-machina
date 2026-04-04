@@ -19,7 +19,7 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 
 | ID        | Task                                  | Status  | Done When |
 |-----------|---------------------------------------|---------|----------|
-| MVP-04-T1 | Persist scope validation outcome      | pending | Session records include scope_ok + unexpected_files and show in explain_changes |
+| MVP-04-T1 | Persist scope validation outcome      | done    | Session records include scope_ok + unexpected_files and show in explain_changes |
 | MVP-04-T2 | Enforce DoD pipeline + block progress | pending | complete_task checks validation status and updates task/block status |
 | MVP-04-T3 | Scope override tool                   | pending | approve_scope_override tool exists and requires explicit approval |
 
@@ -31,16 +31,36 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 
 | Field     | Value                      |
 |-----------|----------------------------|
-| Task ID   | MVP-04-T1                  |
-| Title     | Persist scope validation outcome |
+| Task ID   | MVP-04-T2                  |
+| Title     | Enforce DoD pipeline + block progress |
 | Status    | pending                    |
-| Done When | Session records include scope_ok + unexpected_files and show in explain_changes |
+| Done When | complete_task checks validation status and updates task/block status |
 
 ---
 
 ## Change Plans
 
 > One entry per task. Written by agent before coding. Approved by user before execution.
+
+### MVP-04-T1 — Persist scope validation outcome
+
+**Files to modify:**
+- `src/state.ts` — add scope fields to Session
+- `src/engine.ts` — persist scope validation + show in explain_changes
+- `src/storage/schema.sql` — add scope columns for session
+- `src/storage/sqlite.ts` — read/write scope fields
+
+**Files to create:**
+- none
+
+**Files NOT touched:**
+- `src/tools.ts`, `src/index.ts`
+
+**Approach:**
+Store scope validation results on the session record and surface them in explanations. Mirror fields in SQLite for persistence.
+
+**Risks:**
+Low. Session-level data only.
 
 ---
 
@@ -58,6 +78,7 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 
 | Date       | Task ID   | Status | Note |
 |------------|-----------|--------|------|
+| 2026-04-04 | MVP-04-T1 | done   | Stored scope validation in session + surfaced in explain_changes |
 
 ---
 

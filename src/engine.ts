@@ -273,6 +273,11 @@ export class WorkflowEngine {
 
   validateScope(session_id: string, allowed_files: string[], changed_files: string[]) {
     const unexpected = changed_files.filter((f) => !allowed_files.includes(f));
+    const session = this.store.sessions.get(session_id);
+    if (session) {
+      session.scope_ok = unexpected.length === 0;
+      session.unexpected_files = unexpected;
+    }
     if (unexpected.length > 0) {
       return {
         session_id,
@@ -295,8 +300,16 @@ export class WorkflowEngine {
   explainChanges(session_id: string) {
     const session = this.store.sessions.get(session_id);
     if (!session) return null;
+    const scopeNote =
+      session.scope_ok === false
+        ? `Scope drift detected: ${session.unexpected_files?.join(", ") ?? "unknown files"}`
+        : session.scope_ok === true
+          ? "Scope validated: all changes stayed within the approved files."
+          : undefined;
+    const summaryLines = [session.result_summary ?? "No summary provided."];
+    if (scopeNote) summaryLines.push(scopeNote);
     return {
-      plain_language_summary: [session.result_summary ?? "No summary provided."],
+      plain_language_summary: summaryLines,
       why_it_matters: "This advances the project by one validated step.",
       user_safe_to_continue: true
     };

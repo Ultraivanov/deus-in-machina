@@ -425,8 +425,8 @@ export class SqliteStore {
     const created_at = input.created_at ?? nowIso();
     const updated_at = input.updated_at ?? created_at;
     this.db.prepare(
-      `INSERT INTO session (id, task_id, assistant, prompt_snapshot, change_plan_json, result_summary, changed_files_json, status, created_at, updated_at)
-       VALUES (@id, @task_id, @assistant, @prompt_snapshot, @change_plan_json, @result_summary, @changed_files_json, @status, @created_at, @updated_at)`
+      `INSERT INTO session (id, task_id, assistant, prompt_snapshot, change_plan_json, result_summary, changed_files_json, scope_ok, unexpected_files_json, status, created_at, updated_at)
+       VALUES (@id, @task_id, @assistant, @prompt_snapshot, @change_plan_json, @result_summary, @changed_files_json, @scope_ok, @unexpected_files_json, @status, @created_at, @updated_at)`
     ).run({
       id: input.id,
       task_id: input.task_id,
@@ -435,6 +435,8 @@ export class SqliteStore {
       change_plan_json: toJson(input.change_plan ?? null),
       result_summary: input.result_summary ?? null,
       changed_files_json: toJson(input.changed_files ?? null),
+      scope_ok: typeof input.scope_ok === "boolean" ? (input.scope_ok ? 1 : 0) : null,
+      unexpected_files_json: toJson(input.unexpected_files ?? null),
       status: input.status,
       created_at,
       updated_at
@@ -448,7 +450,9 @@ export class SqliteStore {
     return {
       ...row,
       change_plan: fromJson(row.change_plan_json, null),
-      changed_files: fromJson(row.changed_files_json, null)
+      changed_files: fromJson(row.changed_files_json, null),
+      scope_ok: row.scope_ok === null || row.scope_ok === undefined ? undefined : row.scope_ok === 1,
+      unexpected_files: fromJson(row.unexpected_files_json, null)
     } as SessionRecord;
   }
 
@@ -460,6 +464,8 @@ export class SqliteStore {
            change_plan_json = @change_plan_json,
            result_summary = @result_summary,
            changed_files_json = @changed_files_json,
+           scope_ok = @scope_ok,
+           unexpected_files_json = @unexpected_files_json,
            status = @status,
            updated_at = @updated_at
        WHERE id = @id`
@@ -469,6 +475,8 @@ export class SqliteStore {
       change_plan_json: toJson(input.change_plan ?? null),
       result_summary: input.result_summary ?? null,
       changed_files_json: toJson(input.changed_files ?? null),
+      scope_ok: typeof input.scope_ok === "boolean" ? (input.scope_ok ? 1 : 0) : null,
+      unexpected_files_json: toJson(input.unexpected_files ?? null),
       status: input.status ?? "started",
       updated_at
     });
