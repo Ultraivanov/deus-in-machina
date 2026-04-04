@@ -42,6 +42,10 @@ This starts a minimal MCP server over stdio with stub handlers for the MVP tools
 
 See `examples/codex-client.md` for a full, runnable tool-call sequence.
 
+## Claude / Cursor Integration Example
+
+See `examples/claude-cursor-client.md` for the same full happy-path sequence.
+
 ## Happy Path Demo
 
 Runs a full loop: initialize → next_step → prompt → submit → validate → complete.
