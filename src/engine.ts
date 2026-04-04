@@ -1,5 +1,6 @@
 import { InMemoryStore, Project, Phase, Block, Task, Session } from "./state.js";
 import type { SqliteStore } from "./storage/sqlite.js";
+import { inferAllowedFiles } from "./repo/allowlist.js";
 import {
   buildPhasesMarkdown,
   buildSnapshotMarkdown,
@@ -390,7 +391,11 @@ export class WorkflowEngine {
         "Scope limited to allowed files"
       ],
       constraints: input.constraints ?? [],
-      allowed_files: [],
+      allowed_files: inferAllowedFiles({
+        repoIndex: this.repoIndex,
+        taskTitle: "Define the first visible screen",
+        technicalGoal: "Create an initial page or entry point"
+      }),
       status: "ready"
     };
 
@@ -502,18 +507,43 @@ export class WorkflowEngine {
       const tasks = readBlockTasksFromFile(repoRoot, blockFilePath);
       const next = tasks.find((t) => t.status === "pending" || t.status === "ready");
       if (next) {
+        if (!next.allowed_files || next.allowed_files.length === 0) {
+          const derived = inferAllowedFiles({
+            repoIndex: this.repoIndex,
+            taskTitle: next.title,
+            technicalGoal: ""
+          });
+          if (derived.length > 0) {
+            next.allowed_files = derived;
+            const stored = this.store.tasks.get(next.id);
+            if (stored) {
+              stored.allowed_files = derived;
+              this.upsertTask(stored);
+            }
+          }
+        }
         return {
           task_id: next.id,
           title: next.title,
           user_explanation: "Next pending task from the active block.",
           why_now: "This keeps the block moving sequentially.",
           expected_result: next.doneWhen,
-          estimated_change_scope: []
+          estimated_change_scope: next.allowed_files ?? []
         };
       }
     }
 
     if (!task) return null;
+
+    if (!task.allowed_files || task.allowed_files.length === 0) {
+      const derived = inferAllowedFiles({
+        repoIndex: this.repoIndex,
+        taskTitle: task.title,
+        technicalGoal: task.technical_goal
+      });
+      task.allowed_files = derived;
+      this.upsertTask(task);
+    }
 
     return {
       task_id: task.id,
