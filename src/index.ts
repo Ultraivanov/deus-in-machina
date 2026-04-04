@@ -5,6 +5,7 @@ import { InMemoryStore } from "./state.js";
 import { WorkflowEngine } from "./engine.js";
 import { initSqliteStore } from "./storage/index.js";
 import type { SqliteStore } from "./storage/sqlite.js";
+import { buildRepoIndex } from "./repo/indexer.js";
 
 const server = new Server(
   {
@@ -27,6 +28,13 @@ try {
 }
 const engine = new WorkflowEngine(memoryStore, sqliteStore);
 const { tools, handleToolCall } = createToolRouter(engine, sqliteStore);
+
+try {
+  const repoIndex = buildRepoIndex({ root: process.cwd() });
+  engine.setRepoIndex(repoIndex);
+} catch {
+  // best-effort
+}
 
 engine.hydrateFromSqlite();
 

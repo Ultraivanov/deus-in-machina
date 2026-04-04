@@ -22,7 +22,17 @@ export type InitProjectInput = {
 };
 
 export class WorkflowEngine {
+  private repoIndex: string[] | null = null;
+
   constructor(private store: InMemoryStore, private sqlite?: SqliteStore) {}
+
+  setRepoIndex(paths: string[]) {
+    this.repoIndex = paths;
+  }
+
+  getRepoIndex() {
+    return this.repoIndex;
+  }
 
   private nowIso() {
     return new Date().toISOString();
