@@ -115,6 +115,10 @@ Guide: `docs/packaging-guide.md`.
 
 Outline: `docs/hosted-deployment.md`.
 
+## Release
+
+Checklist: `docs/release-checklist.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
