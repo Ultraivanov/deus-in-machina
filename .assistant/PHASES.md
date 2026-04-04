@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | MVP-04                     |
-| Title      | Scope + DoD validation pipeline |
+| Block ID   | A-01                       |
+| Title      | SQLite mirror + persistence |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/MVP-04.md` |
+| File       | `.assistant/blocks/A-01.md` |
 
 ---
 
@@ -36,14 +36,14 @@
 | MVP-01 | Product + MCP tool specs       | done    |
 | MVP-02 | MCP server skeleton            | done    |
 | MVP-03 | File-first state I/O           | done |
-| MVP-04 | Scope + DoD validation pipeline| in-progress |
+| MVP-04 | Scope + DoD validation pipeline| done |
 
 ### Phase 2 — Alpha
 > Goal: internal testing, real users
 
 | ID   | Block                          | Status  |
 |------|--------------------------------|---------|
-| A-01 | SQLite mirror + persistence    | pending |
+| A-01 | SQLite mirror + persistence    | in-progress |
 | A-02 | Repo awareness + allowed files | pending |
 | A-03 | Error handling + telemetry     | pending |
 
