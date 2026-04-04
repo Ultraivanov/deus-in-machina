@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | A-02                       |
-| Title      | Repo awareness + allowed files |
+| Block ID   | A-03                       |
+| Title      | Error handling + telemetry |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/A-02.md` |
+| File       | `.assistant/blocks/A-03.md` |
 
 ---
 
@@ -44,8 +44,8 @@
 | ID   | Block                          | Status  |
 |------|--------------------------------|---------|
 | A-01 | SQLite mirror + persistence    | done |
-| A-02 | Repo awareness + allowed files | in-progress |
-| A-03 | Error handling + telemetry     | pending |
+| A-02 | Repo awareness + allowed files | done |
+| A-03 | Error handling + telemetry     | in-progress |
 
 ### Phase 3 — Beta
 > Goal: external testing, stability
