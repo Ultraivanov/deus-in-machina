@@ -3,6 +3,7 @@ import { applyMonetization } from "./monetization/enforce.js";
 import type { SqliteStore } from "./storage/sqlite.js";
 import { makeError } from "./errors.js";
 import { track } from "./telemetry.js";
+import { loadTemplate } from "./templates/loader.js";
 
 const monetizationContextSchema = {
   user_id: { type: "string" },
@@ -153,6 +154,17 @@ export const tools = [
       },
       required: ["session_id", "approved_files"]
     }
+  },
+  {
+    name: "get_workflow_template",
+    description: "Return a workflow template by name.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string" }
+      },
+      required: ["name"]
+    }
   }
 ];
 
@@ -241,6 +253,14 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             (args.approved_files as string[]) ?? [],
             args.reason as string | undefined
           );
+        case "get_workflow_template": {
+          track("get_workflow_template", { ...basePayload, name: args.name });
+          const template = loadTemplate(args.name as string);
+          if (!template) {
+            return makeError("TEMPLATE_NOT_FOUND", "Template not found.", false);
+          }
+          return { template };
+        }
         default:
           return makeError("UNKNOWN_TOOL", `Unknown tool: ${name}`, false);
       }

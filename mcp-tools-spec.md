@@ -126,6 +126,7 @@ All error responses should follow this shape. Tool handlers must not return bare
 8. `explain_changes`
 9. `complete_task`
 10. `approve_scope_override`
+11. `get_workflow_template`
 
 ### Optional tools for v0.2
 - `resume_project`
@@ -618,7 +619,31 @@ Allows a user to explicitly approve out-of-scope files for a session.
 
 ---
 
-## 15. End-to-End Happy Path
+## 15. Tool: `get_workflow_template`
+
+### Purpose
+Returns a workflow template by name.
+
+### Input schema
+```json
+{
+  "name": "saas-landing"
+}
+```
+
+### Output schema
+```json
+{
+  "template": { "id": "template_saas_landing", "phases": [] }
+}
+```
+
+### Errors
+- `TEMPLATE_NOT_FOUND`
+
+---
+
+## 16. End-to-End Happy Path
 
 1. `initialize_project`
 2. `get_next_step`
@@ -632,7 +657,7 @@ Allows a user to explicitly approve out-of-scope files for a session.
 
 ---
 
-## 16. State Transition Rules
+## 17. State Transition Rules
 
 ### Task transitions
 ```text
@@ -655,7 +680,7 @@ started → submitted → validated
 
 ---
 
-## 17. Logging and Persistence
+## 18. Logging and Persistence
 
 The server should persist:
 - project record
@@ -672,6 +697,6 @@ Canonical state lives in `.assistant/` in the repo; DB mirrors are optional for 
 
 ---
 
-## 18. One-line Summary
+## 19. One-line Summary
 
 **These tools turn a coding assistant into a bounded, stateful execution flow rather than a free-form chat that rewrites the project unpredictably.**
