@@ -38,11 +38,33 @@ npm run dev
 
 This starts a minimal MCP server over stdio with stub handlers for the MVP tools.
 
-## Codex Integration Example
+## Integration
 
+### Run the server
+
+```
+npm install
+npm run dev
+```
+
+### Example flows
+
+Codex:
 See `examples/codex-client.md` for a full, runnable tool-call sequence.
 
-## Claude / Cursor Integration Example
+Claude / Cursor:
+See `examples/claude-cursor-client.md` for the same full happy-path sequence.
+
+### Happy-path tool order
+
+1. `initialize_project`
+2. `get_next_step`
+3. `generate_agent_prompt`
+4. `start_session`
+5. `submit_agent_result`
+6. `validate_scope`
+7. `explain_changes`
+8. `complete_task`
 
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
