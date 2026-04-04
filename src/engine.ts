@@ -1,4 +1,5 @@
 import { InMemoryStore, Project, Phase, Block, Task, Session } from "./state.js";
+import { buildPhasesMarkdown, buildSnapshotMarkdown, writePhases, writeSnapshot } from "./state-files.js";
 
 export type InitProjectInput = {
   idea: string;
@@ -6,6 +7,7 @@ export type InitProjectInput = {
   repo_url?: string;
   skill_level?: string;
   constraints?: string[];
+  repo_root?: string;
 };
 
 export class WorkflowEngine {
@@ -61,6 +63,24 @@ export class WorkflowEngine {
     this.store.phases.set(phase_id, phase);
     this.store.blocks.set(block_id, block);
     this.store.tasks.set(task_id, task);
+
+    if (input.repo_root) {
+      const phasesMd = buildPhasesMarkdown({
+        activePhase: {
+          phase: "MVP",
+          goal: phase.goal,
+          started: new Date().toISOString().slice(0, 10),
+          target: "TBD"
+        },
+        activeBlock: {
+          id: block.id,
+          title: block.title,
+          status: block.status,
+          file: `.assistant/blocks/${block.id}.md`
+        }
+      });
+      writePhases(input.repo_root, phasesMd).catch(() => undefined);
+    }
 
     return {
       project_id,
@@ -142,7 +162,7 @@ export class WorkflowEngine {
     };
   }
 
-  startSession(project_id: string, task_id: string, assistant: string, prompt_snapshot: string, change_plan: Record<string, unknown>) {
+  startSession(project_id: string, task_id: string, assistant: string, prompt_snapshot: string, change_plan: Record<string, unknown>, repo_root?: string) {
     const project = this.store.projects.get(project_id);
     const task = this.store.tasks.get(task_id);
     if (!project || !task) return null;
@@ -161,6 +181,11 @@ export class WorkflowEngine {
     task.status = "in_progress";
     this.store.sessions.set(session_id, session);
 
+    if (repo_root) {
+      const snapshot = buildSnapshotMarkdown(`Started task ${task.id}: ${task.title}`);
+      writeSnapshot(repo_root, snapshot).catch(() => undefined);
+    }
+
     return {
       session_id,
       task_id: task.id,
@@ -169,12 +194,17 @@ export class WorkflowEngine {
     };
   }
 
-  submitAgentResult(session_id: string, summary: string, changed_files: string[]) {
+  submitAgentResult(session_id: string, summary: string, changed_files: string[], repo_root?: string) {
     const session = this.store.sessions.get(session_id);
     if (!session) return null;
     session.result_summary = summary;
     session.changed_files = changed_files;
     session.status = "submitted";
+
+    if (repo_root) {
+      const snapshot = buildSnapshotMarkdown(summary);
+      writeSnapshot(repo_root, snapshot).catch(() => undefined);
+    }
 
     return {
       session_id,
@@ -214,7 +244,7 @@ export class WorkflowEngine {
     };
   }
 
-  completeTask(task_id: string, session_id: string, checks: Record<string, boolean>) {
+  completeTask(task_id: string, session_id: string, checks: Record<string, boolean>, repo_root?: string) {
     const task = this.store.tasks.get(task_id);
     const session = this.store.sessions.get(session_id);
     if (!task || !session) return null;
@@ -233,6 +263,11 @@ export class WorkflowEngine {
 
     task.status = "done";
     session.status = "validated";
+
+    if (repo_root) {
+      const snapshot = buildSnapshotMarkdown(`Completed task ${task.id}: ${task.title}`);
+      writeSnapshot(repo_root, snapshot).catch(() => undefined);
+    }
 
     return {
       task_id: task.id,

@@ -15,7 +15,8 @@ export const tools = [
         repo_summary: { type: "string" },
         repo_url: { type: "string" },
         skill_level: { type: "string" },
-        constraints: { type: "array", items: { type: "string" } }
+        constraints: { type: "array", items: { type: "string" } },
+        repo_root: { type: "string" }
       },
       required: ["idea"]
     }
@@ -62,7 +63,8 @@ export const tools = [
         assistant: { type: "string" },
         prompt_snapshot: { type: "string" },
         change_plan: { type: "object" },
-        change_plan_approved: { type: "boolean" }
+        change_plan_approved: { type: "boolean" },
+        repo_root: { type: "string" }
       },
       required: ["project_id", "task_id", "assistant", "prompt_snapshot", "change_plan", "change_plan_approved"]
     }
@@ -75,7 +77,8 @@ export const tools = [
       properties: {
         session_id: { type: "string" },
         summary: { type: "string" },
-        changed_files: { type: "array", items: { type: "string" } }
+        changed_files: { type: "array", items: { type: "string" } },
+        repo_root: { type: "string" }
       },
       required: ["session_id", "summary", "changed_files"]
     }
@@ -110,7 +113,8 @@ export const tools = [
       properties: {
         task_id: { type: "string" },
         session_id: { type: "string" },
-        definition_of_done_checks: { type: "object" }
+        definition_of_done_checks: { type: "object" },
+        repo_root: { type: "string" }
       },
       required: ["task_id", "session_id", "definition_of_done_checks"]
     }
@@ -138,13 +142,15 @@ export function handleToolCall(name: string, args: Record<string, unknown>) {
         args.task_id as string,
         args.assistant as string,
         args.prompt_snapshot as string,
-        (args.change_plan as Record<string, unknown>) ?? {}
+        (args.change_plan as Record<string, unknown>) ?? {},
+        args.repo_root as string | undefined
       );
     case "submit_agent_result":
       return engine.submitAgentResult(
         args.session_id as string,
         args.summary as string,
-        (args.changed_files as string[]) ?? []
+        (args.changed_files as string[]) ?? [],
+        args.repo_root as string | undefined
       );
     case "validate_scope":
       return engine.validateScope(
@@ -158,7 +164,8 @@ export function handleToolCall(name: string, args: Record<string, unknown>) {
       return engine.completeTask(
         args.task_id as string,
         args.session_id as string,
-        (args.definition_of_done_checks as Record<string, boolean>) ?? {}
+        (args.definition_of_done_checks as Record<string, boolean>) ?? {},
+        args.repo_root as string | undefined
       );
     default:
       return { error: "UNKNOWN_TOOL" };
