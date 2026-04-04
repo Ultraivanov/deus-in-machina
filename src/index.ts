@@ -1,5 +1,6 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { createToolRouter } from "./tools.js";
 import { InMemoryStore } from "./state.js";
 import { WorkflowEngine } from "./engine.js";
@@ -48,11 +49,11 @@ try {
 
 engine.hydrateFromSqlite();
 
-server.setRequestHandler("tools/list", async () => {
+server.setRequestHandler(ListToolsRequestSchema, async () => {
   return { tools };
 });
 
-server.setRequestHandler("tools/call", async (request) => {
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   let payload: unknown;
   try {
