@@ -23,51 +23,55 @@ For content projects, the files live under `.codex/content/`.
 
 ## Phase-Based Development
 
-This project follows a structured phase workflow.
-Full rules are in `.codex/protocols/phase-workflow.md`.
-Phase state is tracked in `.codex/PHASES.md`.
+This project uses a four-level development hierarchy: Phase → Block → Task → Session.
+
+Full rules: `.codex/protocols/phase-workflow.md`
+Phase state: `.codex/PHASES.md`
+Block detail: `.codex/blocks/<ID>.md`
 
 **On every session start:**
-Load `PHASES.md` as part of the `start` protocol.
-Confirm the active phase and block with the user before doing anything else.
+Run `start`. It loads `PHASES.md` → active block file → active task → Done When.
+Context is fully deterministic. Nothing is inferred. Everything comes from files.
 
 **Hard constraints:**
-- One block per session. Never start a second block in the same session.
-- Always output a Change Plan and wait for approval before writing code.
-- Never refactor code outside the current block scope. Log it, don't touch it.
-- A block is done only when its Definition of Done condition is verified — not when code is written.
+- One task per session. Never start a second task in the same session.
+- Always output a Change Plan and wait for `yes` before writing any code.
+- Never refactor outside the current task scope. Log it to block file, don't touch it.
+- A task is done only when its Done When condition is verified — not when code is written.
+- A block is done only when all tasks are done and block DoD is verified.
 
 **Phase sequence:** MVP → Alpha → Beta → Release
-Block IDs follow the pattern: `MVP-01`, `A-01`, `B-01`, `R-01`
-
-Current state is always in `.codex/PHASES.md`.
+(Adjusted automatically by `init-phases` based on project type.)
 
 ---
 
 ## Commands
 
-| Command        | What it does                                                                 |
-|----------------|------------------------------------------------------------------------------|
-| `start`        | Cold start protocol — loads shared context, checks session state             |
-| `/fi`          | Finish protocol — security checks, git diff, session finalization            |
-| `init-phases`  | Analyzes project context, generates `PHASES.md` draft, waits for approval   |
-| `done`         | Marks active block complete, advances to next block                          |
-| `block <ID>`   | Switches active block explicitly (e.g. `block MVP-03`)                       |
-| `pause`        | Suspends current block mid-session, saves state                              |
-
----
+| Command           | Level   | What it does                                              |
+|-------------------|---------|-----------------------------------------------------------|
+| `start`           | Session | Load active task context from files, cold start protocol  |
+| `/fi`             | Session | Finalize session, update block file, write SNAPSHOT       |
+| `init-phases`     | Phase   | Analyze context, generate `PHASES.md`, approve            |
+| `init-block <ID>` | Block   | Analyze block, propose tasks, create block file, approve  |
+| `init-task`       | Task    | Take next task, write Change Plan, approve                |
+| `done`            | Task/Block | Close task or block, advance state                    |
+| `pause`           | Session | Suspend task mid-session, save state                      |
 
 ### init-phases
+Reads all context, infers project type, generates `PHASES.md` draft.
+Writes nothing until user responds `approve`.
+Protocol: `.codex/protocols/init-phases-protocol.md`
+If `PHASES.md` already exists — ask user whether to overwrite or extend.
 
-Activated when user writes `init-phases` in chat.
+### init-block
+Reads block definition from `PHASES.md` and project context.
+Proposes first 2-3 tasks with Done When conditions.
+Creates `.codex/blocks/<ID>.md` and updates `PHASES.md`.
+Writes nothing until user responds `approve`.
+Protocol: `.codex/protocols/init-block-protocol.md`
 
-The agent:
-1. Reads all available context — `SNAPSHOT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, session history
-2. Infers project type, maturity, and core user flow
-3. Generates a full `PHASES.md` draft with phases, blocks, and Definition of Done per block
-4. Presents the draft for approval — writes nothing until user responds `approve`
-
-Full protocol: `.codex/protocols/init-phases-protocol.md`
-
-**Never run `init-phases` mid-project without reviewing the existing `PHASES.md` first.**
-If `PHASES.md` already exists, ask the user whether to overwrite or extend.
+### init-task
+Reads active block file, takes next pending task.
+Writes Change Plan, waits for `yes`, then writes code.
+If task is too large mid-session — stops, proposes split, re-approves.
+Protocol: `.codex/protocols/init-task-protocol.md`

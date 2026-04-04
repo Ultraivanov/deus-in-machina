@@ -1,108 +1,120 @@
 # Phase Workflow Protocol
 
-Enforced rules for all phase-based development sessions.
-These rules apply to every session, every block, every change.
+Rules for all levels of AI-assisted development.
+Applies to every session, every task, every block, every phase.
 
 ---
 
-## Rule 1 — One Block Per Session
-
-The agent works on **exactly one block** per session.
-
-- Block is taken from `PHASES.md → Active Block`.
-- The agent does not start the next block without an explicit `done` command from the user.
-- If a session ends before the block is complete, block status stays `in-progress`. The next session resumes it — does not restart.
-- The agent never says "while I'm at it…" and touches adjacent code.
-
-**Allowed commands to advance:**
-- `done` — mark block complete, pick next block
-- `block <ID>` — switch to a specific block explicitly
-- `pause` — suspend current block, update status to `in-progress`, end session
-
----
-
-## Rule 2 — Change Contract Before Code
-
-Before writing any code, the agent **must output a change plan** and wait for approval.
-
-Change plan format:
+## Hierarchy
 
 ```
-## Change Plan — <Block ID>
-
-**Files to modify:**
-- path/to/file.ts — reason
-
-**Files to create:**
-- path/to/new.ts — reason
-
-**Files NOT touched:**
-- everything else
-
-**Approach:**
-One paragraph. What the change does, how, and why this approach.
-
-**Risks:**
-Any side effects, dependencies, or things that could break.
-
-Proceed? [yes / adjust / cancel]
+Phase
+  └── Block        (.codex/PHASES.md)
+        └── Task   (.codex/blocks/<ID>.md)
+              └── Session
 ```
 
-The agent writes **zero code** until the user responds `yes` or a revised plan is approved.
+Each level has its own init command, approval gate, and done condition.
 
 ---
 
-## Rule 3 — Definition of Done
+## Level 1 — Phase
 
-Every block has an explicit, pre-defined exit condition written in `PHASES.md`.
+**Init:** `init-phases`
+**Done:** all blocks in phase are `done`
+**State:** `PHASES.md` — phase goal, block list, block statuses
 
-- Done When is set **before** the session starts, not after.
-- The agent checks the Done When condition before declaring a block complete.
-- If Done When is missing, the agent asks the user to define it before starting work.
-- Done When must be verifiable: a passing test, a working URL, a specific user action — not "looks good."
-
-Examples of valid Done When:
-- ✅ `npm test` passes with no failures
-- ✅ user can log in and see dashboard
-- ✅ API returns 200 for all documented endpoints
-
-Examples of invalid Done When:
-- ❌ code is written
-- ❌ looks correct
-- ❌ should work
+Rules:
+- Only one phase is active at a time
+- Phases are sequential: MVP → Alpha → Beta → Release
+- Phase structure can be adapted to project type at `init-phases` time
+- No code is written at the phase level
 
 ---
 
-## Rule 4 — No Refactoring in Feature Sessions
+## Level 2 — Block
 
-If the agent notices code that should be refactored during a feature block:
+**Init:** `init-block <ID>`
+**Done:** `done` command after all tasks complete and block DoD verified
+**State:** `PHASES.md` (status) + `.codex/blocks/<ID>.md` (detail)
 
-1. It logs the item to `PHASES.md → Refactor Backlog` with a one-line note.
-2. It continues with the feature block unchanged.
-3. It does **not** refactor, rename, reorganize, or "clean up" anything outside the current block scope.
-
-Refactoring is only allowed in a block explicitly typed as `refactor` in `PHASES.md`.
+Rules:
+- Only one block is `in-progress` at a time
+- Block is not opened without a file in `.codex/blocks/`
+- Block file is created by `init-block`, never manually
+- First 2-3 tasks are planned at block open. More added via `init-task` as work progresses
+- Block DoD is defined at init time, not after
 
 ---
 
-## Session Checklist
+## Level 3 — Task
 
-### On `start`
+**Init:** `init-task`
+**Done:** `done` command after Done When condition is verified
+**State:** `.codex/blocks/<ID>.md` — task list, active task, change plans, session log
 
-- [ ] Load `PHASES.md`
-- [ ] Confirm Active Phase and Active Block with user
-- [ ] Read Done When for the active block
-- [ ] If Done When is missing — ask before proceeding
+Rules:
+- One task per session
+- Task must be atomic — designed to complete in one session
+- If task turns out larger mid-session: stop, split, re-approve
+- Change Plan is required before any code is written
+- Change Plan is approved by user before execution
+- Done When is verified before declaring task complete
+- Refactor opportunities are logged to block file, never executed in a feature task
 
-### On `done`
+---
 
-- [ ] Verify Done When conditions are met
-- [ ] Update block status to `done` in `PHASES.md`
-- [ ] Set next block as Active Block (or ask user which one)
-- [ ] Append any refactor notes to Refactor Backlog
+## Level 4 — Session
 
-### On `/fi`
+**Start:** `start`
+**End:** `/fi`
+**State:** `.codex/SNAPSHOT.md` (session summary) + block file (task status, session log)
 
-- [ ] Save current block status
-- [ ] Note any in-progress items
-- [ ] Write session summary to `SNAPSHOT.md`
+Rules:
+- `start` loads: `PHASES.md` → active block file → active task → Done When
+- Context is fully deterministic — nothing is inferred or pulled from memory
+- `pause` suspends task mid-session: status stays `in-progress`, session log updated
+- `/fi` always updates block file session log and writes `SNAPSHOT.md`
+- Agent never carries assumptions between sessions — everything comes from files
+
+---
+
+## Command Reference
+
+| Command           | Level   | What it does                                              |
+|-------------------|---------|-----------------------------------------------------------|
+| `init-phases`     | Phase   | Analyze context, generate `PHASES.md`, approve            |
+| `init-block <ID>` | Block   | Analyze block, propose tasks, create block file, approve  |
+| `init-task`       | Task    | Take next task, write Change Plan, approve                |
+| `start`           | Session | Load active task context from files                       |
+| `done`            | Task/Block | Close task or block, advance state                    |
+| `pause`           | Session | Suspend task, save state, end session                     |
+| `/fi`             | Session | Finalize session, update block file, write SNAPSHOT       |
+
+---
+
+## Approval Gates
+
+Every level has an explicit approval gate. Nothing is written until the user approves.
+
+| Gate              | Trigger         | User response |
+|-------------------|-----------------|---------------|
+| Phase structure   | `init-phases`   | `approve`     |
+| Block + task list | `init-block`    | `approve`     |
+| Change Plan       | `init-task`     | `yes`         |
+| Task split        | mid-session     | `approve`     |
+
+---
+
+## What Lives Where
+
+| Information                  | File                          |
+|------------------------------|-------------------------------|
+| Phase list, block statuses   | `.codex/PHASES.md`            |
+| Block goal, task list, DoD   | `.codex/blocks/<ID>.md`       |
+| Change plans                 | `.codex/blocks/<ID>.md`       |
+| Session log                  | `.codex/blocks/<ID>.md`       |
+| Refactor backlog             | `.codex/blocks/<ID>.md`       |
+| Current project snapshot     | `.codex/SNAPSHOT.md`          |
+| Architecture decisions       | `.codex/ARCHITECTURE.md`      |
+| Pending ideas, known unknowns| `.codex/BACKLOG.md`           |
