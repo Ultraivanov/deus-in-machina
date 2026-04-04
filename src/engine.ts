@@ -1,4 +1,5 @@
 import { InMemoryStore, Project, Phase, Block, Task, Session } from "./state.js";
+import type { SqliteStore } from "./storage/sqlite.js";
 import {
   buildPhasesMarkdown,
   buildSnapshotMarkdown,
@@ -20,7 +21,183 @@ export type InitProjectInput = {
 };
 
 export class WorkflowEngine {
-  constructor(private store: InMemoryStore) {}
+  constructor(private store: InMemoryStore, private sqlite?: SqliteStore) {}
+
+  private nowIso() {
+    return new Date().toISOString();
+  }
+
+  private withSqlite(fn: (store: SqliteStore) => void) {
+    if (!this.sqlite) return;
+    try {
+      fn(this.sqlite);
+    } catch {
+      // Best-effort mirror only; file-first remains canonical.
+    }
+  }
+
+  private upsertProject(project: Project, repo_url?: string) {
+    this.withSqlite((db) => {
+      const existing = db.getProject(project.id);
+      const now = this.nowIso();
+      if (!existing) {
+        db.createProject({
+          id: project.id,
+          summary: project.summary,
+          repo_url,
+          status: project.status,
+          current_phase_id: project.current_phase_id,
+          current_block_id: project.current_block_id,
+          current_task_id: project.current_task_id,
+          created_at: now,
+          updated_at: now
+        });
+        return;
+      }
+      db.updateProject({
+        id: project.id,
+        user_id: existing.user_id,
+        name: existing.name,
+        summary: project.summary,
+        repo_url: repo_url ?? existing.repo_url,
+        status: project.status,
+        current_phase_id: project.current_phase_id,
+        current_block_id: project.current_block_id,
+        current_task_id: project.current_task_id,
+        updated_at: now
+      });
+    });
+  }
+
+  private upsertPhase(phase: Phase) {
+    this.withSqlite((db) => {
+      const existing = db.getPhase(phase.id);
+      const now = this.nowIso();
+      if (!existing) {
+        db.createPhase({
+          id: phase.id,
+          project_id: phase.project_id,
+          title: phase.title,
+          goal: phase.goal,
+          order_index: 0,
+          status: phase.status,
+          created_at: now,
+          updated_at: now
+        });
+        return;
+      }
+      db.updatePhase({
+        id: phase.id,
+        title: phase.title,
+        goal: phase.goal,
+        order_index: existing.order_index ?? 0,
+        status: phase.status,
+        updated_at: now
+      });
+    });
+  }
+
+  private upsertBlock(block: Block) {
+    this.withSqlite((db) => {
+      const existing = db.getBlock(block.id);
+      const now = this.nowIso();
+      const file_path = `.assistant/blocks/${block.id}.md`;
+      if (!existing) {
+        db.createBlock({
+          id: block.id,
+          phase_id: block.phase_id,
+          title: block.title,
+          goal: block.goal,
+          order_index: 0,
+          status: block.status,
+          file_path,
+          created_at: now,
+          updated_at: now
+        });
+        return;
+      }
+      db.updateBlock({
+        id: block.id,
+        title: block.title,
+        goal: block.goal,
+        order_index: existing.order_index ?? 0,
+        status: block.status,
+        file_path: existing.file_path ?? file_path,
+        updated_at: now
+      });
+    });
+  }
+
+  private upsertTask(task: Task) {
+    this.withSqlite((db) => {
+      const existing = db.getTask(task.id);
+      const now = this.nowIso();
+      if (!existing) {
+        db.createTask({
+          id: task.id,
+          block_id: task.block_id,
+          title: task.title,
+          user_value: task.user_value,
+          technical_goal: task.technical_goal,
+          definition_of_done: task.definition_of_done,
+          constraints: task.constraints,
+          allowed_files: task.allowed_files,
+          order_index: 0,
+          status: task.status,
+          created_at: now,
+          updated_at: now
+        });
+        return;
+      }
+      db.updateTask({
+        id: task.id,
+        title: task.title,
+        user_value: task.user_value,
+        technical_goal: task.technical_goal,
+        definition_of_done: task.definition_of_done,
+        constraints: task.constraints,
+        allowed_files: task.allowed_files,
+        order_index: existing.order_index ?? 0,
+        status: task.status,
+        updated_at: now
+      });
+    });
+  }
+
+  private upsertSession(session: Session) {
+    this.withSqlite((db) => {
+      const existing = db.getSession(session.id);
+      const now = this.nowIso();
+      if (!existing) {
+        db.createSession({
+          id: session.id,
+          task_id: session.task_id,
+          assistant: session.assistant,
+          prompt_snapshot: session.prompt_snapshot,
+          change_plan: session.change_plan,
+          result_summary: session.result_summary,
+          changed_files: session.changed_files,
+          scope_ok: session.scope_ok,
+          unexpected_files: session.unexpected_files,
+          status: session.status,
+          created_at: now,
+          updated_at: now
+        });
+        return;
+      }
+      db.updateSession({
+        id: session.id,
+        prompt_snapshot: session.prompt_snapshot,
+        change_plan: session.change_plan,
+        result_summary: session.result_summary,
+        changed_files: session.changed_files,
+        scope_ok: session.scope_ok,
+        unexpected_files: session.unexpected_files,
+        status: session.status,
+        updated_at: now
+      });
+    });
+  }
 
   initializeProject(input: InitProjectInput) {
     const project_id = this.store.nextId("proj");
@@ -90,6 +267,11 @@ export class WorkflowEngine {
       });
       writePhases(input.repo_root, phasesMd).catch(() => undefined);
     }
+
+    this.upsertProject(project, input.repo_url);
+    this.upsertPhase(phase);
+    this.upsertBlock(block);
+    this.upsertTask(task);
 
     return {
       project_id,
@@ -238,6 +420,8 @@ export class WorkflowEngine {
 
     task.status = "in_progress";
     this.store.sessions.set(session_id, session);
+    this.upsertTask(task);
+    this.upsertSession(session);
 
     if (repo_root) {
       const snapshot = buildSnapshotMarkdown(`Started task ${task.id}: ${task.title}`);
@@ -258,6 +442,7 @@ export class WorkflowEngine {
     session.result_summary = summary;
     session.changed_files = changed_files;
     session.status = "submitted";
+    this.upsertSession(session);
 
     if (repo_root) {
       const snapshot = buildSnapshotMarkdown(summary);
@@ -277,6 +462,7 @@ export class WorkflowEngine {
     if (session) {
       session.scope_ok = unexpected.length === 0;
       session.unexpected_files = unexpected;
+      this.upsertSession(session);
     }
     if (unexpected.length > 0) {
       return {
@@ -320,6 +506,7 @@ export class WorkflowEngine {
     if (!session) return null;
     session.scope_ok = true;
     session.unexpected_files = approved_files;
+    this.upsertSession(session);
     return {
       session_id,
       scope_ok: true,
@@ -336,6 +523,7 @@ export class WorkflowEngine {
 
     if (session.scope_ok !== true) {
       task.status = "review";
+      this.upsertTask(task);
       return {
         task_id: task.id,
         task_status: "review",
@@ -348,6 +536,7 @@ export class WorkflowEngine {
     const missing = Object.entries(checks).filter(([, ok]) => !ok).map(([k]) => k);
     if (missing.length > 0) {
       task.status = "review";
+      this.upsertTask(task);
       return {
         task_id: task.id,
         task_status: "review",
@@ -359,6 +548,8 @@ export class WorkflowEngine {
 
     task.status = "done";
     session.status = "validated";
+    this.upsertTask(task);
+    this.upsertSession(session);
     const block = this.store.blocks.get(task.block_id);
     if (block) {
       const blockTasks = Array.from(this.store.tasks.values()).filter(
@@ -369,6 +560,7 @@ export class WorkflowEngine {
       } else if (block.status === "not_started") {
         block.status = "in_progress";
       }
+      this.upsertBlock(block);
     }
 
     if (repo_root) {

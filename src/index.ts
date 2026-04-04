@@ -1,6 +1,10 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { tools, handleToolCall } from "./tools.js";
+import { createToolRouter } from "./tools.js";
+import { InMemoryStore } from "./state.js";
+import { WorkflowEngine } from "./engine.js";
+import { initSqliteStore } from "./storage/index.js";
+import type { SqliteStore } from "./storage/sqlite.js";
 
 const server = new Server(
   {
@@ -13,6 +17,16 @@ const server = new Server(
     }
   }
 );
+
+const memoryStore = new InMemoryStore();
+let sqliteStore: SqliteStore | undefined;
+try {
+  sqliteStore = initSqliteStore().store;
+} catch {
+  sqliteStore = undefined;
+}
+const engine = new WorkflowEngine(memoryStore, sqliteStore);
+const { tools, handleToolCall } = createToolRouter(engine);
 
 server.setRequestHandler("tools/list", async () => {
   return { tools };

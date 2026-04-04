@@ -1,9 +1,5 @@
 import { WorkflowEngine } from "./engine.js";
-import { InMemoryStore } from "./state.js";
 import { applyMonetization } from "./monetization/enforce.js";
-
-export const store = new InMemoryStore();
-export const engine = new WorkflowEngine(store);
 
 const monetizationContextSchema = {
   user_id: { type: "string" },
@@ -157,61 +153,65 @@ export const tools = [
   }
 ];
 
-export function handleToolCall(name: string, args: Record<string, unknown>) {
-  return applyMonetization(name, args, () => {
-    switch (name) {
-      case "initialize_project":
-        return engine.initializeProject(args as any);
-      case "get_project_state":
-        return engine.getProjectState(args.project_id as string);
-      case "get_next_step":
-        return engine.getNextStep(args.project_id as string);
-      case "generate_agent_prompt":
-        return engine.generateAgentPrompt(
-          args.project_id as string,
-          args.task_id as string,
-          args.assistant as string
-        );
-      case "start_session":
-        if (!args.change_plan_approved) return { error: "CHANGE_PLAN_NOT_APPROVED" };
-        return engine.startSession(
-          args.project_id as string,
-          args.task_id as string,
-          args.assistant as string,
-          args.prompt_snapshot as string,
-          (args.change_plan as Record<string, unknown>) ?? {},
-          args.repo_root as string | undefined
-        );
-      case "submit_agent_result":
-        return engine.submitAgentResult(
-          args.session_id as string,
-          args.summary as string,
-          (args.changed_files as string[]) ?? [],
-          args.repo_root as string | undefined
-        );
-      case "validate_scope":
-        return engine.validateScope(
-          args.session_id as string,
-          (args.allowed_files as string[]) ?? [],
-          (args.changed_files as string[]) ?? []
-        );
-      case "explain_changes":
-        return engine.explainChanges(args.session_id as string);
-      case "complete_task":
-        return engine.completeTask(
-          args.task_id as string,
-          args.session_id as string,
-          (args.definition_of_done_checks as Record<string, boolean>) ?? {},
-          args.repo_root as string | undefined
-        );
-      case "approve_scope_override":
-        return engine.approveScopeOverride(
-          args.session_id as string,
-          (args.approved_files as string[]) ?? [],
-          args.reason as string | undefined
-        );
-      default:
-        return { error: "UNKNOWN_TOOL" };
-    }
-  });
-}
+export const createToolRouter = (engine: WorkflowEngine) => {
+  const handleToolCall = (name: string, args: Record<string, unknown>) => {
+    return applyMonetization(name, args, () => {
+      switch (name) {
+        case "initialize_project":
+          return engine.initializeProject(args as any);
+        case "get_project_state":
+          return engine.getProjectState(args.project_id as string);
+        case "get_next_step":
+          return engine.getNextStep(args.project_id as string);
+        case "generate_agent_prompt":
+          return engine.generateAgentPrompt(
+            args.project_id as string,
+            args.task_id as string,
+            args.assistant as string
+          );
+        case "start_session":
+          if (!args.change_plan_approved) return { error: "CHANGE_PLAN_NOT_APPROVED" };
+          return engine.startSession(
+            args.project_id as string,
+            args.task_id as string,
+            args.assistant as string,
+            args.prompt_snapshot as string,
+            (args.change_plan as Record<string, unknown>) ?? {},
+            args.repo_root as string | undefined
+          );
+        case "submit_agent_result":
+          return engine.submitAgentResult(
+            args.session_id as string,
+            args.summary as string,
+            (args.changed_files as string[]) ?? [],
+            args.repo_root as string | undefined
+          );
+        case "validate_scope":
+          return engine.validateScope(
+            args.session_id as string,
+            (args.allowed_files as string[]) ?? [],
+            (args.changed_files as string[]) ?? []
+          );
+        case "explain_changes":
+          return engine.explainChanges(args.session_id as string);
+        case "complete_task":
+          return engine.completeTask(
+            args.task_id as string,
+            args.session_id as string,
+            (args.definition_of_done_checks as Record<string, boolean>) ?? {},
+            args.repo_root as string | undefined
+          );
+        case "approve_scope_override":
+          return engine.approveScopeOverride(
+            args.session_id as string,
+            (args.approved_files as string[]) ?? [],
+            args.reason as string | undefined
+          );
+        default:
+          return { error: "UNKNOWN_TOOL" };
+      }
+    });
+  };
+
+  return { tools, handleToolCall };
+};
