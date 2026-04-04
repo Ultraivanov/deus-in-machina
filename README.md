@@ -16,6 +16,14 @@ Deterministic execution layer for AI-assisted coding. It keeps projects **struct
    - `examples/codex-client.md`
    - `examples/claude-cursor-client.md`
 
+## Release Summary
+
+- File-first state with `.assistant/` as the source of truth.
+- MCP tool surface with change-plan gating and scope validation.
+- SQLite mirror, subscription usage counters, and hydration on startup.
+- Workflow templates, client examples, and a thin companion UI.
+- Security, privacy, onboarding, and release docs included.
+
 ## Why
 AI assistants are powerful but session-fragile. This product makes work predictable by storing context, scope, and progress in files and enforcing approval gates.
 

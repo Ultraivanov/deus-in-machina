@@ -10,10 +10,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Phase      | MVP                        |
-| Goal       | Working MCP server with deterministic, file-first workflow |
+| Phase      | Release                    |
+| Goal       | Production launch          |
 | Started    | 2026-04-04                 |
-| Target     | TBD                        |
+| Target     | Completed                  |
 
 ## Active Block
 
@@ -21,7 +21,7 @@
 |------------|----------------------------|
 | Block ID   | R-03                       |
 | Title      | Packaging + hosted deployment |
-| Status     | in-progress                |
+| Status     | done                       |
 | File       | `.assistant/blocks/R-03.md` |
 
 ---
@@ -63,7 +63,7 @@
 |------|--------------------------------|---------|
 | R-01 | Security + privacy review      | done |
 | R-02 | Docs + onboarding              | done |
-| R-03 | Packaging + hosted deployment  | in-progress |
+| R-03 | Packaging + hosted deployment  | done |
 
 ---
 
@@ -75,4 +75,4 @@
 
 ---
 
-_Last updated: 2026-04-04_
+_Last updated: 2026-04-05_
