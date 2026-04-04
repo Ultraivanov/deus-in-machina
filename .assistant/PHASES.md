@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | R-03                       |
-| Title      | Packaging + hosted deployment |
-| Status     | done                       |
-| File       | `.assistant/blocks/R-03.md` |
+| Block ID   | R-04                       |
+| Title      | Stripe billing integration |
+| Status     | in-progress                |
+| File       | `.assistant/blocks/R-04.md` |
 
 ---
 
@@ -64,6 +64,7 @@
 | R-01 | Security + privacy review      | done |
 | R-02 | Docs + onboarding              | done |
 | R-03 | Packaging + hosted deployment  | done |
+| R-04 | Stripe billing integration     | in-progress |
 
 ---
 

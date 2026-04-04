@@ -127,6 +127,10 @@ Outline: `docs/hosted-deployment.md`.
 
 Checklist: `docs/release-checklist.md`.
 
+## Stripe
+
+Integration guide: `docs/stripe-integration.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo

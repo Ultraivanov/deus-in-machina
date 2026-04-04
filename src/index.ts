@@ -8,6 +8,7 @@ import type { SqliteStore } from "./storage/sqlite.js";
 import { buildRepoIndex } from "./repo/indexer.js";
 import { makeError, ensureErrorShape, logError } from "./errors.js";
 import { setTelemetrySink } from "./telemetry.js";
+import { startStripeServer } from "./stripe/server.js";
 
 const server = new Server(
   {
@@ -35,6 +36,8 @@ setTelemetrySink((event) => {
   // Default sink: stdout JSON
   console.log(JSON.stringify({ type: "telemetry", ...event }));
 });
+
+startStripeServer(sqliteStore);
 
 try {
   const repoIndex = buildRepoIndex({ root: process.cwd() });

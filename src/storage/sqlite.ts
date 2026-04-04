@@ -87,6 +87,11 @@ const getUsageFromLimits = (limits: Record<string, unknown> | null | undefined) 
   project_count: toNumber(limits?.project_count, 0)
 });
 
+const getStripeFromLimits = (limits: Record<string, unknown> | null | undefined) => ({
+  stripe_customer_id: typeof limits?.stripe_customer_id === "string" ? (limits.stripe_customer_id as string) : undefined,
+  stripe_subscription_id: typeof limits?.stripe_subscription_id === "string" ? (limits.stripe_subscription_id as string) : undefined
+});
+
 const mergeUsageIntoLimits = (
   limits: Record<string, unknown> | null | undefined,
   usage: { sessions_used: number; project_count: number }
@@ -309,6 +314,41 @@ export class SqliteStore {
       current_period_start: subscription.current_period_start,
       current_period_end: subscription.current_period_end,
       limits: mergeUsageIntoLimits(subscription.limits, next)
+    });
+  }
+
+  getStripeMetadata(user_id: string) {
+    const subscription = this.ensureSubscription(user_id);
+    const stripeMeta = getStripeFromLimits(subscription.limits);
+    return stripeMeta;
+  }
+
+  updateStripeMetadata(user_id: string, data: { stripe_customer_id?: string; stripe_subscription_id?: string }) {
+    const subscription = this.ensureSubscription(user_id);
+    const limits = {
+      ...(subscription.limits ?? {}),
+      ...(data.stripe_customer_id ? { stripe_customer_id: data.stripe_customer_id } : {}),
+      ...(data.stripe_subscription_id ? { stripe_subscription_id: data.stripe_subscription_id } : {})
+    };
+    return this.updateSubscription({
+      id: subscription.id,
+      plan: subscription.plan,
+      status: subscription.status,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      limits
+    });
+  }
+
+  updateSubscriptionFromStripe(user_id: string, data: { plan?: SubscriptionPlan; status?: SubscriptionStatus }) {
+    const subscription = this.ensureSubscription(user_id);
+    return this.updateSubscription({
+      id: subscription.id,
+      plan: data.plan ?? subscription.plan,
+      status: data.status ?? subscription.status,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      limits: subscription.limits
     });
   }
 
