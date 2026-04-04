@@ -320,6 +320,17 @@ export class WorkflowEngine {
     const session = this.store.sessions.get(session_id);
     if (!task || !session) return null;
 
+    if (session.scope_ok !== true) {
+      task.status = "review";
+      return {
+        task_id: task.id,
+        task_status: "review",
+        session_status: session.status,
+        missing_conditions: ["scope_validated"],
+        message: "Task is not complete because scope validation has not passed."
+      };
+    }
+
     const missing = Object.entries(checks).filter(([, ok]) => !ok).map(([k]) => k);
     if (missing.length > 0) {
       task.status = "review";
@@ -334,6 +345,17 @@ export class WorkflowEngine {
 
     task.status = "done";
     session.status = "validated";
+    const block = this.store.blocks.get(task.block_id);
+    if (block) {
+      const blockTasks = Array.from(this.store.tasks.values()).filter(
+        (entry) => entry.block_id === block.id
+      );
+      if (blockTasks.length > 0 && blockTasks.every((entry) => entry.status === "done")) {
+        block.status = "done";
+      } else if (block.status === "not_started") {
+        block.status = "in_progress";
+      }
+    }
 
     if (repo_root) {
       const snapshot = buildSnapshotMarkdown(`Completed task ${task.id}: ${task.title}`);

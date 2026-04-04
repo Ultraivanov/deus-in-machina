@@ -20,7 +20,7 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 | ID        | Task                                  | Status  | Done When |
 |-----------|---------------------------------------|---------|----------|
 | MVP-04-T1 | Persist scope validation outcome      | done    | Session records include scope_ok + unexpected_files and show in explain_changes |
-| MVP-04-T2 | Enforce DoD pipeline + block progress | pending | complete_task checks validation status and updates task/block status |
+| MVP-04-T2 | Enforce DoD pipeline + block progress | done    | complete_task checks validation status and updates task/block status |
 | MVP-04-T3 | Scope override tool                   | pending | approve_scope_override tool exists and requires explicit approval |
 
 > New tasks are added here as the block progresses via `init-task`.
@@ -31,10 +31,10 @@ Scope validation and DoD checks persist in state, block/phase progress updates c
 
 | Field     | Value                      |
 |-----------|----------------------------|
-| Task ID   | MVP-04-T2                  |
-| Title     | Enforce DoD pipeline + block progress |
+| Task ID   | MVP-04-T3                  |
+| Title     | Scope override tool |
 | Status    | pending                    |
-| Done When | complete_task checks validation status and updates task/block status |
+| Done When | approve_scope_override tool exists and requires explicit approval |
 
 ---
 
@@ -64,6 +64,25 @@ Low. Session-level data only.
 
 ---
 
+### MVP-04-T2 — Enforce DoD pipeline + block progress
+
+**Files to modify:**
+- `src/engine.ts` — block completion if scope validation failed; update block status when all tasks are done
+
+**Files to create:**
+- none
+
+**Files NOT touched:**
+- `src/tools.ts`, `src/index.ts`, `src/storage/*`
+
+**Approach:**
+Require `scope_ok === true` before completing a task. After DoD passes, update the parent block to `done` when all tasks are completed.
+
+**Risks:**
+Medium. Must avoid completing tasks when scope validation is missing.
+
+---
+
 ## Refactor Backlog
 
 > Spotted during this block. Do not touch until a dedicated refactor block.
@@ -79,6 +98,7 @@ Low. Session-level data only.
 | Date       | Task ID   | Status | Note |
 |------------|-----------|--------|------|
 | 2026-04-04 | MVP-04-T1 | done   | Stored scope validation in session + surfaced in explain_changes |
+| 2026-04-04 | MVP-04-T2 | done   | Enforced scope validation and updated block completion logic |
 
 ---
 
