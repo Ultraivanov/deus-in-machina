@@ -7,6 +7,7 @@ import { initSqliteStore } from "./storage/index.js";
 import type { SqliteStore } from "./storage/sqlite.js";
 import { buildRepoIndex } from "./repo/indexer.js";
 import { makeError, ensureErrorShape } from "./errors.js";
+import { setTelemetrySink } from "./telemetry.js";
 
 const server = new Server(
   {
@@ -29,6 +30,11 @@ try {
 }
 const engine = new WorkflowEngine(memoryStore, sqliteStore);
 const { tools, handleToolCall } = createToolRouter(engine, sqliteStore);
+
+setTelemetrySink((event) => {
+  // Default sink: stdout JSON
+  console.log(JSON.stringify({ type: "telemetry", ...event }));
+});
 
 try {
   const repoIndex = buildRepoIndex({ root: process.cwd() });

@@ -2,6 +2,7 @@ import { WorkflowEngine } from "./engine.js";
 import { applyMonetization } from "./monetization/enforce.js";
 import type { SqliteStore } from "./storage/sqlite.js";
 import { makeError } from "./errors.js";
+import { track } from "./telemetry.js";
 
 const monetizationContextSchema = {
   user_id: { type: "string" },
@@ -172,14 +173,22 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
       name,
       args,
       () => {
+      const basePayload = {
+        tool: name,
+        user_id: args.user_id ?? (args.subscription as any)?.user_id ?? "anon"
+      };
       switch (name) {
         case "initialize_project":
+          track("initialize_project", basePayload);
           return engine.initializeProject(args as any);
         case "get_project_state":
+          track("get_project_state", { ...basePayload, project_id: args.project_id });
           return engine.getProjectState(args.project_id as string);
         case "get_next_step":
+          track("get_next_step", { ...basePayload, project_id: args.project_id });
           return engine.getNextStep(args.project_id as string);
         case "generate_agent_prompt":
+          track("generate_agent_prompt", { ...basePayload, task_id: args.task_id });
           return engine.generateAgentPrompt(
             args.project_id as string,
             args.task_id as string,
@@ -189,6 +198,7 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
           if (!args.change_plan_approved) {
             return makeError("CHANGE_PLAN_NOT_APPROVED", "Change Plan approval is required.", false);
           }
+          track("start_session", { ...basePayload, task_id: args.task_id });
           return engine.startSession(
             args.project_id as string,
             args.task_id as string,
@@ -199,6 +209,7 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             args.user_id as string | undefined
           );
         case "submit_agent_result":
+          track("submit_agent_result", { ...basePayload, session_id: args.session_id });
           return engine.submitAgentResult(
             args.session_id as string,
             args.summary as string,
@@ -206,14 +217,17 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             args.repo_root as string | undefined
           );
         case "validate_scope":
+          track("validate_scope", { ...basePayload, session_id: args.session_id });
           return engine.validateScope(
             args.session_id as string,
             (args.allowed_files as string[]) ?? [],
             (args.changed_files as string[]) ?? []
           );
         case "explain_changes":
+          track("explain_changes", { ...basePayload, session_id: args.session_id });
           return engine.explainChanges(args.session_id as string);
         case "complete_task":
+          track("complete_task", { ...basePayload, task_id: args.task_id });
           return engine.completeTask(
             args.task_id as string,
             args.session_id as string,
@@ -221,6 +235,7 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             args.repo_root as string | undefined
           );
         case "approve_scope_override":
+          track("approve_scope_override", { ...basePayload, session_id: args.session_id });
           return engine.approveScopeOverride(
             args.session_id as string,
             (args.approved_files as string[]) ?? [],
