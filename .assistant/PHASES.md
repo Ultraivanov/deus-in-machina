@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | B-03                       |
-| Title      | Workflow graph templates |
+| Block ID   | R-01                       |
+| Title      | Security + privacy review |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/B-03.md` |
+| File       | `.assistant/blocks/R-01.md` |
 
 ---
 
@@ -54,14 +54,14 @@
 |------|--------------------------------|---------|
 | B-01 | Client integration examples    | done |
 | B-02 | Thin companion UI (optional)   | done |
-| B-03 | Workflow graph templates       | in-progress |
+| B-03 | Workflow graph templates       | done |
 
 ### Phase 4 — Release
 > Goal: production launch
 
 | ID   | Block                          | Status  |
 |------|--------------------------------|---------|
-| R-01 | Security + privacy review      | pending |
+| R-01 | Security + privacy review      | in-progress |
 | R-02 | Docs + onboarding              | pending |
 | R-03 | Packaging + hosted deployment  | pending |
 
