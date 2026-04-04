@@ -339,6 +339,13 @@ export class SqliteStore {
     return row ?? null;
   }
 
+  getLatestProject(): ProjectRecord | null {
+    const row = this.db
+      .prepare(`SELECT * FROM project ORDER BY updated_at DESC, created_at DESC LIMIT 1`)
+      .get();
+    return row ?? null;
+  }
+
   updateProject(input: Partial<ProjectRecord> & { id: string }) {
     const updated_at = input.updated_at ?? nowIso();
     this.db.prepare(
@@ -396,6 +403,12 @@ export class SqliteStore {
     return row ?? null;
   }
 
+  listPhasesByProjectId(project_id: string): PhaseRecord[] {
+    return this.db
+      .prepare(`SELECT * FROM phase WHERE project_id = ? ORDER BY order_index ASC, created_at ASC`)
+      .all(project_id) as PhaseRecord[];
+  }
+
   updatePhase(input: Partial<PhaseRecord> & { id: string }) {
     const updated_at = input.updated_at ?? nowIso();
     this.db.prepare(
@@ -440,6 +453,12 @@ export class SqliteStore {
   getBlock(id: string): BlockRecord | null {
     const row = this.db.prepare(`SELECT * FROM block WHERE id = ?`).get(id);
     return row ?? null;
+  }
+
+  listBlocksByPhaseId(phase_id: string): BlockRecord[] {
+    return this.db
+      .prepare(`SELECT * FROM block WHERE phase_id = ? ORDER BY order_index ASC, created_at ASC`)
+      .all(phase_id) as BlockRecord[];
   }
 
   updateBlock(input: Partial<BlockRecord> & { id: string }) {
@@ -501,6 +520,18 @@ export class SqliteStore {
       constraints: fromJson(row.constraints_json, []),
       allowed_files: fromJson(row.allowed_files_json, [])
     } as TaskRecord;
+  }
+
+  listTasksByBlockId(block_id: string): TaskRecord[] {
+    const rows = this.db
+      .prepare(`SELECT * FROM task WHERE block_id = ? ORDER BY order_index ASC, created_at ASC`)
+      .all(block_id) as Array<Record<string, unknown>>;
+    return rows.map((row) => ({
+      ...row,
+      definition_of_done: fromJson(row.definition_of_done_json as string, []),
+      constraints: fromJson(row.constraints_json as string, []),
+      allowed_files: fromJson(row.allowed_files_json as string, [])
+    })) as TaskRecord[];
   }
 
   updateTask(input: Partial<TaskRecord> & { id: string }) {
@@ -569,6 +600,20 @@ export class SqliteStore {
       scope_ok: row.scope_ok === null || row.scope_ok === undefined ? undefined : row.scope_ok === 1,
       unexpected_files: fromJson(row.unexpected_files_json, null)
     } as SessionRecord;
+  }
+
+  listSessionsByTaskId(task_id: string): SessionRecord[] {
+    const rows = this.db
+      .prepare(`SELECT * FROM session WHERE task_id = ? ORDER BY created_at ASC`)
+      .all(task_id) as Array<Record<string, unknown>>;
+    return rows.map((row) => ({
+      ...row,
+      change_plan: fromJson(row.change_plan_json as string, null),
+      changed_files: fromJson(row.changed_files_json as string, null),
+      scope_ok:
+        row.scope_ok === null || row.scope_ok === undefined ? undefined : (row.scope_ok as number) === 1,
+      unexpected_files: fromJson(row.unexpected_files_json as string, null)
+    })) as SessionRecord[];
   }
 
   updateSession(input: Partial<SessionRecord> & { id: string }) {

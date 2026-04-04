@@ -28,6 +28,8 @@ try {
 const engine = new WorkflowEngine(memoryStore, sqliteStore);
 const { tools, handleToolCall } = createToolRouter(engine, sqliteStore);
 
+engine.hydrateFromSqlite();
+
 server.setRequestHandler("tools/list", async () => {
   return { tools };
 });

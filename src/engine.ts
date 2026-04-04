@@ -221,6 +221,123 @@ export class WorkflowEngine {
     });
   }
 
+  hydrateFromSqlite() {
+    if (!this.sqlite) {
+      return { ok: false, reason: "NO_SQLITE" };
+    }
+    try {
+      const project = this.sqlite.getLatestProject();
+      if (!project) return { ok: false, reason: "NO_PROJECT" };
+
+      this.store.projects.clear();
+      this.store.phases.clear();
+      this.store.blocks.clear();
+      this.store.tasks.clear();
+      this.store.sessions.clear();
+
+      this.store.projects.set(project.id, {
+        id: project.id,
+        summary: project.summary,
+        status: project.status,
+        current_phase_id: project.current_phase_id,
+        current_block_id: project.current_block_id,
+        current_task_id: project.current_task_id
+      });
+
+      const phases = this.sqlite.listPhasesByProjectId(project.id);
+      phases.forEach((phase) => {
+        this.store.phases.set(phase.id, {
+          id: phase.id,
+          project_id: phase.project_id,
+          title: phase.title,
+          goal: phase.goal,
+          status: phase.status
+        });
+      });
+
+      const blocks: Block[] = [];
+      phases.forEach((phase) => {
+        const phaseBlocks = this.sqlite!.listBlocksByPhaseId(phase.id);
+        phaseBlocks.forEach((block) => {
+          this.store.blocks.set(block.id, {
+            id: block.id,
+            phase_id: block.phase_id,
+            title: block.title,
+            goal: block.goal,
+            status: block.status
+          });
+          blocks.push({
+            id: block.id,
+            phase_id: block.phase_id,
+            title: block.title,
+            goal: block.goal,
+            status: block.status
+          });
+        });
+      });
+
+      const tasks: Task[] = [];
+      blocks.forEach((block) => {
+        const blockTasks = this.sqlite!.listTasksByBlockId(block.id);
+        blockTasks.forEach((task) => {
+          this.store.tasks.set(task.id, {
+            id: task.id,
+            block_id: task.block_id,
+            title: task.title,
+            user_value: task.user_value,
+            technical_goal: task.technical_goal,
+            definition_of_done: task.definition_of_done,
+            constraints: task.constraints,
+            allowed_files: task.allowed_files,
+            status: task.status
+          });
+          tasks.push({
+            id: task.id,
+            block_id: task.block_id,
+            title: task.title,
+            user_value: task.user_value,
+            technical_goal: task.technical_goal,
+            definition_of_done: task.definition_of_done,
+            constraints: task.constraints,
+            allowed_files: task.allowed_files,
+            status: task.status
+          });
+        });
+      });
+
+      let sessionCount = 0;
+      tasks.forEach((task) => {
+        const sessions = this.sqlite!.listSessionsByTaskId(task.id);
+        sessions.forEach((session) => {
+          this.store.sessions.set(session.id, {
+            id: session.id,
+            task_id: session.task_id,
+            assistant: session.assistant,
+            prompt_snapshot: session.prompt_snapshot,
+            change_plan: session.change_plan ?? undefined,
+            result_summary: session.result_summary ?? undefined,
+            changed_files: session.changed_files ?? undefined,
+            scope_ok: session.scope_ok,
+            unexpected_files: session.unexpected_files ?? undefined,
+            status: session.status
+          });
+          sessionCount += 1;
+        });
+      });
+
+      return {
+        ok: true,
+        project_id: project.id,
+        phase_count: phases.length,
+        block_count: blocks.length,
+        task_count: tasks.length,
+        session_count: sessionCount
+      };
+    } catch {
+      return { ok: false, reason: "HYDRATE_FAILED" };
+    }
+  }
+
   initializeProject(input: InitProjectInput) {
     const project_id = this.store.nextId("proj");
     const phase_id = this.store.nextId("phase");
