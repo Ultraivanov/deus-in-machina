@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | B-01                       |
-| Title      | Client integration examples |
+| Block ID   | B-02                       |
+| Title      | Thin companion UI (optional) |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/B-01.md` |
+| File       | `.assistant/blocks/B-02.md` |
 
 ---
 
@@ -52,8 +52,8 @@
 
 | ID   | Block                          | Status  |
 |------|--------------------------------|---------|
-| B-01 | Client integration examples    | in-progress |
-| B-02 | Thin companion UI (optional)   | pending |
+| B-01 | Client integration examples    | done |
+| B-02 | Thin companion UI (optional)   | in-progress |
 | B-03 | Workflow graph templates       | pending |
 
 ### Phase 4 — Release
