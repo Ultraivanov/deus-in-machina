@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | A-03                       |
-| Title      | Error handling + telemetry |
+| Block ID   | B-01                       |
+| Title      | Client integration examples |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/A-03.md` |
+| File       | `.assistant/blocks/B-01.md` |
 
 ---
 
@@ -45,14 +45,14 @@
 |------|--------------------------------|---------|
 | A-01 | SQLite mirror + persistence    | done |
 | A-02 | Repo awareness + allowed files | done |
-| A-03 | Error handling + telemetry     | in-progress |
+| A-03 | Error handling + telemetry     | done |
 
 ### Phase 3 — Beta
 > Goal: external testing, stability
 
 | ID   | Block                          | Status  |
 |------|--------------------------------|---------|
-| B-01 | Client integration examples    | pending |
+| B-01 | Client integration examples    | in-progress |
 | B-02 | Thin companion UI (optional)   | pending |
 | B-03 | Workflow graph templates       | pending |
 
