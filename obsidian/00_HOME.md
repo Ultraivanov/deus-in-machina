@@ -15,6 +15,7 @@ tags: [codex, starter, home]
 - [[05_Migration_Update]]
 - [[06_FAQ]]
 - [[07_Templates]]
+- [[08_Use_Cases]]
 
 ## Внешние ссылки
 
