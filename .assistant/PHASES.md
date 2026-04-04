@@ -19,10 +19,10 @@
 
 | Field      | Value                      |
 |------------|----------------------------|
-| Block ID   | MVP-03                     |
-| Title      | File-first state I/O       |
+| Block ID   | MVP-04                     |
+| Title      | Scope + DoD validation pipeline |
 | Status     | in-progress                |
-| File       | `.assistant/blocks/MVP-03.md` |
+| File       | `.assistant/blocks/MVP-04.md` |
 
 ---
 
@@ -35,8 +35,8 @@
 |--------|--------------------------------|---------|
 | MVP-01 | Product + MCP tool specs       | done    |
 | MVP-02 | MCP server skeleton            | done    |
-| MVP-03 | File-first state I/O           | in-progress |
-| MVP-04 | Scope + DoD validation pipeline| pending |
+| MVP-03 | File-first state I/O           | done |
+| MVP-04 | Scope + DoD validation pipeline| in-progress |
 
 ### Phase 2 — Alpha
 > Goal: internal testing, real users
