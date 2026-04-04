@@ -107,6 +107,10 @@ Checklist: `docs/onboarding-checklist.md`.
 
 Answers: `docs/faq.md`.
 
+## Packaging
+
+Guide: `docs/packaging-guide.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
