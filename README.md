@@ -77,6 +77,10 @@ Examples:
 
 Release checklist: `docs/security-checklist.md`.
 
+## Privacy
+
+Notes: `docs/privacy-notes.md`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
