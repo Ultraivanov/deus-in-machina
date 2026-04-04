@@ -130,3 +130,26 @@ body {
   text-decoration: none;
   font-weight: 600;
 }
+
+.scope-list {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: #fffdf9;
+}
+
+.scope-list ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.action-panel {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}

@@ -52,10 +52,22 @@ export const routes = {
     title: "Next Step",
     body: `
       <div class="card">
-        <h2>Next Task</h2>
-        <p class="muted">Implement allowlist inference for the current task.</p>
-        <p>Why now: keeps scope deterministic and drift‑free.</p>
-        <a class="cta" href="#/state">View current state</a>
+        <h2>${mockState.next_step.title}</h2>
+        <p class="muted">Task ID: ${mockState.next_step.task_id}</p>
+        <p><strong>Why now:</strong> ${mockState.next_step.why_now}</p>
+        <p><strong>Expected result:</strong> ${mockState.next_step.expected_result}</p>
+        <div class="scope-list">
+          <span class="pill">Scope</span>
+          <ul>
+            ${mockState.next_step.estimated_change_scope
+              .map((file) => `<li>${file}</li>`)
+              .join("")}
+          </ul>
+        </div>
+        <div class="action-panel">
+          <span class="muted">Session status: waiting for approval</span>
+          <a class="cta" href="#/state">Review state</a>
+        </div>
       </div>
     `
   })

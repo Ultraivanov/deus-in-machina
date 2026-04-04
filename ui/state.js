@@ -23,5 +23,12 @@ export const mockState = {
     steps_completed: 18,
     blocked: false,
     confidence: "medium"
+  },
+  next_step: {
+    task_id: "B-02-T3",
+    title: "Next step + action panel",
+    why_now: "Keeps the companion UI actionable and reduces uncertainty.",
+    expected_result: "UI shows next task, scope, and session status.",
+    estimated_change_scope: ["ui/router.js", "ui/state.js", "ui/styles.css"]
   }
 };
