@@ -69,7 +69,9 @@ See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 ## Workflow Templates
 
 Templates live in `templates/` as JSON (phases → blocks → tasks).
-Example: `templates/saas-landing.json`.
+Examples:
+- `templates/saas-landing.json`
+- `templates/auth-dashboard.json`
 
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
