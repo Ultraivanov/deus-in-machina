@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | P2-04                                    |
-| Title      | Validator implementation stub            |
-| Status     | done                                     |
-| File       | `.codex/blocks/P2-04.md`                 |
+| Block ID   | P2-05                                    |
+| Title      | CLI/runner for pipeline execution        |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/P2-05.md`                 |
 
 ---
 
@@ -48,7 +48,7 @@
 | P2-02 | Normalizer implementation stub         | done        |
 | P2-03 | Pattern engine implementation stub     | done        |
 | P2-04 | Validator implementation stub          | done        |
-| P2-05 | CLI/runner for pipeline execution      | pending |
+| P2-05 | CLI/runner for pipeline execution      | in-progress |
 
 ### Phase 3 — Moat Layer
 > Goal: cross-project learning and pattern growth
