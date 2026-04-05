@@ -1,0 +1,638 @@
+# ARCHITECTURE — DSR v3
+
+## System Overview
+Pipeline:
+Figma → Extractor → Normalizer → Pattern Engine → Rules → Validator → Fix Loop
+
+MCP Toolchain:
+extract_figma_context → normalize_tokens → build_landing_spec → generate_ui → validate_ui → fix_ui → loop_until_valid
+
+## Core Modules
+- Extractor: ingests Figma layout tree, variables, and styles into a machine-safe input contract.
+- Normalizer: maps raw names/values into a strict semantic token model.
+- Pattern Engine: detects reusable UI structures (Hero, Card, List) via heuristics.
+- Rules: validation ruleset (tokens, spacing, components, layout, patterns).
+- Validator: produces lint-style output with severity levels.
+- Correction Engine: generates fix instructions and re-runs validation.
+
+## Token Model (v3)
+
+### Layer 1: Raw (Figma)
+- `name` (string)
+- `value` (string | number)
+- `type` (optional: color, number, typography, shadow, etc.)
+
+Example:
+```json
+{ "name": "Color/Primary/Default", "value": "#3366FF", "type": "color" }
+```
+
+### Layer 2: Normalized
+- `category` (color, space, typography, radius, shadow, motion)
+- `role` (primary, secondary, neutral, background, text) optional
+- `scale` (string or number) optional
+- `state` (default, hover, disabled, focus, active) optional
+- `sourceName` (original raw name) optional
+
+Example:
+```json
+{
+  "category": "color",
+  "role": "primary",
+  "state": "default",
+  "sourceName": "Color/Primary/Default"
+}
+```
+
+### Layer 3: Semantic
+- `token` (string)
+- `value` (same as raw value)
+
+Example:
+```json
+{ "token": "color.primary.default", "value": "#3366FF" }
+```
+
+## Naming & Mapping Rules
+- Split raw names by `/`, `-`, `_`, whitespace, and camelCase boundaries.
+- Normalize all segments to lowercase.
+- Category is the first segment (or inferred from known sets).
+- Role is the next semantic segment (primary, secondary, neutral, background, text).
+- Scale is numeric (e.g. 100–900 or 8, 12, 16).
+- State is one of: `default`, `hover`, `disabled`, `focus`, `active`.
+- If role is missing, use `base`.
+- If state is missing and a state is expected, use explicit `default`.
+- Semantic token format: `category.role[.scale][.state]`.
+
+## Examples (Normalization)
+
+### Example A — Primary color (state)
+Raw:
+```json
+{ "name": "Color/Primary/Default", "value": "#3366FF" }
+```
+Normalized:
+```json
+{ "category": "color", "role": "primary", "state": "default" }
+```
+Semantic:
+```json
+{ "token": "color.primary.default", "value": "#3366FF" }
+```
+
+### Example B — Neutral scale
+Raw:
+```json
+{ "name": "Color/Neutral/500", "value": "#999999" }
+```
+Normalized:
+```json
+{ "category": "color", "role": "neutral", "scale": "500" }
+```
+Semantic:
+```json
+{ "token": "color.neutral.500", "value": "#999999" }
+```
+
+### Example C — Spacing scale
+Raw:
+```json
+{ "name": "Spacing/8", "value": 8 }
+```
+Normalized:
+```json
+{ "category": "space", "role": "base", "scale": "8" }
+```
+Semantic:
+```json
+{ "token": "space.base.8", "value": 8 }
+```
+
+### Example D — Typography size
+Raw:
+```json
+{ "name": "Typography/Body/16", "value": 16, "type": "typography" }
+```
+Normalized:
+```json
+{ "category": "typography", "role": "body", "scale": "16" }
+```
+Semantic:
+```json
+{ "token": "typography.body.16", "value": 16 }
+```
+
+## MCP Tool Spec (Runtime API)
+
+### Tool 1 — extract_figma_context
+Extract full design system from a Figma file.
+
+Input:
+```json
+{ "fileKey": "string" }
+```
+Output:
+```json
+{
+  "context": {
+    "variables": {},
+    "styles": {},
+    "components": {},
+    "layout": {}
+  }
+}
+```
+
+#### Example — extract_figma_context output
+```json
+{
+  "context": {
+    "variables": {
+      "color.primary.default": "#3366FF",
+      "spacing.8": 8
+    },
+    "styles": {
+      "text.h1": { "fontSize": 48, "fontWeight": 700 },
+      "text.body": { "fontSize": 16, "fontWeight": 400 }
+    },
+    "components": {
+      "Button/Primary": { "id": "10:2", "variants": ["default", "hover"] }
+    },
+    "layout": {
+      "root": { "id": "0:1", "children": ["1:1", "1:2"] }
+    }
+  }
+}
+```
+
+### Tool 2 — normalize_tokens
+Convert raw Figma data into semantic tokens.
+
+Input:
+```json
+{ "context": {} }
+```
+Output:
+```json
+{
+  "normalized_context": {
+    "tokens": {
+      "color.primary.default": "#3366FF"
+    }
+  }
+}
+```
+
+### Tool 3 — build_landing_spec
+Merge landing copy with design system context.
+
+Input:
+```json
+{
+  "normalized_context": {},
+  "landing_spec": {}
+}
+```
+Output:
+```json
+{ "execution_spec": {} }
+```
+
+### Tool 4 — generate_ui
+Generate UI code using Codex.
+
+Input:
+```json
+{ "execution_spec": {} }
+```
+Output:
+```json
+{ "code": "string" }
+```
+
+### Tool 5 — validate_ui
+Run UI linting engine.
+
+Input:
+```json
+{
+  "code": "string",
+  "rules": {}
+}
+```
+Output:
+```json
+{
+  "valid": false,
+  "errors": [
+    {
+      "type": "spacing_violation",
+      "message": "Expected 8pt grid"
+    }
+  ]
+}
+```
+
+### Tool 6 — fix_ui
+Fix UI based on validation errors.
+
+Input:
+```json
+{ "code": "string", "errors": [] }
+```
+Output:
+```json
+{ "fixed_code": "string" }
+```
+
+### Tool 7 — loop_until_valid
+Run generation → validation → fix loop.
+
+Input:
+```json
+{ "execution_spec": {}, "rules": {} }
+```
+Output:
+```json
+{ "final_code": "string", "iterations": 2 }
+```
+
+## Data Contracts (v0)
+
+### Raw Input (from Figma)
+- `variables`: list of name/value pairs
+- `styles`: typography/spacing styles
+- `layoutTree`: component and node hierarchy
+
+### Patterns (Output Schema)
+- `id` (string, optional stable identifier)
+- `name` (Human-readable pattern name: Hero, Card, List)
+- `type` (enum: `hero`, `card`, `list`)
+- `confidence` (0–1)
+- `structure` (ordered list of semantic roles: `headline`, `subheadline`, `cta`, `media`, `title`, `description`, `item`)
+- `nodes` (array of source node IDs)
+- `metadata` (optional: spacing, alignment, columns, layout direction)
+
+Example:
+```json
+{
+  "id": "pattern_hero_01",
+  "name": "Hero",
+  "type": "hero",
+  "confidence": 0.92,
+  "structure": ["headline", "subheadline", "cta"],
+  "nodes": ["1:12", "1:18", "1:21"],
+  "metadata": { "direction": "vertical", "spacing": 16 }
+}
+```
+
+### Pattern Naming Conventions
+- Use Title Case for `name` (Hero, Card, List).
+- Use lowercase enum for `type` (`hero`, `card`, `list`).
+- Keep `id` stable across re-runs when the same layout subtree is detected.
+
+### Validation Output
+- `valid`: boolean
+- `errors`: list of `{ type, message, severity, nodeId? }`
+
+## Token Normalization Rules
+
+### Mapping (Deterministic)
+- Parse naming conventions (`/`, `-`, `_`, camelCase).
+- Lowercase all segments and trim empty segments.
+- Known categories: `color`, `space`, `typography`, `radius`, `shadow`, `motion`.
+- If the first segment is not a known category, infer category from `type` when available, else use `custom`.
+- Role is the next semantic segment (primary, secondary, neutral, background, text), otherwise `base`.
+- Scale is the last numeric segment (e.g. 100–900 or 8, 12, 16).
+- State is one of: `default`, `hover`, `disabled`, `focus`, `active` (first match wins).
+- Semantic token format: `category.role[.scale][.state]` in that order.
+
+### Duplicate Resolution
+If multiple raw entries map to the same semantic token, choose a deterministic winner:
+1. Raw name already in semantic format (matches `^[a-z]+(\.[a-z0-9]+)+$`).
+2. Entry with both `role` and `state` present.
+3. Entry with `role` and `scale` present.
+4. Entry with `role` only.
+5. Lexicographic order by `sourceName` (stable tie-break).
+
+### Edge Cases
+- Multiple numeric segments: take the last numeric segment as `scale`.
+- Missing role: use `base` to preserve token shape.
+- Missing state: omit `state` unless the name explicitly signals a state token, then use `default`.
+- Unknown segments: ignore for token construction but keep in `sourceName` for traceability.
+
+## Pattern Heuristics (v1)
+
+### Hero
+Required elements:
+- `headline` (largest text on page or section)
+- `subheadline` (text block adjacent to headline)
+- `cta` (button or link styled as primary action)
+
+Layout cues:
+- Vertical stack (single column) or two-column split (text + media)
+- Headline appears above subheadline within the same container
+- CTA appears after text group within the same container
+
+Detection rules:
+- Headline font size is top 5% of text sizes in the section
+- CTA node has button-like traits (background fill + padding + short label)
+- Container spacing is consistent (grid-aligned)
+
+### Card
+Required elements:
+- `container` with padding
+- `title`
+- `description`
+- Optional `media` (image or icon)
+
+Layout cues:
+- Rounded corners or shadow commonly present
+- Title above description within container
+- Media placed above or left of text group
+
+Detection rules:
+- Container has explicit padding and a background
+- Title is larger or bolder than description
+- Media node has fixed aspect ratio or image fill
+
+### List
+Required elements:
+- Repeated `item` structure (2+)
+
+Layout cues:
+- Consistent spacing between items
+- Each item has similar internal structure (e.g., title + meta)
+- Items aligned in a single column or grid
+
+Detection rules:
+- Two or more sibling nodes with similar subtree signatures
+- Spacing variance between items within tolerance (e.g., ±2px)
+- Item width or height variance within tolerance (e.g., ±10%)
+
+## Pattern Examples + Confidence (v1)
+
+### Example 1 — Hero
+```json
+{
+  "id": "pattern_hero_01",
+  "name": "Hero",
+  "type": "hero",
+  "confidence": 0.91,
+  "structure": ["headline", "subheadline", "cta"],
+  "nodes": ["1:10", "1:12", "1:15"],
+  "metadata": { "direction": "vertical", "spacing": 16 }
+}
+```
+Confidence rationale:
+- Large headline + stacked subheadline detected
+- CTA button present with padding and primary fill
+- Vertical stack spacing consistent (grid)
+
+### Example 2 — Card
+```json
+{
+  "id": "pattern_card_02",
+  "name": "Card",
+  "type": "card",
+  "confidence": 0.86,
+  "structure": ["media", "title", "description"],
+  "nodes": ["2:04", "2:06", "2:08"],
+  "metadata": { "padding": 24, "radius": 12 }
+}
+```
+Confidence rationale:
+- Container with padding + background
+- Title larger than description
+- Media node present with image fill
+
+### Example 3 — List
+```json
+{
+  "id": "pattern_list_01",
+  "name": "List",
+  "type": "list",
+  "confidence": 0.79,
+  "structure": ["item", "item", "item"],
+  "nodes": ["3:01", "3:02", "3:03"],
+  "metadata": { "direction": "vertical", "itemSpacing": 12 }
+}
+```
+Confidence rationale:
+- Repeated item subtrees detected (3 items)
+- Spacing variance within tolerance
+- Consistent width across items
+
+## Validation Rules
+- Token compliance: no raw values.
+- Spacing rules: enforce grid (e.g. 8pt).
+- Component integrity: forbid custom components outside system.
+- Layout constraints: max columns, responsive rules.
+- Pattern compliance: required elements and structure.
+
+## Validation Rule Taxonomy + Naming
+
+### Rule Categories
+- `token` — semantic token usage (no raw values, valid tokens)
+- `spacing` — grid and spacing consistency
+- `component` — system component usage and variants
+- `layout` — layout constraints (columns, breakpoints)
+- `pattern` — structural compliance with detected patterns
+
+### Rule ID Naming
+Format: `dsr.<category>.<slug>`
+
+Examples:
+- `dsr.token.no-raw-values`
+- `dsr.spacing.grid-8pt`
+- `dsr.component.unknown-component`
+- `dsr.layout.max-columns`
+- `dsr.pattern.hero-missing-cta`
+
+## Severity Model + Validation Output
+
+### Severity Levels
+- `ERROR` — must fix before output is accepted
+- `WARNING` — allowed, but flagged for review
+- `INFO` — suggestion only
+
+Default handling:
+- `ERROR` blocks `generate_ui` output from being accepted in `loop_until_valid`
+- `WARNING` and `INFO` do not block, but are returned in the report
+
+### Validation Output Schema
+```json
+{
+  "valid": false,
+  "summary": {
+    "errors": 2,
+    "warnings": 1,
+    "infos": 0
+  },
+  "errors": [
+    {
+      "id": "dsr.spacing.grid-8pt",
+      "type": "spacing_violation",
+      "severity": "ERROR",
+      "message": "Expected 8pt grid",
+      "nodeId": "3:12"
+    }
+  ],
+  "warnings": [
+    {
+      "id": "dsr.pattern.hero-missing-cta",
+      "type": "pattern_violation",
+      "severity": "WARNING",
+      "message": "CTA missing in detected Hero",
+      "nodeId": "1:10"
+    }
+  ],
+  "infos": []
+}
+```
+
+## Example Validation Reports
+
+### Example A — Token violation (ERROR)
+```json
+{
+  "valid": false,
+  "summary": { "errors": 1, "warnings": 0, "infos": 0 },
+  "errors": [
+    {
+      "id": "dsr.token.no-raw-values",
+      "type": "token_violation",
+      "severity": "ERROR",
+      "message": "Raw color used instead of token",
+      "nodeId": "5:22"
+    }
+  ],
+  "warnings": [],
+  "infos": []
+}
+```
+
+### Example B — Spacing violation (ERROR)
+```json
+{
+  "valid": false,
+  "summary": { "errors": 1, "warnings": 0, "infos": 0 },
+  "errors": [
+    {
+      "id": "dsr.spacing.grid-8pt",
+      "type": "spacing_violation",
+      "severity": "ERROR",
+      "message": "Expected 8pt grid",
+      "nodeId": "2:07"
+    }
+  ],
+  "warnings": [],
+  "infos": []
+}
+```
+
+### Example C — Pattern warning (WARNING)
+```json
+{
+  "valid": true,
+  "summary": { "errors": 0, "warnings": 1, "infos": 0 },
+  "errors": [],
+  "warnings": [
+    {
+      "id": "dsr.pattern.hero-missing-cta",
+      "type": "pattern_violation",
+      "severity": "WARNING",
+      "message": "CTA missing in detected Hero",
+      "nodeId": "1:10"
+    }
+  ],
+  "infos": []
+}
+```
+
+## Fix Loop
+1. Detect violation
+2. Map to rule
+3. Generate fix instruction
+4. Re-run generation/validation
+
+## Fix Instruction Schema + Naming
+
+### Fix Instruction Format
+```json
+{
+  "id": "fix_001",
+  "ruleId": "dsr.spacing.grid-8pt",
+  "nodeId": "2:07",
+  "action": "adjust_spacing",
+  "params": {
+    "from": 10,
+    "to": 8
+  },
+  "message": "Normalize spacing to 8pt grid",
+  "severity": "ERROR"
+}
+```
+
+### Naming Conventions
+- `id`: `fix_<increment>` or deterministic hash (`fix_<ruleId>_<nodeId>`).
+- `action` is a verb in snake_case (e.g., `adjust_spacing`, `replace_token`, `swap_component`).
+- `ruleId` must match validation rule naming (`dsr.<category>.<slug>`).
+
+## Correction Flow (Detect → Fix → Rerun)
+
+1. **Validate UI**: run `validate_ui` to collect errors/warnings/infos.\n\n2. **Map errors to actions**: for each `ERROR`, choose a fix action based on rule type.\n\n3. **Generate fix instructions**: produce a list of fix instructions with deterministic IDs.\n\n4. **Apply fixes**: run `fix_ui` (or apply actions directly in generator).\n\n5. **Re-validate**: run `validate_ui` again on fixed code.\n\n6. **Loop**: stop when no `ERROR` remains or max iterations reached.\n\n7. **Emit final code + report**: output final code and summary.
+
+### Action Mapping (v1)
+- `dsr.token.no-raw-values` → `replace_token`
+- `dsr.spacing.grid-8pt` → `adjust_spacing`
+- `dsr.component.unknown-component` → `swap_component`
+- `dsr.layout.max-columns` → `adjust_layout`
+- `dsr.pattern.hero-missing-cta` → `add_element`
+
+### Loop Constraints
+- Max iterations: 3 (configurable)
+- Stop early if error count does not decrease between iterations
+
+## Example Fix Instructions
+
+### Fix A — Replace raw color token
+```json
+{
+  "id": "fix_dsr.token.no-raw-values_5:22",
+  "ruleId": "dsr.token.no-raw-values",
+  "nodeId": "5:22",
+  "action": "replace_token",
+  "params": { "from": "#FF0000", "to": "color.primary.default" },
+  "message": "Replace raw color with semantic token",
+  "severity": "ERROR"
+}
+```
+
+### Fix B — Adjust spacing to grid
+```json
+{
+  "id": "fix_dsr.spacing.grid-8pt_2:07",
+  "ruleId": "dsr.spacing.grid-8pt",
+  "nodeId": "2:07",
+  "action": "adjust_spacing",
+  "params": { "from": 10, "to": 8 },
+  "message": "Normalize spacing to 8pt grid",
+  "severity": "ERROR"
+}
+```
+
+### Fix C — Add missing CTA
+```json
+{
+  "id": "fix_dsr.pattern.hero-missing-cta_1:10",
+  "ruleId": "dsr.pattern.hero-missing-cta",
+  "nodeId": "1:10",
+  "action": "add_element",
+  "params": { "element": "cta", "label": "Get Started" },
+  "message": "Add CTA to Hero pattern",
+  "severity": "WARNING"
+}
+```
+
+_Last updated: 2026-04-05_
