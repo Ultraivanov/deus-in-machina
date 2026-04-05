@@ -858,6 +858,58 @@ Detection rules:
   ]
 }
 ```
+
+## Learning From Usage Signals
+
+### Signal Schema (v0)
+```json
+{
+  "signals": [
+    {
+      "patternId": "lib_hero_01",
+      "usageCount": 42,
+      "overrideCount": 3,
+      "userRating": 4.5,
+      "lastUsedAt": "ISO-8601"
+    }
+  ]
+}
+```
+
+Inputs:
+- `usageCount` — number of times a pattern was applied.
+- `overrideCount` — number of manual edits after application.
+- `userRating` — optional explicit feedback.
+
+### Scoring + Feedback Loop (v0)
+- Base confidence from detection is adjusted by usage signals.
+- Formula (example):
+  - `score = base + 0.1*log(usageCount+1) - 0.2*overrideRate + 0.1*(userRating/5)`
+  - `overrideRate = overrideCount / max(usageCount,1)`
+- If score increases above 0.85 → strengthen cluster confidence.
+- If score drops below 0.6 → mark for review or downgrade.
+
+### Example Signal Updates
+```json
+{
+  "updates": [
+    {
+      "patternId": "lib_hero_01",
+      "base": 0.78,
+      "signals": { "usageCount": 50, "overrideCount": 2, "userRating": 4.6 },
+      "score": 0.87,
+      "action": "promote"
+    },
+    {
+      "patternId": "lib_card_02",
+      "base": 0.8,
+      "signals": { "usageCount": 10, "overrideCount": 5, "userRating": 3.2 },
+      "score": 0.58,
+      "action": "review"
+    }
+  ]
+}
+```
 Confidence rationale:
 - Large headline + stacked subheadline detected
 - CTA button present with padding and primary fill
