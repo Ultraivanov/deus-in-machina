@@ -10,19 +10,19 @@
 
 | Field      | Value                                   |
 |------------|-----------------------------------------|
-| Phase      | Foundation & Spec Lock                  |
-| Goal       | Lock v3 architecture and data contracts |
+| Phase      | Completed                               |
+| Goal       | Phase 3 done / MVP Runtime done         |
 | Started    | 2026-04-05                              |
-| Target     | TBD                                     |
+| Target     | 2026-04-05                              |
 
 ## Active Block
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | P3-03                                    |
-| Title      | Learning from usage signals              |
-| Status     | in-progress                              |
-| File       | `.codex/blocks/P3-03.md`                 |
+| Block ID   | —                                        |
+| Title      | —                                        |
+| Status     | done                                     |
+| File       | —                                        |
 
 ---
 
@@ -48,16 +48,16 @@
 | P2-02 | Normalizer implementation stub         | done        |
 | P2-03 | Pattern engine implementation stub     | done        |
 | P2-04 | Validator implementation stub          | done        |
-| P2-05 | CLI/runner for pipeline execution      | in-progress |
+| P2-05 | CLI/runner for pipeline execution      | done        |
 
 ### Phase 3 — Moat Layer
 > Goal: cross-project learning and pattern growth
 
 | ID    | Block                              | Status  |
 |-------|------------------------------------|---------|
-| P3-01 | Pattern clustering across projects | in-progress |
-| P3-02 | Pattern library auto-growth        | in-progress |
-| P3-03 | Learning from usage signals        | in-progress |
+| P3-01 | Pattern clustering across projects | done        |
+| P3-02 | Pattern library auto-growth        | done        |
+| P3-03 | Learning from usage signals        | done        |
 
 ---
 
@@ -66,6 +66,12 @@
 | ID | Block | Reason | Unblocked By |
 |----|-------|--------|--------------|
 |    |       |        |              |
+
+---
+
+## Project Status
+
+Phase 3 done / MVP Runtime done.
 
 ---
 
