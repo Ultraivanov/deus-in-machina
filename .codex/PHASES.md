@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | P3-01                                    |
-| Title      | Pattern clustering across projects       |
+| Block ID   | P3-02                                    |
+| Title      | Pattern library auto-growth              |
 | Status     | in-progress                              |
-| File       | `.codex/blocks/P3-01.md`                 |
+| File       | `.codex/blocks/P3-02.md`                 |
 
 ---
 
@@ -56,7 +56,7 @@
 | ID    | Block                              | Status  |
 |-------|------------------------------------|---------|
 | P3-01 | Pattern clustering across projects | in-progress |
-| P3-02 | Pattern library auto-growth        | pending |
+| P3-02 | Pattern library auto-growth        | in-progress |
 | P3-03 | Learning from usage signals        | pending |
 
 ---
