@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | P2-02                                    |
-| Title      | Normalizer implementation stub           |
+| Block ID   | P2-03                                    |
+| Title      | Pattern engine implementation stub       |
 | Status     | in-progress                              |
-| File       | `.codex/blocks/P2-02.md`                 |
+| File       | `.codex/blocks/P2-03.md`                 |
 
 ---
 
@@ -46,7 +46,7 @@
 |-------|----------------------------------------|---------|
 | P2-01 | Extractor interface contract           | in-progress |
 | P2-02 | Normalizer implementation stub         | in-progress |
-| P2-03 | Pattern engine implementation stub     | pending |
+| P2-03 | Pattern engine implementation stub     | in-progress |
 | P2-04 | Validator implementation stub          | pending |
 | P2-05 | CLI/runner for pipeline execution      | pending |
 
