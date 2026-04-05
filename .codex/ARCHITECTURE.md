@@ -416,6 +416,72 @@ Output:
 }
 ```
 
+## Validator Interface (v0)
+
+### Input Contract
+```json
+{
+  "code": "string",
+  "rules": {}
+}
+```
+
+### Output Contract
+```json
+{
+  "valid": false,
+  "summary": { "errors": 0, "warnings": 0, "infos": 0 },
+  "errors": [],
+  "warnings": [],
+  "infos": []
+}
+```
+
+Notes:
+- `rules` can be empty for defaults.
+- Severity model applies to `errors`, `warnings`, `infos`.
+
+### Stub Flow (v0)
+1. Load `code` and `rules` (or defaults).
+2. Parse UI structure and extract raw values.
+3. Check token usage and spacing grid.
+4. Validate component usage and layout constraints.
+5. Validate pattern compliance from detected patterns.
+6. Build error/warning/info lists.
+7. Emit `valid` and `summary` counts.
+
+### Test Vectors (v0)
+
+#### Vector 1 — Token violation
+Input:
+```json
+{ "code": "<div style='color:#FF0000'>", "rules": {} }
+```
+Expected:
+```json
+{ "valid": false, "errors": [{ "id": "dsr.token.no-raw-values" }] }
+```
+
+#### Vector 2 — Spacing violation
+Input:
+```json
+{ "code": "<div style='margin:10px'>", "rules": { "grid": 8 } }
+```
+Expected:
+```json
+{ "valid": false, "errors": [{ "id": "dsr.spacing.grid-8pt" }] }
+```
+
+#### Vector 3 — Pattern warning
+Input:
+```json
+{ "code": "<section class='hero'><h1>Title</h1></section>", "rules": {} }
+```
+Expected:
+```json
+{ "valid": true, "warnings": [{ "id": "dsr.pattern.hero-missing-cta" }] }
+```
+
 ### Tool 6 — fix_ui
 Fix UI based on validation errors.
 
