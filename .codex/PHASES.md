@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | P2-05                                    |
-| Title      | CLI/runner for pipeline execution        |
+| Block ID   | P3-01                                    |
+| Title      | Pattern clustering across projects       |
 | Status     | in-progress                              |
-| File       | `.codex/blocks/P2-05.md`                 |
+| File       | `.codex/blocks/P3-01.md`                 |
 
 ---
 
@@ -55,7 +55,7 @@
 
 | ID    | Block                              | Status  |
 |-------|------------------------------------|---------|
-| P3-01 | Pattern clustering across projects | pending |
+| P3-01 | Pattern clustering across projects | in-progress |
 | P3-02 | Pattern library auto-growth        | pending |
 | P3-03 | Learning from usage signals        | pending |
 
