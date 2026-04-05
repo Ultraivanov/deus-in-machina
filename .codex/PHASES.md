@@ -10,19 +10,19 @@
 
 | Field      | Value                                   |
 |------------|-----------------------------------------|
-| Phase      | Completed                               |
-| Goal       | Phase 3 done / MVP Runtime done         |
+| Phase      | Phase 4 — Implementation & Pilot        |
+| Goal       | Build runnable MVP and validate on real inputs |
 | Started    | 2026-04-05                              |
-| Target     | 2026-04-05                              |
+| Target     | TBD                                     |
 
 ## Active Block
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | —                                        |
-| Title      | —                                        |
-| Status     | done                                     |
-| File       | —                                        |
+| Block ID   | I-01                                     |
+| Title      | Runtime scaffold + CLI skeleton          |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/I-01.md`                  |
 
 ---
 
@@ -69,9 +69,25 @@
 
 ---
 
+_Last updated: 2026-04-05_
+
+## Phase 4 — Implementation & Pilot
+> Goal: runnable MVP and real-world validation
+
+| ID    | Block                                | Status      |
+|-------|--------------------------------------|-------------|
+| I-01  | Runtime scaffold + CLI skeleton      | in-progress |
+| I-02  | Extractor adapter (Figma input)      | pending     |
+| I-03  | Normalizer implementation            | pending     |
+| I-04  | Pattern engine implementation        | pending     |
+| I-05  | Validator implementation             | pending     |
+| I-06  | Fix loop + pipeline integration      | pending     |
+
+---
+
 ## Project Status
 
-Phase 3 done / MVP Runtime done.
+Phase 4 started (implementation).
 
 ---
 
