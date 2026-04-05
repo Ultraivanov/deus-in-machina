@@ -8,62 +8,56 @@
 
 ## Active Phase
 
-| Field      | Value                      |
-|------------|----------------------------|
-| Phase      | <!-- e.g. MVP -->          |
-| Goal       | <!-- one sentence -->      |
-| Started    | <!-- YYYY-MM-DD -->        |
-| Target     | <!-- YYYY-MM-DD or TBD --> |
+| Field      | Value                                   |
+|------------|-----------------------------------------|
+| Phase      | Foundation & Spec Lock                  |
+| Goal       | Lock v3 architecture and data contracts |
+| Started    | 2026-04-05                              |
+| Target     | TBD                                     |
 
 ## Active Block
 
-| Field      | Value                      |
-|------------|----------------------------|
-| Block ID   | <!-- e.g. MVP-01 -->       |
-| Title      | <!-- e.g. Auth flow -->    |
-| Status     | <!-- pending / in-progress / done / blocked --> |
-| File       | `.codex/blocks/MVP-01.md` |
+| Field      | Value                                    |
+|------------|------------------------------------------|
+| Block ID   | P1-05                                    |
+| Title      | Data contracts + examples                |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/P1-05.md`                 |
 
 ---
 
 ## Phase Map
 
-### Phase 1 — MVP
-> Goal: working core loop, no polish
+### Phase 1 — Foundation & Spec Lock
+> Goal: codify v3 models, rules, and contracts
 
-| ID     | Block             | Status  |
-|--------|-------------------|---------|
-| MVP-01 | Project scaffold  | pending |
-| MVP-02 | Data model        | pending |
-| MVP-03 | Core API          | pending |
-| MVP-04 | Minimal UI        | pending |
+| ID    | Block                                   | Status      |
+|-------|-----------------------------------------|-------------|
+| P1-01 | Token model + mapping rules             | done        |
+| P1-02 | Pattern inference heuristics v1          | done        |
+| P1-03 | Validation rules + severity model        | done        |
+| P1-04 | Correction flow + fix instruction format | done        |
+| P1-05 | Data contracts + examples                | in-progress |
 
-### Phase 2 — Alpha
-> Goal: internal testing, real users
+### Phase 2 — MVP Runtime
+> Goal: runnable pipeline with test vectors
 
-| ID   | Block            | Status  |
-|------|------------------|---------|
-| A-01 | Auth             | pending |
-| A-02 | Error handling   | pending |
-| A-03 | Basic analytics  | pending |
+| ID    | Block                                  | Status  |
+|-------|----------------------------------------|---------|
+| P2-01 | Extractor interface contract           | pending |
+| P2-02 | Normalizer implementation stub         | pending |
+| P2-03 | Pattern engine implementation stub     | pending |
+| P2-04 | Validator implementation stub          | pending |
+| P2-05 | CLI/runner for pipeline execution      | pending |
 
-### Phase 3 — Beta
-> Goal: external testing, stability
+### Phase 3 — Moat Layer
+> Goal: cross-project learning and pattern growth
 
-| ID   | Block            | Status  |
-|------|------------------|---------|
-| B-01 | Performance pass | pending |
-| B-02 | Security review  | pending |
-| B-03 | Onboarding flow  | pending |
-
-### Phase 4 — Release
-> Goal: production launch
-
-| ID   | Block               | Status  |
-|------|---------------------|---------|
-| R-01 | Prod infrastructure | pending |
-| R-02 | Docs                | pending |
-| R-03 | Launch checklist    | pending |
+| ID    | Block                              | Status  |
+|-------|------------------------------------|---------|
+| P3-01 | Pattern clustering across projects | pending |
+| P3-02 | Pattern library auto-growth        | pending |
+| P3-03 | Learning from usage signals        | pending |
 
 ---
 
@@ -75,4 +69,4 @@
 
 ---
 
-_Last updated: <!-- YYYY-MM-DD -->_
+_Last updated: 2026-04-05_
