@@ -36,8 +36,20 @@ Figma → Extractor → Normalizer → Pattern Engine → Rules → Validator �
 2. Use `.codex/PHASES.md` to see active work.
 3. Follow block files under `.codex/blocks/`.
 
+## CLI (v0)
+```bash
+npm install
+node bin/dsr.js --help
+```
+
+Examples:
+```bash
+node bin/dsr.js extract --file AbCdEf123 --out context.json
+node bin/dsr.js normalize --input context.json --out normalized.json
+```
+
 ## Status
-Active development. Phase 2 (MVP Runtime) in progress.
+Active development. Phase 4 (Implementation & Pilot) in progress.
 
 ## License
 MIT. See `LICENSE`.

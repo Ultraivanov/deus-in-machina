@@ -1,0 +1,17 @@
+{
+  "name": "deus-in-machina",
+  "version": "0.1.0",
+  "description": "Design System Runtime (DSR) — enforcement + structure + runtime for design systems",
+  "type": "module",
+  "bin": {
+    "dsr": "bin/dsr.js"
+  },
+  "scripts": {
+    "dsr": "node bin/dsr.js",
+    "start": "node bin/dsr.js"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
