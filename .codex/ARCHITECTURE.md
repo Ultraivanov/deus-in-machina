@@ -746,6 +746,69 @@ Detection rules:
   "metadata": { "direction": "vertical", "spacing": 16 }
 }
 ```
+
+## Pattern Clustering (Moat Layer)
+
+### Input Schema (v0)
+```json
+{
+  "patterns": [
+    {
+      "projectId": "string",
+      "patternId": "string",
+      "type": "hero|card|list",
+      "structure": ["headline", "subheadline", "cta"],
+      "metadata": { "direction": "vertical", "spacing": 16 }
+    }
+  ]
+}
+```
+
+### Output Schema (v0)
+```json
+{
+  "clusters": [
+    {
+      "clusterId": "cluster_01",
+      "type": "hero",
+      "members": ["pattern_hero_01", "pattern_hero_07"],
+      "centroid": { "structure": ["headline", "subheadline", "cta"] },
+      "confidence": 0.82
+    }
+  ]
+}
+```
+
+### Clustering Approach + Metrics (v0)
+- Represent each pattern as a feature vector (type, structure length, spacing, layout direction).
+- Compute similarity using weighted cosine distance.
+- Group with simple agglomerative clustering by type (`hero`, `card`, `list`).
+- Thresholds:
+  - `similarity >= 0.8` → same cluster
+  - `0.6–0.79` → candidate merge
+  - `< 0.6` → separate clusters
+
+### Example Clusters
+```json
+{
+  "clusters": [
+    {
+      "clusterId": "cluster_hero_01",
+      "type": "hero",
+      "members": ["pattern_hero_01", "pattern_hero_07"],
+      "centroid": { "structure": ["headline", "subheadline", "cta"], "direction": "vertical" },
+      "confidence": 0.84
+    },
+    {
+      "clusterId": "cluster_card_02",
+      "type": "card",
+      "members": ["pattern_card_02", "pattern_card_09"],
+      "centroid": { "structure": ["media", "title", "description"], "spacing": 16 },
+      "confidence": 0.78
+    }
+  ]
+}
+```
 Confidence rationale:
 - Large headline + stacked subheadline detected
 - CTA button present with padding and primary fill
