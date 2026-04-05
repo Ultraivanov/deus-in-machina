@@ -275,6 +275,78 @@ Output:
 }
 ```
 
+## Normalizer Interface (v0)
+
+### Input Contract
+```json
+{
+  "context": {
+    "variables": {},
+    "styles": {},
+    "components": {},
+    "layout": {}
+  }
+}
+```
+
+### Output Contract
+```json
+{
+  "normalized_context": {
+    "tokens": {},
+    "meta": {
+      "sourceCount": 0,
+      "normalizedCount": 0
+    }
+  }
+}
+```
+
+Notes:
+- Uses `context.variables` and `context.styles` as primary inputs.
+- `components` and `layout` are ignored in v0 normalization.
+
+### Stub Flow (v0)
+1. Read raw variables/styles from `context`.
+2. Split names into segments (`/`, `_`, `-`, camelCase).
+3. Infer category from first segment or `type`.
+4. Infer role, scale, state.
+5. Build semantic token `category.role[.scale][.state]`.
+6. Deduplicate using deterministic precedence.
+7. Emit `normalized_context.tokens` and `meta` counts.
+
+### Test Vectors (v0)
+
+#### Vector 1 — Primary color
+Input:
+```json
+{ "name": "Color/Primary/Default", "value": "#3366FF" }
+```
+Expected:
+```json
+{ "token": "color.primary.default", "value": "#3366FF" }
+```
+
+#### Vector 2 — Neutral scale
+Input:
+```json
+{ "name": "Color/Neutral/500", "value": "#999999" }
+```
+Expected:
+```json
+{ "token": "color.neutral.500", "value": "#999999" }
+```
+
+#### Vector 3 — Spacing
+Input:
+```json
+{ "name": "Spacing/8", "value": 8 }
+```
+Expected:
+```json
+{ "token": "space.base.8", "value": 8 }
+```
+
 ### Tool 3 — build_landing_spec
 Merge landing copy with design system context.
 
