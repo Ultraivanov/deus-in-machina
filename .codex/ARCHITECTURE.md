@@ -513,6 +513,75 @@ Example:
 }
 ```
 
+## Pattern Engine Interface (v0)
+
+### Input Contract
+```json
+{
+  "context": {
+    "layout": {}
+  },
+  "options": {
+    "minConfidence": 0.7
+  }
+}
+```
+
+### Output Contract
+```json
+{
+  "patterns": [],
+  "meta": {
+    "detectedCount": 0
+  }
+}
+```
+
+Notes:
+- Primary input is `context.layout`.
+- `minConfidence` filters weak detections.
+
+### Stub Flow (v0)
+1. Load layout tree from `context.layout`.
+2. Traverse nodes and compute simple signatures (type, size, text roles).
+3. Detect Hero: headline + subheadline + CTA stack.
+4. Detect Card: container + title + description + optional media.
+5. Detect List: repeated item subtrees with consistent spacing.
+6. Compute confidence scores and filter by `minConfidence`.
+7. Emit `patterns` with `meta.detectedCount`.
+
+### Test Vectors (v0)
+
+#### Vector 1 — Hero
+Input (layout excerpt):
+```json
+{ "nodes": ["headline", "subheadline", "cta"], "direction": "vertical" }
+```
+Expected:
+```json
+{ "type": "hero", "confidence": 0.9, "structure": ["headline", "subheadline", "cta"] }
+```
+
+#### Vector 2 — Card
+Input (layout excerpt):
+```json
+{ "nodes": ["media", "title", "description"], "container": "padded" }
+```
+Expected:
+```json
+{ "type": "card", "confidence": 0.85, "structure": ["media", "title", "description"] }
+```
+
+#### Vector 3 — List
+Input (layout excerpt):
+```json
+{ "items": 3, "itemSpacing": 12 }
+```
+Expected:
+```json
+{ "type": "list", "confidence": 0.8, "structure": ["item", "item", "item"] }
+```
+
 ### Pattern Naming Conventions
 - Use Title Case for `name` (Hero, Card, List).
 - Use lowercase enum for `type` (`hero`, `card`, `list`).
