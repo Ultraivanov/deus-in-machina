@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | P1-05                                    |
-| Title      | Data contracts + examples                |
+| Block ID   | P2-01                                    |
+| Title      | Extractor interface contract             |
 | Status     | in-progress                              |
-| File       | `.codex/blocks/P1-05.md`                 |
+| File       | `.codex/blocks/P2-01.md`                 |
 
 ---
 
@@ -37,14 +37,14 @@
 | P1-02 | Pattern inference heuristics v1          | done        |
 | P1-03 | Validation rules + severity model        | done        |
 | P1-04 | Correction flow + fix instruction format | done        |
-| P1-05 | Data contracts + examples                | in-progress |
+| P1-05 | Data contracts + examples                | done        |
 
 ### Phase 2 — MVP Runtime
 > Goal: runnable pipeline with test vectors
 
 | ID    | Block                                  | Status  |
 |-------|----------------------------------------|---------|
-| P2-01 | Extractor interface contract           | pending |
+| P2-01 | Extractor interface contract           | in-progress |
 | P2-02 | Normalizer implementation stub         | pending |
 | P2-03 | Pattern engine implementation stub     | pending |
 | P2-04 | Validator implementation stub          | pending |
