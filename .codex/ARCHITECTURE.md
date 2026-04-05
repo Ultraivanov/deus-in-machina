@@ -165,6 +165,74 @@ Output:
 }
 ```
 
+## Extractor Interface (v0)
+
+### Input Contract
+```json
+{
+  "fileKey": "string",
+  "nodeIds": ["string"],
+  "include": ["variables", "styles", "components", "layout"]
+}
+```
+
+Notes:
+- `nodeIds` is optional; if omitted, extract from the full file.
+- `include` is optional; defaults to all sections.
+
+#### Example — extract_figma_context input
+```json
+{
+  "fileKey": "AbCdEf123",
+  "nodeIds": ["1:1", "1:10"],
+  "include": ["variables", "styles", "layout"]
+}
+```
+
+### Output Contract
+```json
+{
+  "context": {
+    "variables": {},
+    "styles": {},
+    "components": {},
+    "layout": {}
+  },
+  "meta": {
+    "fileKey": "string",
+    "nodeCount": 0,
+    "extractedAt": "ISO-8601"
+  }
+}
+```
+
+#### Example — extract_figma_context output (full)
+```json
+{
+  "context": {
+    "variables": {
+      "Color/Primary/Default": "#3366FF",
+      "Spacing/8": 8
+    },
+    "styles": {
+      "Text/H1": { "fontSize": 48, "fontWeight": 700 },
+      "Text/Body": { "fontSize": 16, "fontWeight": 400 }
+    },
+    "components": {
+      "Button/Primary": { "id": "10:2", "variants": ["default", "hover"] }
+    },
+    "layout": {
+      "root": { "id": "0:1", "children": ["1:1", "1:2"] }
+    }
+  },
+  "meta": {
+    "fileKey": "AbCdEf123",
+    "nodeCount": 120,
+    "extractedAt": "2026-04-05T12:00:00Z"
+  }
+}
+```
+
 ### Tool 2 — normalize_tokens
 Convert raw Figma data into semantic tokens.
 
@@ -178,6 +246,23 @@ Output:
   "normalized_context": {
     "tokens": {
       "color.primary.default": "#3366FF"
+    }
+  }
+}
+```
+
+#### Example — normalize_tokens output
+```json
+{
+  "normalized_context": {
+    "tokens": {
+      "color.primary.default": "#3366FF",
+      "color.neutral.500": "#999999",
+      "space.base.8": 8
+    },
+    "meta": {
+      "sourceCount": 24,
+      "normalizedCount": 18
     }
   }
 }
@@ -233,6 +318,25 @@ Output:
 }
 ```
 
+#### Example — validate_ui output
+```json
+{
+  "valid": false,
+  "summary": { "errors": 1, "warnings": 0, "infos": 0 },
+  "errors": [
+    {
+      "id": "dsr.spacing.grid-8pt",
+      "type": "spacing_violation",
+      "severity": "ERROR",
+      "message": "Expected 8pt grid",
+      "nodeId": "2:07"
+    }
+  ],
+  "warnings": [],
+  "infos": []
+}
+```
+
 ### Tool 6 — fix_ui
 Fix UI based on validation errors.
 
@@ -245,6 +349,21 @@ Output:
 { "fixed_code": "string" }
 ```
 
+#### Example — fix_ui output
+```json
+{
+  "fixed_code": "<code...>",
+  "applied_fixes": [
+    {
+      "id": "fix_dsr.spacing.grid-8pt_2:07",
+      "ruleId": "dsr.spacing.grid-8pt",
+      "nodeId": "2:07",
+      "action": "adjust_spacing"
+    }
+  ]
+}
+```
+
 ### Tool 7 — loop_until_valid
 Run generation → validation → fix loop.
 
@@ -255,6 +374,18 @@ Input:
 Output:
 ```json
 { "final_code": "string", "iterations": 2 }
+```
+
+#### Example — loop_until_valid output
+```json
+{
+  "final_code": "<code...>",
+  "iterations": 2,
+  "final_report": {
+    "valid": true,
+    "summary": { "errors": 0, "warnings": 1, "infos": 0 }
+  }
+}
 ```
 
 ## Data Contracts (v0)
@@ -283,6 +414,23 @@ Example:
   "structure": ["headline", "subheadline", "cta"],
   "nodes": ["1:12", "1:18", "1:21"],
   "metadata": { "direction": "vertical", "spacing": 16 }
+}
+```
+
+#### Example — pattern detection output
+```json
+{
+  "patterns": [
+    {
+      "id": "pattern_hero_01",
+      "name": "Hero",
+      "type": "hero",
+      "confidence": 0.91,
+      "structure": ["headline", "subheadline", "cta"],
+      "nodes": ["1:10", "1:12", "1:15"],
+      "metadata": { "direction": "vertical", "spacing": 16 }
+    }
+  ]
 }
 ```
 
