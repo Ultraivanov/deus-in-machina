@@ -21,7 +21,7 @@
 |------------|------------------------------------------|
 | Block ID   | P2-04                                    |
 | Title      | Validator implementation stub            |
-| Status     | in-progress                              |
+| Status     | done                                     |
 | File       | `.codex/blocks/P2-04.md`                 |
 
 ---
@@ -44,10 +44,10 @@
 
 | ID    | Block                                  | Status  |
 |-------|----------------------------------------|---------|
-| P2-01 | Extractor interface contract           | in-progress |
-| P2-02 | Normalizer implementation stub         | in-progress |
-| P2-03 | Pattern engine implementation stub     | in-progress |
-| P2-04 | Validator implementation stub          | in-progress |
+| P2-01 | Extractor interface contract           | done        |
+| P2-02 | Normalizer implementation stub         | done        |
+| P2-03 | Pattern engine implementation stub     | done        |
+| P2-04 | Validator implementation stub          | done        |
 | P2-05 | CLI/runner for pipeline execution      | pending |
 
 ### Phase 3 — Moat Layer
