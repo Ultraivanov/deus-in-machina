@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { loadConfig, log } from "./config.js";
 
 const COMMANDS = new Set([
   "extract",
@@ -14,6 +15,7 @@ const COMMANDS = new Set([
 
 export function run(argv) {
   const { command, flags } = parseArgs(argv);
+  const config = loadConfig(flags);
 
   if (!command || flags.help) {
     printUsage();
@@ -21,7 +23,7 @@ export function run(argv) {
   }
 
   if (!COMMANDS.has(command)) {
-    console.error(`Unknown command: ${command}`);
+    log("error", `Unknown command: ${command}`, config);
     printUsage();
     process.exit(1);
   }
@@ -33,10 +35,10 @@ export function run(argv) {
     message: "Command scaffold only. Implementation pending."
   };
 
-  const format = flags.format || "json";
-  const payload = formatOutput(output, format);
+  const payload = formatOutput(output, config.format);
 
   if (flags.out) {
+    log("info", `Writing output to ${flags.out}`, config);
     writeOutput(flags.out, payload);
   } else {
     process.stdout.write(payload + "\n");
@@ -103,5 +105,6 @@ function printUsage() {
   console.log("Flags:");
   console.log("  --out <path>         Write output to file");
   console.log("  --format json|yaml   Output format (default: json)");
+  console.log("  --log debug|info|warn|error   Log level (default: info)");
   console.log("  --help               Show this help");
 }

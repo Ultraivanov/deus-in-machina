@@ -5,5 +5,8 @@ dist/
 # Local framework config
 .codex/.framework-config
 
+# Legacy incoming content (not part of DIM repo)
+legacy_buildrail/
+
 # Build artifacts
 dist-release/
