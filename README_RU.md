@@ -87,6 +87,15 @@ python3 --version
 - software: `.codex/SNAPSHOT.md`, `.codex/BACKLOG.md`, `.codex/ARCHITECTURE.md`
 - content: `.codex/content/SNAPSHOT.md`, `.codex/content/BACKLOG.md`, `.codex/content/ARCHITECTURE.md`
 
+### Фазовый workflow
+
+Фреймворк поддерживает фазовую разработку. Правила находятся здесь:
+
+- `.codex/protocols/phase-workflow.md`
+- `.codex/PHASES.md` (текущее состояние фаз)
+
+На каждом `start` Codex должен загрузить `PHASES.md`, подтвердить активный блок и работать только с одним блоком за сессию.
+
 ### Finish
 
 `/fi` выполняет completion:
@@ -142,6 +151,10 @@ codex-code-starter/
 **Можно удалить позже?**
 
 Да. Удалите `.codex/` и `init-project.sh` для полного удаления.
+
+**Как работают фазы?**
+
+Используйте `init-phases` для черновика `.codex/PHASES.md`. Каждая сессия работает с одним блоком, подтверждаемым на `start`.
 
 ## Для разработчиков фреймворка
 
