@@ -1,5 +1,6 @@
 import { WorkflowEngine } from "./engine.js";
 import { applyMonetization } from "./monetization/enforce.js";
+import { evaluateRiskMonetization } from "./monetization/risk.js";
 import type { SqliteStore } from "./storage/sqlite.js";
 import { makeError } from "./errors.js";
 import { track } from "./telemetry.js";
@@ -68,6 +69,19 @@ export const tools = [
         assistant: { type: "string" }
       },
       required: ["project_id", "task_id", "assistant"]
+    }
+  },
+  {
+    name: "get_risk_profile",
+    description: "Return risk evaluation for a task without generating a prompt.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ...monetizationContextSchema,
+        project_id: { type: "string" },
+        task_id: { type: "string" }
+      },
+      required: ["project_id", "task_id"]
     }
   },
   {
@@ -187,7 +201,7 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
     return applyMonetization(
       name,
       args,
-      () => {
+      (context) => {
       const basePayload = {
         tool: name,
         user_id: args.user_id ?? (args.subscription as any)?.user_id ?? "anon"
@@ -198,17 +212,114 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
           return engine.initializeProject(args as any);
         case "get_project_state":
           track("get_project_state", { ...basePayload, project_id: args.project_id });
-          return engine.getProjectState(args.project_id as string);
+          const state = engine.getProjectState(args.project_id as string);
+          if (!state) return state;
+          const stateContext = state.current_task
+            ? engine.getProjectTask(args.project_id as string, state.current_task.id)
+            : null;
+          const stateRisk = stateContext
+            ? evaluateRiskMonetization({
+                task: stateContext.task,
+                project: stateContext.project,
+                plan: context.plan,
+                subscription: context.subscription
+              })
+            : undefined;
+          return {
+            ...state,
+            ...(stateRisk ? { risk: stateRisk } : {})
+          };
         case "get_next_step":
           track("get_next_step", { ...basePayload, project_id: args.project_id });
-          return engine.getNextStep(args.project_id as string);
-        case "generate_agent_prompt":
+          const next = engine.getNextStep(args.project_id as string);
+          if (!next) return next;
+          const nextContext = next.task_id
+            ? engine.getProjectTask(args.project_id as string, next.task_id as string)
+            : null;
+          const nextRisk = nextContext
+            ? evaluateRiskMonetization({
+                task: nextContext.task,
+                project: nextContext.project,
+                plan: context.plan,
+                subscription: context.subscription
+              })
+            : undefined;
+          return {
+            ...next,
+            ...(nextRisk ? { risk: nextRisk } : {})
+          };
+        case "generate_agent_prompt": {
           track("generate_agent_prompt", { ...basePayload, task_id: args.task_id });
-          return engine.generateAgentPrompt(
+          const promptPayload = engine.generateAgentPrompt(
             args.project_id as string,
             args.task_id as string,
             args.assistant as string
           );
+          if (!promptPayload) {
+            return makeError("NOT_FOUND", "Project or task not found.", false);
+          }
+          const riskContext = engine.getProjectTask(
+            args.project_id as string,
+            args.task_id as string
+          );
+          const risk = riskContext
+            ? evaluateRiskMonetization({
+                task: riskContext.task,
+                project: riskContext.project,
+                plan: context.plan,
+                subscription: context.subscription
+              })
+            : undefined;
+          const risk_reasoning = risk
+            ? {
+                score: risk.risk_level,
+                signals: risk.signals ?? [],
+                summary:
+                  risk.risk_level === "high"
+                    ? "High risk step due to scope or core files."
+                    : risk.risk_level === "medium"
+                      ? "Medium risk step; watch scope and constraints."
+                      : "Low risk step."
+              }
+            : undefined;
+          return {
+            ...promptPayload,
+            ...(risk ? { risk } : {}),
+            ...(risk_reasoning ? { risk_reasoning } : {})
+          };
+        }
+        case "get_risk_profile": {
+          track("get_risk_profile", { ...basePayload, task_id: args.task_id });
+          const riskContext = engine.getProjectTask(
+            args.project_id as string,
+            args.task_id as string
+          );
+          if (!riskContext) {
+            return makeError("NOT_FOUND", "Project or task not found.", false);
+          }
+          const risk = evaluateRiskMonetization({
+            task: riskContext.task,
+            project: riskContext.project,
+            plan: context.plan,
+            subscription: context.subscription
+          });
+          const risk_reasoning = {
+            score: risk.risk_level,
+            signals: risk.signals ?? [],
+            summary:
+              risk.risk_level === "high"
+                ? "High risk step due to scope or core files."
+                : risk.risk_level === "medium"
+                  ? "Medium risk step; watch scope and constraints."
+                  : "Low risk step."
+          };
+          return {
+            project_id: args.project_id,
+            task_id: args.task_id,
+            risk,
+            risk_reasoning
+          };
+        }
         case "start_session":
           if (!args.change_plan_approved) {
             return makeError("CHANGE_PLAN_NOT_APPROVED", "Change Plan approval is required.", false);
@@ -233,14 +344,37 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
           );
         case "validate_scope":
           track("validate_scope", { ...basePayload, session_id: args.session_id });
+          const scopeRiskContext = args.task_id
+            ? engine.getProjectTask(args.project_id as string, args.task_id as string)
+            : null;
+          const scopeRisk = scopeRiskContext
+            ? evaluateRiskMonetization({
+                task: scopeRiskContext.task,
+                project: scopeRiskContext.project,
+                plan: context.plan,
+                subscription: context.subscription
+              })
+            : undefined;
           return engine.validateScope(
             args.session_id as string,
             (args.allowed_files as string[]) ?? [],
-            (args.changed_files as string[]) ?? []
+            (args.changed_files as string[]) ?? [],
+            scopeRisk
           );
         case "explain_changes":
           track("explain_changes", { ...basePayload, session_id: args.session_id });
-          return engine.explainChanges(args.session_id as string);
+          const explainRiskContext = args.task_id
+            ? engine.getProjectTask(args.project_id as string, args.task_id as string)
+            : null;
+          const explainRisk = explainRiskContext
+            ? evaluateRiskMonetization({
+                task: explainRiskContext.task,
+                project: explainRiskContext.project,
+                plan: context.plan,
+                subscription: context.subscription
+              })
+            : undefined;
+          return engine.explainChanges(args.session_id as string, explainRisk);
         case "complete_task":
           track("complete_task", { ...basePayload, task_id: args.task_id });
           return engine.completeTask(

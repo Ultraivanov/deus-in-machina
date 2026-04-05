@@ -21,6 +21,7 @@ Deterministic execution layer for AI-assisted coding. It keeps projects **struct
 - File-first state with `.assistant/` as the source of truth.
 - MCP tool surface with change-plan gating and scope validation.
 - SQLite mirror, subscription usage counters, and hydration on startup.
+- Risk-aware prompt generation with upgrade triggers for high-risk steps.
 - Workflow templates, client examples, and a thin companion UI.
 - Security, privacy, onboarding, and release docs included.
 
@@ -41,6 +42,15 @@ User ↔ AI Client (Codex / Claude / Cursor)
        ↕
 Repo / .assistant state files
 ```
+
+## Token Ownership & LLM Mode
+- **Default (client_keys):** the user’s AI client (Codex / Claude / Cursor) pays for tokens. Buildrail does not call an LLM.
+- **Optional (server_proxy):** the server pays for tokens if you add an LLM proxy layer. This requires your own provider keys and is not enabled in the skeleton. Free plans and non-active subscription states are blocked from server tokens by default.
+
+Configure via environment:
+- `BUILDRAIL_LLM_MODE=client_keys` (default)
+- `BUILDRAIL_LLM_MODE=server_proxy` (requires provider integration and a paid plan)
+- `BUILDRAIL_UPGRADE_URL=https://your.app/upgrade` (optional direct checkout link surfaced in errors)
 
 ## Specs
 - `ai-project-companion-spec.md`
@@ -82,6 +92,7 @@ See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 1. `initialize_project`
 2. `get_next_step`
 3. `generate_agent_prompt`
+4. `get_risk_profile` (optional, for UI-only risk display)
 4. `start_session`
 5. `submit_agent_result`
 6. `validate_scope`
@@ -131,6 +142,14 @@ Checklist: `docs/release-checklist.md`.
 
 Integration guide: `docs/stripe-integration.md`.
 
+### Stripe setup (test mode)
+1. Create a Stripe account and enable Test Mode.
+2. Set environment variables:
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `STRIPE_PRICE_ID`
+3. Run the MCP server and Stripe endpoints will be available on `BUILDRAIL_STRIPE_PORT`.
+
 See `examples/claude-cursor-client.md` for the same full happy-path sequence.
 
 ## Happy Path Demo
@@ -139,7 +158,49 @@ Runs a full loop: initialize → next_step → prompt → submit → validate �
 
 ```
 npm install
-./node_modules/.bin/tsx scripts/happy-path-demo.ts
+node scripts/mcp-happy-path-demo.mjs
 ```
 
 The demo writes file-first state into `.assistant/` (PHASES + SNAPSHOT).
+
+## High-Risk (Free Plan) Demo
+
+Shows how risk signals and soft paywalls appear on free.
+
+```
+node scripts/mcp-high-risk-free-demo.mjs
+```
+
+## MCP Resources & Prompts
+
+List resources:
+```json
+{ "method": "resources/list", "params": {} }
+```
+
+Read a resource:
+```json
+{ "method": "resources/read", "params": { "uri": "buildrail://risk/signals" } }
+```
+
+List prompts:
+```json
+{ "method": "prompts/list", "params": {} }
+```
+
+Get a prompt:
+```json
+{ "method": "prompts/get", "params": { "name": "change_plan" } }
+```
+
+## Free vs Pro (Summary)
+
+| Capability | Free | Pro |
+| --- | --- | --- |
+| Project limit | 1 | Unlimited |
+| Sessions / month | 40 | 400 |
+| Drift guard | No | Yes |
+| Scope preview | No | Yes |
+| Smart next step | No | Yes |
+| Advanced explanations | No | Yes |
+| Workflow graph | No | Yes |

@@ -93,6 +93,10 @@ const getStripeFromLimits = (limits: Record<string, unknown> | null | undefined)
   stripe_subscription_id: typeof limits?.stripe_subscription_id === "string" ? (limits.stripe_subscription_id as string) : undefined
 });
 
+const normalizeSnapshotStatus = (
+  status: SubscriptionStatus
+): "active" | "past_due" | "canceled" | "paused" => (status === "trialing" ? "active" : status);
+
 const mergeUsageIntoLimits = (
   limits: Record<string, unknown> | null | undefined,
   usage: { sessions_used: number; project_count: number }
@@ -150,7 +154,7 @@ export class SqliteStore {
   }
 
   getUser(id: string): UserRecord | null {
-    const row = this.db.prepare(`SELECT * FROM user WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM user WHERE id = ?`).get(id) as UserRecord | undefined;
     return row ?? null;
   }
 
@@ -193,30 +197,46 @@ export class SqliteStore {
   }
 
   getSubscription(id: string): SubscriptionRecord | null {
-    const row = this.db.prepare(`SELECT * FROM subscription WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM subscription WHERE id = ?`).get(id) as
+      | Record<string, unknown>
+      | undefined;
     if (!row) return null;
-    const limits = fromJson<Record<string, unknown> | null>(row.limits_json, null);
+    const limits = fromJson<Record<string, unknown> | null>(row.limits_json as string | null, null);
     const usage = getUsageFromLimits(limits);
     return {
-      ...row,
+      id: row.id as string,
+      user_id: row.user_id as string,
+      plan: row.plan as SubscriptionPlan,
+      status: row.status as SubscriptionStatus,
+      current_period_start: (row.current_period_start as string | null) ?? undefined,
+      current_period_end: (row.current_period_end as string | null) ?? undefined,
       limits,
       sessions_used: usage.sessions_used,
-      project_count: usage.project_count
+      project_count: usage.project_count,
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
     } as SubscriptionRecord;
   }
 
   getSubscriptionByUserId(user_id: string): SubscriptionRecord | null {
     const row = this.db
       .prepare(`SELECT * FROM subscription WHERE user_id = ? ORDER BY created_at DESC LIMIT 1`)
-      .get(user_id);
+      .get(user_id) as Record<string, unknown> | undefined;
     if (!row) return null;
-    const limits = fromJson<Record<string, unknown> | null>(row.limits_json, null);
+    const limits = fromJson<Record<string, unknown> | null>(row.limits_json as string | null, null);
     const usage = getUsageFromLimits(limits);
     return {
-      ...row,
+      id: row.id as string,
+      user_id: row.user_id as string,
+      plan: row.plan as SubscriptionPlan,
+      status: row.status as SubscriptionStatus,
+      current_period_start: (row.current_period_start as string | null) ?? undefined,
+      current_period_end: (row.current_period_end as string | null) ?? undefined,
       limits,
       sessions_used: usage.sessions_used,
-      project_count: usage.project_count
+      project_count: usage.project_count,
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
     } as SubscriptionRecord;
   }
 
@@ -275,7 +295,7 @@ export class SqliteStore {
   getSubscriptionSnapshot(user_id: string): {
     user_id: string;
     plan: "free" | "pro";
-    status: SubscriptionStatus;
+    status: "active" | "past_due" | "canceled" | "paused";
     sessions_used: number;
     project_count: number;
   } {
@@ -284,7 +304,7 @@ export class SqliteStore {
     return {
       user_id: subscription.user_id,
       plan: subscription.plan === "pro" ? "pro" : "free",
-      status: subscription.status,
+      status: normalizeSnapshotStatus(subscription.status),
       sessions_used: usage.sessions_used,
       project_count: usage.project_count
     };
@@ -382,14 +402,14 @@ export class SqliteStore {
   }
 
   getProject(id: string): ProjectRecord | null {
-    const row = this.db.prepare(`SELECT * FROM project WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM project WHERE id = ?`).get(id) as ProjectRecord | undefined;
     return row ?? null;
   }
 
   getLatestProject(): ProjectRecord | null {
     const row = this.db
       .prepare(`SELECT * FROM project ORDER BY updated_at DESC, created_at DESC LIMIT 1`)
-      .get();
+      .get() as ProjectRecord | undefined;
     return row ?? null;
   }
 
@@ -446,7 +466,7 @@ export class SqliteStore {
   }
 
   getPhase(id: string): PhaseRecord | null {
-    const row = this.db.prepare(`SELECT * FROM phase WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM phase WHERE id = ?`).get(id) as PhaseRecord | undefined;
     return row ?? null;
   }
 
@@ -498,7 +518,7 @@ export class SqliteStore {
   }
 
   getBlock(id: string): BlockRecord | null {
-    const row = this.db.prepare(`SELECT * FROM block WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM block WHERE id = ?`).get(id) as BlockRecord | undefined;
     return row ?? null;
   }
 
@@ -559,14 +579,24 @@ export class SqliteStore {
   }
 
   getTask(id: string): TaskRecord | null {
-    const row = this.db.prepare(`SELECT * FROM task WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM task WHERE id = ?`).get(id) as
+      | Record<string, unknown>
+      | undefined;
     if (!row) return null;
     return {
-      ...row,
-      definition_of_done: fromJson(row.definition_of_done_json, []),
-      constraints: fromJson(row.constraints_json, []),
-      allowed_files: fromJson(row.allowed_files_json, [])
-    } as TaskRecord;
+      id: row.id as string,
+      block_id: row.block_id as string,
+      title: row.title as string,
+      user_value: row.user_value as string,
+      technical_goal: row.technical_goal as string,
+      definition_of_done: fromJson(row.definition_of_done_json as string, []),
+      constraints: fromJson(row.constraints_json as string, []),
+      allowed_files: fromJson(row.allowed_files_json as string, []),
+      order_index: Number(row.order_index ?? 0),
+      status: row.status as Task["status"],
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
+    };
   }
 
   listTasksByBlockId(block_id: string): TaskRecord[] {
@@ -646,15 +676,29 @@ export class SqliteStore {
   }
 
   getSession(id: string): SessionRecord | null {
-    const row = this.db.prepare(`SELECT * FROM session WHERE id = ?`).get(id);
+    const row = this.db.prepare(`SELECT * FROM session WHERE id = ?`).get(id) as
+      | Record<string, unknown>
+      | undefined;
     if (!row) return null;
+    const change_plan = fromJson<Record<string, unknown> | null>(row.change_plan_json as string, null);
+    const changed_files = fromJson<string[] | null>(row.changed_files_json as string, null);
+    const unexpected_files = fromJson<string[] | null>(row.unexpected_files_json as string, null);
+    const result_summary = typeof row.result_summary === "string" ? row.result_summary : undefined;
     return {
-      ...row,
-      change_plan: fromJson(row.change_plan_json, null),
-      changed_files: fromJson(row.changed_files_json, null),
-      scope_ok: row.scope_ok === null || row.scope_ok === undefined ? undefined : row.scope_ok === 1,
-      unexpected_files: fromJson(row.unexpected_files_json, null)
-    } as SessionRecord;
+      id: row.id as string,
+      task_id: row.task_id as string,
+      assistant: row.assistant as Session["assistant"],
+      prompt_snapshot: row.prompt_snapshot as string,
+      change_plan: change_plan ?? undefined,
+      result_summary,
+      changed_files: changed_files ?? undefined,
+      scope_ok:
+        row.scope_ok === null || row.scope_ok === undefined ? undefined : (row.scope_ok as number) === 1,
+      unexpected_files: unexpected_files ?? undefined,
+      status: row.status as Session["status"],
+      created_at: row.created_at as string,
+      updated_at: row.updated_at as string
+    };
   }
 
   listSessionsByTaskId(task_id: string): SessionRecord[] {
@@ -666,12 +710,12 @@ export class SqliteStore {
       task_id: row.task_id as string,
       assistant: row.assistant as Session["assistant"],
       prompt_snapshot: row.prompt_snapshot as string,
-      change_plan: fromJson(row.change_plan_json as string, null),
-      result_summary: row.result_summary as string | null | undefined,
-      changed_files: fromJson(row.changed_files_json as string, null),
+      change_plan: fromJson<Record<string, unknown> | null>(row.change_plan_json as string, null) ?? undefined,
+      result_summary: typeof row.result_summary === "string" ? row.result_summary : undefined,
+      changed_files: fromJson<string[] | null>(row.changed_files_json as string, null) ?? undefined,
       scope_ok:
         row.scope_ok === null || row.scope_ok === undefined ? undefined : (row.scope_ok as number) === 1,
-      unexpected_files: fromJson(row.unexpected_files_json as string, null),
+      unexpected_files: fromJson<string[] | null>(row.unexpected_files_json as string, null) ?? undefined,
       status: row.status as Session["status"],
       created_at: row.created_at as string,
       updated_at: row.updated_at as string

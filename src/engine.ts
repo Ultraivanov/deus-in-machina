@@ -35,6 +35,13 @@ export class WorkflowEngine {
     return this.repoIndex;
   }
 
+  getProjectTask(project_id: string, task_id: string) {
+    const project = this.store.projects.get(project_id);
+    const task = this.store.tasks.get(task_id);
+    if (!project || !task) return null;
+    return { project, task };
+  }
+
   private nowIso() {
     return new Date().toISOString();
   }
@@ -642,12 +649,29 @@ export class WorkflowEngine {
     };
   }
 
-  validateScope(session_id: string, allowed_files: string[], changed_files: string[]) {
+  validateScope(
+    session_id: string,
+    allowed_files: string[],
+    changed_files: string[],
+    risk?: {
+      risk_level: string;
+      signals?: string[];
+      message?: string;
+    }
+  ) {
     const session = this.store.sessions.get(session_id);
     const task = session ? this.store.tasks.get(session.task_id) : undefined;
     const inferredAllowed =
       allowed_files && allowed_files.length > 0 ? allowed_files : task?.allowed_files ?? [];
     const unexpected = changed_files.filter((f) => !inferredAllowed.includes(f));
+    const risk_meta =
+      risk && risk.risk_level !== "low"
+        ? {
+            risk_level: risk.risk_level,
+            risk_signals: risk.signals ?? [],
+            risk_message: risk.message ?? undefined
+          }
+        : undefined;
     if (session) {
       session.scope_ok = unexpected.length === 0;
       session.unexpected_files = unexpected;
@@ -659,7 +683,8 @@ export class WorkflowEngine {
         scope_ok: false,
         validation_status: "needs_approval",
         unexpected_files: changed_files,
-        message: "No allowlist available. Please approve the scope manually."
+        message: "No allowlist available. Please approve the scope manually.",
+        ...(risk_meta ? { risk: risk_meta } : {})
       };
     }
     if (unexpected.length > 0) {
@@ -668,7 +693,19 @@ export class WorkflowEngine {
         scope_ok: false,
         validation_status: "needs_approval",
         unexpected_files: unexpected,
-        message: "The agent touched files outside the approved task scope."
+        message: "The agent touched files outside the approved task scope.",
+        ...(risk_meta ? { risk: risk_meta } : {})
+      };
+    }
+
+    if (risk && risk.risk_level === "high") {
+      return {
+        session_id,
+        scope_ok: false,
+        validation_status: "needs_approval",
+        unexpected_files: [],
+        message: "High-risk step requires explicit approval before completion.",
+        ...(risk_meta ? { risk: risk_meta } : {})
       };
     }
 
@@ -677,11 +714,19 @@ export class WorkflowEngine {
       scope_ok: true,
       validation_status: "passed",
       unexpected_files: [],
-      message: "All changed files are inside the approved task scope."
+      message: "All changed files are inside the approved task scope.",
+      ...(risk_meta ? { risk: risk_meta } : {})
     };
   }
 
-  explainChanges(session_id: string) {
+  explainChanges(
+    session_id: string,
+    risk?: {
+      risk_level: string;
+      signals?: string[];
+      message?: string;
+    }
+  ) {
     const session = this.store.sessions.get(session_id);
     if (!session) return null;
     const scopeNote =
@@ -692,10 +737,14 @@ export class WorkflowEngine {
           : undefined;
     const summaryLines = [session.result_summary ?? "No summary provided."];
     if (scopeNote) summaryLines.push(scopeNote);
+    if (risk && risk.risk_level !== "low") {
+      summaryLines.push(`Risk: ${risk.risk_level}. ${risk.message ?? ""}`.trim());
+    }
     return {
       plain_language_summary: summaryLines,
       why_it_matters: "This advances the project by one validated step.",
-      user_safe_to_continue: true
+      user_safe_to_continue: true,
+      ...(risk && risk.signals ? { risk_signals: risk.signals } : {})
     };
   }
 

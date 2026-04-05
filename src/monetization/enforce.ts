@@ -6,6 +6,8 @@ export type MonetizationError = {
     message: string;
     retryable: boolean;
     upgrade_required?: boolean;
+    upgrade_hint?: string;
+    upgrade_url?: string;
   };
 };
 
@@ -16,7 +18,7 @@ export type MonetizationContext = {
 
 export type MonetizationDecision =
   | { ok: true; context: MonetizationContext; upgrade_hint?: string }
-  | { ok: false; error: MonetizationError };
+  | { ok: false; error: MonetizationError; context: MonetizationContext };
 
 export type SubscriptionLoader = (args: Record<string, unknown>) => SubscriptionSnapshot | null;
 
@@ -65,11 +67,73 @@ export const enforceMonetization = (
   const loaded = options?.loadSubscription?.(args);
   const subscription = loaded ?? buildSubscription(args);
   const plan = getPlan(subscription.plan);
+  const context = { subscription, plan };
+  const llmMode = process.env.BUILDRAIL_LLM_MODE ?? "client_keys";
+
+  if (llmMode === "server_proxy") {
+    if (subscription.status === "past_due") {
+      return {
+        ok: false,
+        context,
+        error: {
+          error: {
+            code: "SUBSCRIPTION_PAST_DUE",
+            message: "Subscription is past due. Update billing to continue using server tokens.",
+            retryable: false,
+            upgrade_required: true
+          }
+        }
+      };
+    }
+    if (subscription.status === "canceled") {
+      return {
+        ok: false,
+        context,
+        error: {
+          error: {
+            code: "SUBSCRIPTION_CANCELED",
+            message: "Subscription is canceled. Reactivate to continue using server tokens.",
+            retryable: false,
+            upgrade_required: true
+          }
+        }
+      };
+    }
+    if (subscription.status === "paused") {
+      return {
+        ok: false,
+        context,
+        error: {
+          error: {
+            code: "SUBSCRIPTION_PAUSED",
+            message: "Subscription is paused. Resume to continue using server tokens.",
+            retryable: false,
+            upgrade_required: true
+          }
+        }
+      };
+    }
+    if (plan.name === "free") {
+      return {
+        ok: false,
+        context,
+        error: {
+          error: {
+            code: "SERVER_TOKENS_REQUIRE_PRO",
+            message: "Server tokens are only available on paid plans. Upgrade or switch to client_keys.",
+            retryable: false,
+            upgrade_required: true
+          }
+        }
+      };
+    }
+  }
 
   if (toolName === "initialize_project") {
     if (subscription.project_count >= plan.limits.max_projects) {
       return {
         ok: false,
+        context,
         error: {
           error: {
             code: "PROJECT_LIMIT_REACHED",
@@ -86,6 +150,7 @@ export const enforceMonetization = (
     if (subscription.sessions_used >= plan.limits.max_sessions_per_month) {
       return {
         ok: false,
+        context,
         error: {
           error: {
             code: "SESSION_LIMIT_REACHED",
@@ -100,7 +165,7 @@ export const enforceMonetization = (
 
   return {
     ok: true,
-    context: { subscription, plan },
+    context,
     upgrade_hint: getUpgradeHint(toolName, plan)
   };
 };
@@ -119,6 +184,37 @@ const getUpgradeHint = (toolName: string, plan: Plan): string | undefined => {
       return "Upgrade to preview and refine scope before execution.";
     default:
       return undefined;
+  }
+};
+
+const getUpgradeUrl = (args: Record<string, unknown>) => {
+  if (typeof (args as Record<string, unknown>).upgrade_url === "string") {
+    return (args as Record<string, unknown>).upgrade_url as string;
+  }
+  if (process.env.BUILDRAIL_UPGRADE_URL) return process.env.BUILDRAIL_UPGRADE_URL;
+  return undefined;
+};
+
+const getErrorUpgradeHint = (
+  toolName: string,
+  plan: Plan,
+  errorCode?: string
+): string | undefined => {
+  switch (errorCode) {
+    case "SERVER_TOKENS_REQUIRE_PRO":
+      return "Upgrade to Pro to enable server tokens.";
+    case "SUBSCRIPTION_PAST_DUE":
+      return "Update billing to restore server tokens.";
+    case "SUBSCRIPTION_CANCELED":
+      return "Reactivate your subscription to restore server tokens.";
+    case "SUBSCRIPTION_PAUSED":
+      return "Resume your subscription to restore server tokens.";
+    case "PROJECT_LIMIT_REACHED":
+      return "Upgrade to create more projects.";
+    case "SESSION_LIMIT_REACHED":
+      return "Upgrade to increase your monthly session limit.";
+    default:
+      return getUpgradeHint(toolName, plan) ?? "Upgrade to continue.";
   }
 };
 
@@ -144,12 +240,29 @@ export const attachMonetizationMeta = <T>(
 export const applyMonetization = <T>(
   toolName: string,
   args: Record<string, unknown>,
-  handler: () => T,
+  handler: (context: MonetizationContext) => T,
   options?: { loadSubscription?: SubscriptionLoader }
 ): T | MonetizationError => {
   const decision = enforceMonetization(toolName, args, options);
-  if (!decision.ok) return decision.error;
+  if (!decision.ok) {
+    if (decision.error.error.upgrade_required) {
+      const upgrade_url = getUpgradeUrl(args);
+      const upgrade_hint = getErrorUpgradeHint(
+        toolName,
+        decision.context.plan,
+        decision.error.error.code
+      );
+      return {
+        error: {
+          ...decision.error.error,
+          upgrade_hint,
+          ...(upgrade_url ? { upgrade_url } : {})
+        }
+      };
+    }
+    return decision.error;
+  }
 
-  const result = handler();
+  const result = handler(decision.context);
   return attachMonetizationMeta(result, decision.context, decision.upgrade_hint);
 };

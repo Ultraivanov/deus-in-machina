@@ -70,6 +70,21 @@ Expected response (example):
 
 ---
 
+## 4.1) Optional: get risk profile
+
+```json
+{
+  "tool": "get_risk_profile",
+  "arguments": {
+    "project_id": "proj_123",
+    "task_id": "task_456",
+    "user_id": "user_demo"
+  }
+}
+```
+
+---
+
 ## 5) Start session (requires Change Plan approval)
 
 ```json
@@ -173,4 +188,24 @@ If scope drift is detected:
     "user_id": "user_demo"
   }
 }
+```
+
+---
+
+## 11) MCP resources & prompts
+
+```json
+{ "method": "resources/list", "params": {} }
+```
+
+```json
+{ "method": "resources/read", "params": { "uri": "buildrail://risk/signals" } }
+```
+
+```json
+{ "method": "prompts/list", "params": {} }
+```
+
+```json
+{ "method": "prompts/get", "params": { "name": "change_plan" } }
 ```

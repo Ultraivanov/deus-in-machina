@@ -9,6 +9,8 @@ Buildrail MCP server runs over stdio. For hosted environments, wrap it with a pr
 3. Provide required environment variables:
    - `BUILDRAIL_DB_PATH`
    - `BUILDRAIL_PLAN` (optional)
+   - `BUILDRAIL_LLM_MODE` (`client_keys` default, `server_proxy` if you add an LLM proxy; free plans are blocked from server tokens)
+   - `BUILDRAIL_UPGRADE_URL` (optional direct checkout link surfaced in errors)
 
 ## Deployment Notes
 - MCP stdio is not directly HTTP; a lightweight adapter is required.
