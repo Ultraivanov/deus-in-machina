@@ -1,11 +1,11 @@
 # Codex Code Starter
 
-Одноагентный мета-фреймворк для структурированной AI-разработки с **Codex**.
+Одноагентный мета-фреймворк для структурированной AI-разработки с **Codex**, на 4-уровневой модели: Phase → Block → Task → Session.
 
 > Название репозитория `codex-code-starter` сохранено для долгосрочной совместимости.
 
 [![GitHub](https://img.shields.io/badge/GitHub-codex--code--starter-blue)](https://github.com/Ultraivanov/codex-code-starter)
-[![Version](https://img.shields.io/badge/version-1.0.0-orange.svg)](https://github.com/Ultraivanov/codex-code-starter)
+[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)](https://github.com/Ultraivanov/codex-code-starter)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
@@ -18,18 +18,20 @@
 - Точка входа Codex: `AGENTS.md`
 - История изменений: `CHANGELOG.md`
 - Состояние фаз: `.codex/PHASES.md`
+- Шаблон блока: `.codex/blocks/BLOCK-TEMPLATE.md`
 
-## Что нового в v1.0.0
+## Что нового в v2.0.0
 
-- Codex-first контракт рабочих файлов состояния.
-- Минимальная аддитивная установка без затрагивания бизнес-кода.
-- Протоколы start/finish под границы сессий Codex.
-- Профилирование проектов: software vs content.
+- 4-уровневая иерархия: Phase → Block → Task → Session.
+- Детали блока и задачи в `.codex/blocks/<ID>.md`.
+- Новые протоколы и команды: `init-block`, `init-task`.
+- Контекст полностью детерминирован и читается из файлов.
 
 ## Принципы
 
 - Единое состояние проекта для каждой сессии Codex.
-- Детерминированные start и finish.
+- Контекст детерминирован и берётся только из файлов.
+- Одна задача на сессию с обязательными approval-гейтами.
 - Нулевое влияние на бизнес-код.
 - Четкое разделение software и content проектов.
 
@@ -88,16 +90,21 @@ python3 --version
 - software: `.codex/SNAPSHOT.md`, `.codex/BACKLOG.md`, `.codex/ARCHITECTURE.md`
 - content: `.codex/content/SNAPSHOT.md`, `.codex/content/BACKLOG.md`, `.codex/content/ARCHITECTURE.md`
 
-### Фазовый workflow
+### Workflow фаз / блоков / задач
 
-Фреймворк поддерживает фазовую разработку. Правила находятся здесь:
+Фреймворк поддерживает фазовую разработку с блоками и задачами. Правила находятся здесь:
 
 - `.codex/protocols/phase-workflow.md`
 - `.codex/PHASES.md` (текущее состояние фаз)
+- `.codex/blocks/<ID>.md` (детали блока и задачи)
 
-На каждом `start` Codex должен загрузить `PHASES.md`, подтвердить активный блок и работать только с одним блоком за сессию.
+На каждом `start` Codex загружает `PHASES.md` → активный блок → активную задачу → Done When.
 
-Команда `init-phases` создаёт черновик `PHASES.md` на основе текущего контекста проекта.
+Ключевые команды:
+
+- `init-phases` — создать черновик `PHASES.md` из контекста
+- `init-block <ID>` — открыть блок и создать файл с задачами
+- `init-task` — сформировать Change Plan для следующей задачи
 
 ### Finish
 
@@ -118,9 +125,19 @@ codex-code-starter/
 ├── README_RU.md
 ├── LICENSE
 ├── .codex/
+│   ├── PHASES.md                  # Состояние фаз и блоков
+│   ├── blocks/                    # Детали блоков и шаблон
+│   │   └── BLOCK-TEMPLATE.md
 │   ├── commands/                 # Исполняемые Codex workflows
+│   │   ├── init-phases.md
+│   │   ├── init-block.md
+│   │   ├── init-task.md
 │   │   └── quick-update.sh        # Вход обновления для Codex
-│   ├── protocols/                # Silent protocol specs
+│   ├── protocols/                # Протоколы
+│   │   ├── phase-workflow.md
+│   │   ├── init-phases-protocol.md
+│   │   ├── init-block-protocol.md
+│   │   └── init-task-protocol.md
 │   ├── templates/                # Шаблоны состояния/конфига
 │   └── contracts/
 ├── security/                     # Security scan/cleanup скрипты
@@ -157,7 +174,7 @@ codex-code-starter/
 
 **Как работают фазы?**
 
-Используйте `init-phases` для черновика `.codex/PHASES.md`. Каждая сессия работает с одним блоком, подтверждаемым на `start`.
+Используйте `init-phases` для черновика `.codex/PHASES.md`, затем `init-block <ID>` для открытия блока и `init-task` для старта задачи. Каждая сессия работает с одной задачей.
 
 ## Для разработчиков фреймворка
 
@@ -183,7 +200,7 @@ bash migration/build-distribution.sh
 ## Версионирование
 
 - Используется Semantic Versioning.
-- `1.0.0` — первый стабильный релиз Codex-first контракта.
+- `2.0.0` — переход на 4-уровневую модель Phase → Block → Task → Session.
 
 Подробности см. в [CHANGELOG.md](CHANGELOG.md).
 
