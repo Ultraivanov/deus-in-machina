@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | I-01                                     |
-| Title      | Runtime scaffold + CLI skeleton          |
-| Status     | done                                     |
-| File       | `.codex/blocks/I-01.md`                  |
+| Block ID   | I-02                                     |
+| Title      | Extractor adapter (Figma input)          |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/I-02.md`                  |
 
 ---
 
@@ -73,7 +73,7 @@
 | ID    | Block                                | Status      |
 |-------|--------------------------------------|-------------|
 | I-01  | Runtime scaffold + CLI skeleton      | done        |
-| I-02  | Extractor adapter (Figma input)      | pending     |
+| I-02  | Extractor adapter (Figma input)      | in-progress |
 | I-03  | Normalizer implementation            | pending     |
 | I-04  | Pattern engine implementation        | pending     |
 | I-05  | Validator implementation             | pending     |
