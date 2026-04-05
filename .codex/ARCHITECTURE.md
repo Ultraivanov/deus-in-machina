@@ -233,6 +233,13 @@ Notes:
 }
 ```
 
+### Adapter Notes + Edge Cases
+- Missing nodes: if a `nodeId` is not found, return it in `meta.missingNodes` and continue.
+- Partial extracts: if `include` omits a section, return an empty object for that section.
+- Rate limits / timeouts: return `meta.partial=true` and include `meta.warnings`.
+- Unknown variable types: map to `custom` category and preserve original name.
+- Component cycles or invalid trees: sanitize by removing cycles and record in `meta.warnings`.
+
 ### Tool 2 — normalize_tokens
 Convert raw Figma data into semantic tokens.
 
