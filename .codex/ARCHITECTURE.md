@@ -918,6 +918,51 @@ Default handling:
 3. Generate fix instruction
 4. Re-run generation/validation
 
+## CLI/Runner Interface (v0)
+
+### Commands
+- `dsr extract --file <fileKey> [--nodes <id1,id2>]`
+- `dsr normalize --input <context.json>`
+- `dsr patterns --input <context.json>`
+- `dsr validate --code <ui.html> --rules <rules.json>`
+- `dsr fix --code <ui.html> --errors <errors.json>`
+- `dsr loop --spec <execution.json> --rules <rules.json>`
+
+### Flags
+- `--out <path>`: write output JSON
+- `--format json|yaml`: output format
+- `--min-confidence <0-1>`: pattern detection threshold
+- `--max-iterations <n>`: loop cap
+
+### Output Conventions
+- Commands write JSON to stdout by default.
+- Use `--out` to persist artifacts for later stages.
+
+### Runner Flow (v0)
+1. `dsr extract` → `context.json`
+2. `dsr normalize` → `normalized.json`
+3. `dsr patterns` → `patterns.json`
+4. `dsr build_landing_spec` (optional) → `execution.json`
+5. `dsr generate_ui` → `ui.html`
+6. `dsr validate` → `report.json`
+7. If errors: `dsr fix` → `ui.fixed.html` and re-run `validate`
+8. `dsr loop` wraps steps 5–7 with `--max-iterations`
+
+### Example Runs
+
+#### Example 1 — Full pipeline
+```bash
+dsr extract --file AbCdEf123 --out context.json
+dsr normalize --input context.json --out normalized.json
+dsr patterns --input context.json --out patterns.json
+dsr validate --code ui.html --rules rules.json --out report.json
+```
+
+#### Example 2 — Loop until valid
+```bash
+dsr loop --spec execution.json --rules rules.json --max-iterations 3 --out final.json
+```
+
 ## Fix Instruction Schema + Naming
 
 ### Fix Instruction Format
