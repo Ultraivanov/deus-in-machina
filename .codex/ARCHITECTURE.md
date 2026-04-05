@@ -809,6 +809,55 @@ Detection rules:
   ]
 }
 ```
+
+## Pattern Library Auto-Growth
+
+### Growth Criteria + Thresholds (v0)
+- Promote a cluster to a library pattern if:
+  - cluster size ≥ 3
+  - average confidence ≥ 0.8
+  - cross-project coverage ≥ 2 projects
+- Require manual review if:
+  - confidence is between 0.7–0.79
+  - cluster contains mixed structures
+
+### Library Update Schema (v0)
+```json
+{
+  "library_updates": [
+    {
+      "patternId": "lib_hero_01",
+      "type": "hero",
+      "sourceCluster": "cluster_hero_01",
+      "structure": ["headline", "subheadline", "cta"],
+      "metadata": { "direction": "vertical", "spacing": 16 },
+      "status": "proposed"
+    }
+  ]
+}
+```
+
+### Example Growth Events
+```json
+{
+  "events": [
+    {
+      "eventId": "grow_hero_01",
+      "action": "promote",
+      "patternId": "lib_hero_01",
+      "reason": "cluster size ≥ 3, confidence ≥ 0.8",
+      "status": "approved"
+    },
+    {
+      "eventId": "grow_card_02",
+      "action": "review",
+      "patternId": "lib_card_02",
+      "reason": "confidence below threshold",
+      "status": "pending"
+    }
+  ]
+}
+```
 Confidence rationale:
 - Large headline + stacked subheadline detected
 - CTA button present with padding and primary fill
