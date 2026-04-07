@@ -9,6 +9,8 @@ import { DesignOrchestrator } from "./design/orchestrator.js";
 import { StitchProvider } from "./design/providers/stitch.js";
 import { FigmaProvider } from "./design/providers/figma.js";
 import type { DesignRequest } from "./design/contracts.js";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const monetizationContextSchema = {
   user_id: { type: "string" },
@@ -214,6 +216,25 @@ export const tools = [
 ];
 
 export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteStore) => {
+  const resolveDesignContractContent = (
+    repoRoot: string | undefined,
+    contractPath: string,
+    inlineContent?: string
+  ) => {
+    if (typeof inlineContent === "string" && inlineContent.trim().length > 0) {
+      return { content: inlineContent, resolved_path: contractPath, source: "inline" as const };
+    }
+    const absolutePath = resolve(repoRoot ?? process.cwd(), contractPath);
+    if (!existsSync(absolutePath)) {
+      return { content: undefined, resolved_path: absolutePath, source: "missing" as const };
+    }
+    return {
+      content: readFileSync(absolutePath, "utf8"),
+      resolved_path: absolutePath,
+      source: "file" as const
+    };
+  };
+
   const designOrchestrator = new DesignOrchestrator({
     primary_by_task_type: {
       screen: "stitch",
@@ -457,6 +478,26 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
           }
 
           const request: DesignRequest = {
+            // Load DESIGN.md from repo when inline content is not provided.
+            // This keeps the design contract deterministic for generation.
+            ...(() => {
+              const resolved = resolveDesignContractContent(
+                args.repo_root as string | undefined,
+                (args.design_contract_path as string) ?? "DESIGN.md",
+                args.design_contract_content as string | undefined
+              );
+              return {
+                design_contract: {
+                  path: resolved.resolved_path,
+                  content: resolved.content
+                },
+                metadata: {
+                  source: "mcp_tool",
+                  dry_run: true,
+                  design_contract_source: resolved.source
+                }
+              };
+            })(),
             project_id: args.project_id as string,
             task_id: args.task_id as string,
             task_type: args.task_type as DesignRequest["task_type"],
@@ -464,19 +505,11 @@ export const createToolRouter = (engine: WorkflowEngine, sqliteStore?: SqliteSto
             repo_root: args.repo_root as string | undefined,
             target_paths: (args.target_paths as string[]) ?? projectTask.task.allowed_files,
             constraints: (args.constraints as string[]) ?? projectTask.task.constraints,
-            design_contract: {
-              path: (args.design_contract_path as string) ?? "DESIGN.md",
-              content: args.design_contract_content as string | undefined
-            },
             generation: {
               variants: args.variants as number | undefined,
               output_formats: args.output_formats as DesignRequest["generation"]["output_formats"],
               prefer_provider: args.prefer_provider as string | undefined,
               mode: (args.mode as "draft" | "handoff" | undefined) ?? "draft"
-            },
-            metadata: {
-              source: "mcp_tool",
-              dry_run: true
             }
           };
 
