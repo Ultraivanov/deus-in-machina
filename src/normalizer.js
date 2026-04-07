@@ -115,13 +115,13 @@ export function normalizeTokens(context = {}) {
     }
 
     const current = tokenMeta[token];
+    collisionsResolved += 1;
     const shouldReplace =
       score > current.score ||
       (score === current.score && entry.sourceName.localeCompare(current.sourceName) < 0);
     if (shouldReplace) {
       tokens[token] = entry.rawValue;
       tokenMeta[token] = { sourceName: entry.sourceName, score };
-      collisionsResolved += 1;
     }
   }
 
