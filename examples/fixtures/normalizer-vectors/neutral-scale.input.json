@@ -1,0 +1,12 @@
+{
+  "context": {
+    "variables": {
+      "Color/Neutral/500": {
+        "name": "Color/Neutral/500",
+        "value": "#999999",
+        "type": "color"
+      }
+    },
+    "styles": {}
+  }
+}

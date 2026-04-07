@@ -1,0 +1,12 @@
+{
+  "context": {
+    "variables": {
+      "Color/Primary/Default": {
+        "name": "Color/Primary/Default",
+        "value": "#3366FF",
+        "type": "color"
+      }
+    },
+    "styles": {}
+  }
+}
