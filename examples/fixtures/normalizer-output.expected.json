@@ -1,0 +1,17 @@
+{
+  "normalized_context": {
+    "tokens": {
+      "color.primary.default": "#3355EE",
+      "space.base.8": 8,
+      "typography.body.16": {
+        "fontSize": 16,
+        "fontWeight": 400
+      }
+    },
+    "meta": {
+      "sourceCount": 4,
+      "normalizedCount": 3,
+      "collisionsResolved": 1
+    }
+  }
+}

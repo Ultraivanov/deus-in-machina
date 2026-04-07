@@ -1,0 +1,27 @@
+{
+  "context": {
+    "variables": {
+      "Color/Primary/Default": {
+        "name": "Color/Primary/Default",
+        "value": "#3366FF",
+        "type": "color"
+      },
+      "color.primary.default": {
+        "name": "color.primary.default",
+        "value": "#3355EE",
+        "type": "color"
+      },
+      "Spacing/8": {
+        "name": "Spacing/8",
+        "value": 8,
+        "type": "number"
+      }
+    },
+    "styles": {
+      "Typography/Body/16": {
+        "fontSize": 16,
+        "fontWeight": 400
+      }
+    }
+  }
+}
