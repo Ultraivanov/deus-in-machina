@@ -1,0 +1,21 @@
+{
+  "fileKey": "AbCdEf123",
+  "nodeIds": ["1:1", "1:10"],
+  "include": ["variables", "styles", "components", "layout"],
+  "raw": {
+    "variables": [
+      { "name": "Color/Primary/Default", "value": "#3366FF", "type": "color" },
+      { "name": "Spacing/8", "value": 8, "type": "number" }
+    ],
+    "styles": {
+      "Text/H1": { "fontSize": 48, "fontWeight": 700 },
+      "Text/Body": { "fontSize": 16, "fontWeight": 400 }
+    },
+    "components": [
+      { "id": "10:2", "name": "Button/Primary", "variants": ["default", "hover"] }
+    ],
+    "layout": {
+      "root": { "id": "0:1", "children": ["1:1", "1:2"] }
+    }
+  }
+}
