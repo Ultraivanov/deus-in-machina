@@ -1,0 +1,12 @@
+{
+  "context": {
+    "variables": {
+      "Spacing/8": {
+        "name": "Spacing/8",
+        "value": 8,
+        "type": "number"
+      }
+    },
+    "styles": {}
+  }
+}
