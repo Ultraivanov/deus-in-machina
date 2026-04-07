@@ -1,0 +1,62 @@
+{
+  "context": {
+    "variables": {
+      "Color/Primary/Default": {
+        "name": "Color/Primary/Default",
+        "value": "#3366FF",
+        "type": "color"
+      },
+      "Spacing/8": {
+        "name": "Spacing/8",
+        "value": 8,
+        "type": "number"
+      }
+    },
+    "styles": {
+      "Text/H1": {
+        "fontSize": 48,
+        "fontWeight": 700
+      },
+      "Text/Body": {
+        "fontSize": 16,
+        "fontWeight": 400
+      }
+    },
+    "components": {
+      "Button/Primary": {
+        "id": "10:2",
+        "name": "Button/Primary",
+        "variants": [
+          "default",
+          "hover"
+        ]
+      }
+    },
+    "layout": {
+      "root": {
+        "id": "0:1",
+        "children": [
+          "1:1",
+          "1:2"
+        ]
+      }
+    }
+  },
+  "meta": {
+    "fileKey": "AbCdEf123",
+    "nodeIds": [
+      "1:1",
+      "1:10"
+    ],
+    "nodeCount": 2,
+    "include": [
+      "variables",
+      "styles",
+      "components",
+      "layout"
+    ],
+    "extractedAt": "2026-04-07T17:31:25.125Z",
+    "partial": false,
+    "warnings": []
+  }
+}
