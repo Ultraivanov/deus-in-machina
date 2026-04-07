@@ -4,6 +4,14 @@
 Pipeline:
 Figma → Extractor → Normalizer → Pattern Engine → Rules → Validator → Fix Loop
 
+Design generation layer (provider-agnostic):
+Workflow Task → Design Orchestrator → Provider Adapter → Artifact Normalizer → Validation Gate
+
+Canonical truth split:
+- Execution truth: phase/block/task/session state files + workflow engine.
+- Design truth: `DESIGN.md` in repository root.
+- External providers (Figma/Stitch/etc.) are execution engines, not canonical state.
+
 MCP Toolchain:
 extract_figma_context → normalize_tokens → build_landing_spec → generate_ui → validate_ui → fix_ui → loop_until_valid
 
@@ -14,6 +22,31 @@ extract_figma_context → normalize_tokens → build_landing_spec → generate_u
 - Rules: validation ruleset (tokens, spacing, components, layout, patterns).
 - Validator: produces lint-style output with severity levels.
 - Correction Engine: generates fix instructions and re-runs validation.
+- Design Orchestrator: routes design generation requests to provider adapters and applies policy.
+- Provider Adapter: translates internal request/response contracts to specific provider APIs.
+- Validation Gate: checks generated artifacts against `DESIGN.md` and returns pass/review/fail.
+
+## Design Generation Gateway
+
+### Responsibilities
+- Keep provider selection isolated from workflow engine.
+- Enforce request policy (task type, mode, constraints, target paths).
+- Normalize provider outputs into internal artifacts.
+- Validate outputs against canonical design contract.
+- Return deterministic result payload for apply/review flows.
+
+### Interface Contract
+Implemented in `src/design/contracts.ts`:
+- `DesignProvider`
+- `DesignRequest`
+- `DesignArtifact`
+- `ValidationResult`
+
+### Routing Policy (v0)
+- `task_type=screen|component`: pick best available visual/code provider.
+- `task_type=tokens|design_system_update`: pick token-aware provider.
+- If preferred provider is unavailable, fallback to secondary provider.
+- If validation fails, return `needs_review`/`failed` and block auto-apply.
 
 ## Token Model (v3)
 
