@@ -21,7 +21,7 @@
 |------------|------------------------------------------|
 | Block ID   | I-06                                     |
 | Title      | Fix loop + pipeline integration          |
-| Status     | pending                                  |
+| Status     | in-progress                              |
 | File       | `.codex/blocks/I-06.md`                  |
 
 ---
@@ -77,7 +77,7 @@
 | I-03  | Normalizer implementation            | done        |
 | I-04  | Pattern engine implementation        | done        |
 | I-05  | Validator implementation             | done        |
-| I-06  | Fix loop + pipeline integration      | pending     |
+| I-06  | Fix loop + pipeline integration      | in-progress |
 
 ---
 
