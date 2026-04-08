@@ -1,0 +1,22 @@
+{
+  "valid": true,
+  "summary": {
+    "errors": 0,
+    "warnings": 1,
+    "infos": 0
+  },
+  "errors": [],
+  "warnings": [
+    {
+      "id": "dsr.pattern.hero-missing-cta",
+      "type": "pattern_violation",
+      "severity": "WARNING",
+      "message": "CTA missing in detected Hero"
+    }
+  ],
+  "infos": [],
+  "meta": {
+    "codeLength": 46,
+    "ruleCount": 0
+  }
+}

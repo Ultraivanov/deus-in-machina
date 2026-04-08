@@ -1,0 +1,22 @@
+{
+  "valid": false,
+  "summary": {
+    "errors": 1,
+    "warnings": 0,
+    "infos": 0
+  },
+  "errors": [
+    {
+      "id": "dsr.spacing.grid-8pt",
+      "type": "spacing_violation",
+      "severity": "ERROR",
+      "message": "Expected 8pt grid"
+    }
+  ],
+  "warnings": [],
+  "infos": [],
+  "meta": {
+    "codeLength": 36,
+    "ruleCount": 0
+  }
+}
