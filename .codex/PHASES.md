@@ -21,7 +21,7 @@
 |------------|------------------------------------------|
 | Block ID   | I-04                                     |
 | Title      | Pattern engine implementation            |
-| Status     | pending                                  |
+| Status     | in-progress                              |
 | File       | `.codex/blocks/I-04.md`                  |
 
 ---
@@ -75,7 +75,7 @@
 | I-01  | Runtime scaffold + CLI skeleton      | done        |
 | I-02  | Extractor adapter (Figma input)      | done        |
 | I-03  | Normalizer implementation            | done        |
-| I-04  | Pattern engine implementation        | pending     |
+| I-04  | Pattern engine implementation        | in-progress |
 | I-05  | Validator implementation             | pending     |
 | I-06  | Fix loop + pipeline integration      | pending     |
 
