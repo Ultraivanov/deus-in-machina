@@ -1,0 +1,18 @@
+{
+  "patterns": [
+    {
+      "id": "pattern_hero_01",
+      "name": "Hero",
+      "type": "hero",
+      "confidence": 1,
+      "structure": ["headline", "subheadline", "cta"],
+      "nodes": ["hero_headline", "hero_subheadline", "hero_cta"],
+      "metadata": {}
+    }
+  ],
+  "meta": {
+    "detectedCount": 1,
+    "nodeCount": 3,
+    "minConfidence": 0.7
+  }
+}

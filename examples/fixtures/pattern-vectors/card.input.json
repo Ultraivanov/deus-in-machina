@@ -1,0 +1,9 @@
+{
+  "context": {
+    "layout": [
+      { "id": "card_media", "role": "media" },
+      { "id": "card_title", "role": "title" },
+      { "id": "card_description", "role": "description" }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "patterns": [
+    {
+      "id": "pattern_card_01",
+      "name": "Card",
+      "type": "card",
+      "confidence": 1,
+      "structure": [
+        "media",
+        "title",
+        "description"
+      ],
+      "nodes": [
+        "card_media",
+        "card_title",
+        "card_description"
+      ],
+      "metadata": {}
+    }
+  ],
+  "meta": {
+    "detectedCount": 1,
+    "nodeCount": 3,
+    "minConfidence": 0.7
+  }
+}

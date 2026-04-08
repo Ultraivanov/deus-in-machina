@@ -1,0 +1,9 @@
+{
+  "context": {
+    "layout": [
+      { "id": "hero_headline", "role": "headline" },
+      { "id": "hero_subheadline", "role": "subheadline" },
+      { "id": "hero_cta", "role": "cta" }
+    ]
+  }
+}
