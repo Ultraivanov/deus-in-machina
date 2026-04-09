@@ -1,0 +1,60 @@
+{
+  "normalized_context": {
+    "tokens": {
+      "color.hex.00": "#00A1D3",
+      "color.hex.10325": "#10325A",
+      "color.hex.7": "#7CA9D2",
+      "color.hex": "#BBC1CB",
+      "typography.font.0": {
+        "fontFamily": "Poppins:Medium"
+      },
+      "typography.font.1": {
+        "fontFamily": "Playfair_Display:Italic"
+      },
+      "typography.font.2": {
+        "fontFamily": "Poppins:SemiBold"
+      },
+      "typography.font.3": {
+        "fontFamily": "Poppins:Regular"
+      },
+      "typography.leading.0": {
+        "lineHeight": 1.1
+      },
+      "typography.leading.1": {
+        "lineHeight": 0
+      },
+      "typography.leading.2": {
+        "lineHeight": 1.2
+      },
+      "typography.leading.3": {
+        "lineHeight": 1.5
+      },
+      "typography.size.0": {
+        "fontSize": 36
+      },
+      "typography.size.1": {
+        "fontSize": 14
+      },
+      "typography.size.2": {
+        "fontSize": 42
+      },
+      "typography.size.3": {
+        "fontSize": 18
+      },
+      "typography.size.4": {
+        "fontSize": 16
+      },
+      "typography.tracking.0": {
+        "letterSpacing": -0.36
+      },
+      "typography.tracking.1": {
+        "letterSpacing": -0.84
+      }
+    },
+    "meta": {
+      "sourceCount": 22,
+      "normalizedCount": 19,
+      "collisionsResolved": 3
+    }
+  }
+}
