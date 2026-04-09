@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | I-06                                     |
-| Title      | Fix loop + pipeline integration          |
-| Status     | in-progress                              |
-| File       | `.codex/blocks/I-06.md`                  |
+| Block ID   | -                                        |
+| Title      | -                                        |
+| Status     | done                                     |
+| File       | -                                        |
 
 ---
 
@@ -77,13 +77,13 @@
 | I-03  | Normalizer implementation            | done        |
 | I-04  | Pattern engine implementation        | done        |
 | I-05  | Validator implementation             | done        |
-| I-06  | Fix loop + pipeline integration      | in-progress |
+| I-06  | Fix loop + pipeline integration      | done        |
 
 ---
 
 ## Project Status
 
-Phase 4 started (implementation).
+Phase 4 complete (implementation).
 
 ---
 

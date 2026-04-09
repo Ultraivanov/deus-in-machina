@@ -1,0 +1,36 @@
+{
+  "final_code": "<div style='margin:10px;color:#FF0000'>Hi</div>",
+  "iterations": 0,
+  "report": {
+    "valid": false,
+    "summary": {
+      "errors": 2,
+      "warnings": 0,
+      "infos": 0
+    },
+    "errors": [
+      {
+        "id": "dsr.token.no-raw-values",
+        "type": "token_violation",
+        "severity": "ERROR",
+        "message": "Raw color used instead of token"
+      },
+      {
+        "id": "dsr.spacing.grid-8pt",
+        "type": "spacing_violation",
+        "severity": "ERROR",
+        "message": "Expected 8pt grid"
+      }
+    ],
+    "warnings": [],
+    "infos": [],
+    "meta": {
+      "codeLength": 47,
+      "ruleCount": 0
+    }
+  },
+  "meta": {
+    "maxIterations": 0,
+    "ruleCount": 0
+  }
+}

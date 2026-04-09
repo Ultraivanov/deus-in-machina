@@ -1,0 +1,30 @@
+{
+  "final_code": "<section class='hero' style='margin: 8px;color:color.primary.default'>Hi</section>",
+  "iterations": 1,
+  "report": {
+    "valid": true,
+    "summary": {
+      "errors": 0,
+      "warnings": 1,
+      "infos": 0
+    },
+    "errors": [],
+    "warnings": [
+      {
+        "id": "dsr.pattern.hero-missing-cta",
+        "type": "pattern_violation",
+        "severity": "WARNING",
+        "message": "CTA missing in detected Hero"
+      }
+    ],
+    "infos": [],
+    "meta": {
+      "codeLength": 82,
+      "ruleCount": 0
+    }
+  },
+  "meta": {
+    "maxIterations": 3,
+    "ruleCount": 0
+  }
+}
