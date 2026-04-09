@@ -10,19 +10,19 @@
 
 | Field      | Value                                   |
 |------------|-----------------------------------------|
-| Phase      | Phase 4 — Implementation & Pilot        |
-| Goal       | Build runnable MVP and validate on real inputs |
-| Started    | 2026-04-05                              |
+| Phase      | Phase 5 — Alpha Pilot                   |
+| Goal       | Validate runtime with real Figma exports and end-to-end CLI workflows |
+| Started    | 2026-04-09                              |
 | Target     | TBD                                     |
 
 ## Active Block
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | -                                        |
-| Title      | -                                        |
-| Status     | done                                     |
-| File       | -                                        |
+| Block ID   | A-01                                     |
+| Title      | Real Figma export ingestion              |
+| Status     | pending                                  |
+| File       | `.codex/blocks/A-01.md`                  |
 
 ---
 
@@ -79,12 +79,40 @@
 | I-05  | Validator implementation             | done        |
 | I-06  | Fix loop + pipeline integration      | done        |
 
+## Phase 5 — Alpha Pilot
+> Goal: validate runtime with real Figma exports and end-to-end CLI workflows
+
+| ID    | Block                                   | Status  |
+|-------|-----------------------------------------|---------|
+| A-01  | Real Figma export ingestion             | pending |
+| A-02  | End-to-end CLI pipeline on real project | pending |
+| A-03  | Ruleset tuning + configuration          | pending |
+| A-04  | Pilot docs + onboarding                 | pending |
+
+## Phase 6 — Beta Stabilization
+> Goal: harden runtime reliability and prepare broader adoption
+
+| ID    | Block                                   | Status  |
+|-------|-----------------------------------------|---------|
+| B-01  | Robust error handling + recovery paths  | pending |
+| B-02  | Performance baselines + profiling       | pending |
+| B-03  | Configurable rule packs + severity      | pending |
+| B-04  | Observability + telemetry review        | pending |
+
+## Phase 7 — Release
+> Goal: production-ready release and support readiness
+
+| ID    | Block                                   | Status  |
+|-------|-----------------------------------------|---------|
+| R-01  | Release packaging + versioned artifacts | pending |
+| R-02  | Public docs + examples                  | pending |
+| R-03  | Support + maintenance plan              | pending |
 ---
 
 ## Project Status
 
-Phase 4 complete (implementation).
+Phase 5 pending (Alpha).
 
 ---
 
-_Last updated: 2026-04-05_
+_Last updated: 2026-04-09_
