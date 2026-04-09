@@ -96,6 +96,10 @@ function collectStyles(source) {
 }
 
 export function parseFigmaExport({ fileKey, nodeId, code = "" } = {}) {
+  return parseFigmaExportWithTime({ fileKey, nodeId, code, extractedAt: new Date().toISOString() });
+}
+
+export function parseFigmaExportWithTime({ fileKey, nodeId, code = "", extractedAt } = {}) {
   if (!fileKey) throw new Error("fileKey is required");
   if (!nodeId) throw new Error("nodeId is required");
 
@@ -114,7 +118,7 @@ export function parseFigmaExport({ fileKey, nodeId, code = "" } = {}) {
       fileKey,
       nodeId,
       nodeCount: nodeIds.length,
-      extractedAt: new Date().toISOString(),
+      extractedAt: extractedAt || new Date().toISOString(),
       codeLength: source.length,
       warnings: []
     }
