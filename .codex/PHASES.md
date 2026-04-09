@@ -21,7 +21,7 @@
 |------------|------------------------------------------|
 | Block ID   | A-01                                     |
 | Title      | Real Figma export ingestion              |
-| Status     | pending                                  |
+| Status     | in-progress                              |
 | File       | `.codex/blocks/A-01.md`                  |
 
 ---
@@ -84,7 +84,7 @@
 
 | ID    | Block                                   | Status  |
 |-------|-----------------------------------------|---------|
-| A-01  | Real Figma export ingestion             | pending |
+| A-01  | Real Figma export ingestion             | in-progress |
 | A-02  | End-to-end CLI pipeline on real project | pending |
 | A-03  | Ruleset tuning + configuration          | pending |
 | A-04  | Pilot docs + onboarding                 | pending |
