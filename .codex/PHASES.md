@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | -                                        |
-| Title      | -                                        |
-| Status     | -                                        |
-| File       | -                                        |
+| Block ID   | A-03                                     |
+| Title      | Ruleset tuning + configuration           |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/A-03.md`                  |
 
 ---
 
@@ -86,7 +86,7 @@
 |-------|-----------------------------------------|---------|
 | A-01  | Real Figma export ingestion             | done    |
 | A-02  | End-to-end CLI pipeline on real project | done |
-| A-03  | Ruleset tuning + configuration          | pending |
+| A-03  | Ruleset tuning + configuration          | in-progress |
 | A-04  | Pilot docs + onboarding                 | pending |
 
 ## Phase 6 — Beta Stabilization
@@ -111,7 +111,7 @@
 
 ## Project Status
 
-Phase 5 in progress. `A-02` complete, `A-03` pending.
+Phase 5 in progress. `A-02` complete, `A-03` active.
 
 ---
 
