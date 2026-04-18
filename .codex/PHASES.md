@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | A-02                                     |
-| Title      | End-to-end CLI pipeline on real project  |
-| Status     | in-progress                              |
-| File       | `.codex/blocks/A-02.md`                  |
+| Block ID   | -                                        |
+| Title      | -                                        |
+| Status     | -                                        |
+| File       | -                                        |
 
 ---
 
@@ -85,7 +85,7 @@
 | ID    | Block                                   | Status  |
 |-------|-----------------------------------------|---------|
 | A-01  | Real Figma export ingestion             | done    |
-| A-02  | End-to-end CLI pipeline on real project | in-progress |
+| A-02  | End-to-end CLI pipeline on real project | done |
 | A-03  | Ruleset tuning + configuration          | pending |
 | A-04  | Pilot docs + onboarding                 | pending |
 
@@ -111,8 +111,8 @@
 
 ## Project Status
 
-Phase 5 pending (Alpha).
+Phase 5 in progress. `A-02` complete, `A-03` pending.
 
 ---
 
-_Last updated: 2026-04-09_
+_Last updated: 2026-04-18_
