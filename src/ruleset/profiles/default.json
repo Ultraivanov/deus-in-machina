@@ -1,0 +1,23 @@
+{
+  "name": "default",
+  "description": "Default balanced ruleset for general use",
+  "tokens": {
+    "requireSemantic": true,
+    "allowRawValues": false,
+    "severity": "error"
+  },
+  "spacing": {
+    "enforceGrid": true,
+    "gridSize": 8,
+    "severity": "warn"
+  },
+  "patterns": {
+    "minConfidence": 0.7,
+    "severity": "warn"
+  },
+  "layout": {
+    "maxDepth": 10,
+    "requiredTokens": [],
+    "severity": "info"
+  }
+}

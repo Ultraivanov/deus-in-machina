@@ -8,7 +8,12 @@
   },
   "scripts": {
     "dsr": "node bin/dsr.js",
-    "start": "node bin/dsr.js"
+    "start": "node bin/dsr.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^1.0.0"
   },
   "license": "MIT",
   "engines": {

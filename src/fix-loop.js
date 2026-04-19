@@ -1,5 +1,6 @@
 import { validateUI } from "./validator.js";
 import { fixUI } from "./fix.js";
+import { loadRuleset } from "./ruleset/index.js";
 
 function normalizeMaxIterations(value) {
   if (value === undefined || value === null) return 3;
@@ -8,17 +9,19 @@ function normalizeMaxIterations(value) {
   return Math.floor(parsed);
 }
 
-export function runFixLoop({ code = "", rules = {}, maxIterations } = {}) {
+export async function runFixLoop({ code = "", rules = {}, maxIterations, rulesetName = 'default' } = {}) {
   const loopMax = normalizeMaxIterations(maxIterations);
   let currentCode = String(code);
-  let report = validateUI({ code: currentCode, rules });
+  let report = await validateUI({ code: currentCode, rules, rulesetName });
   let iterations = 0;
+
+  const ruleset = await loadRuleset(rulesetName, rules.ruleset);
 
   while (iterations < loopMax && report.summary.errors > 0) {
     const fixed = fixUI({ code: currentCode, errors: report.errors });
     currentCode = fixed.fixed_code;
     iterations += 1;
-    report = validateUI({ code: currentCode, rules });
+    report = await validateUI({ code: currentCode, rules, rulesetName });
   }
 
   return {
@@ -27,7 +30,8 @@ export function runFixLoop({ code = "", rules = {}, maxIterations } = {}) {
     report,
     meta: {
       maxIterations: loopMax,
-      ruleCount: rules && typeof rules === "object" ? Object.keys(rules).length : 0
+      ruleCount: rules && typeof rules === "object" ? Object.keys(rules).length : 0,
+      ruleset: ruleset.name
     }
   };
 }

@@ -1,0 +1,23 @@
+{
+  "name": "relaxed",
+  "description": "Relaxed ruleset for rapid prototyping and legacy projects",
+  "tokens": {
+    "requireSemantic": false,
+    "allowRawValues": true,
+    "severity": "warn"
+  },
+  "spacing": {
+    "enforceGrid": false,
+    "gridSize": 4,
+    "severity": "info"
+  },
+  "patterns": {
+    "minConfidence": 0.5,
+    "severity": "info"
+  },
+  "layout": {
+    "maxDepth": 15,
+    "requiredTokens": [],
+    "severity": "info"
+  }
+}

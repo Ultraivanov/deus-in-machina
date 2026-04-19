@@ -1,0 +1,23 @@
+{
+  "name": "strict",
+  "description": "Strict ruleset for production-grade compliance",
+  "tokens": {
+    "requireSemantic": true,
+    "allowRawValues": false,
+    "severity": "error"
+  },
+  "spacing": {
+    "enforceGrid": true,
+    "gridSize": 8,
+    "severity": "error"
+  },
+  "patterns": {
+    "minConfidence": 0.8,
+    "severity": "error"
+  },
+  "layout": {
+    "maxDepth": 6,
+    "requiredTokens": ["color.primary.default", "space.4", "radius.md"],
+    "severity": "warn"
+  }
+}

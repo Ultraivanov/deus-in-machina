@@ -5,7 +5,8 @@ DSR is a runtime layer that enforces and structures design systems rather than g
 
 ## Status
 - Phase 4 complete (I-01 through I-06 done).
-- End-to-end runtime now includes normalizer, pattern engine, validator, and fix loop with fixtures.
+- Phase 5 in progress: A-03 block complete — Ruleset tuning + configuration.
+- End-to-end runtime now includes normalizer, pattern engine, validator, fix loop with fixtures, and configurable rulesets (default/strict/relaxed profiles).
 
 ## Current Spec (v3)
 Focus areas:
@@ -31,4 +32,4 @@ Focus areas:
 - Defining sufficient validation rules without over-restricting design work.
 - Pattern inference accuracy and false positives in varied layouts.
 
-_Last updated: 2026-04-09_
+_Last updated: 2026-04-19_
