@@ -1,0 +1,56 @@
+/* Main Styles - Contains intentional violations for DSR demo */
+
+.hero-section {
+  /* VIOLATION: Raw color */
+  background-color: #333333;
+  color: #FFFFFF;
+  
+  /* VIOLATION: 12px is not on 8pt grid */
+  padding: 12px 24px;
+  
+  /* COMPLIANT: 32px is on 8pt grid */
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-size: 2rem;
+  font-weight: bold;
+  /* COMPLIANT: Using design tokens */
+  color: var(--color-text-primary);
+}
+
+/* VIOLATION: Hero section without CTA button */
+/* Rule: dsr.pattern.hero-missing-cta */
+
+.card-container {
+  /* COMPLIANT: 24px is on 8pt grid (8 * 3) */
+  gap: 24px;
+  
+  /* VIOLATION: 14px is not on 8pt grid */
+  padding: 14px;
+  
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card {
+  /* VIOLATION: Raw color */
+  border: 1px solid #DDDDDD;
+  
+  /* COMPLIANT: 16px is on 8pt grid */
+  border-radius: 16px;
+  
+  /* COMPLIANT: 8px is on 8pt grid */
+  padding: 8px;
+}
+
+.sidebar {
+  /* VIOLATION: 6px is not on 8pt grid */
+  width: 246px;
+  
+  /* VIOLATION: Raw color */
+  background-color: #F5F5F5;
+  
+  /* COMPLIANT: 16px is on 8pt grid */
+  padding: 16px;
+}

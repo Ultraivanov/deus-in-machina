@@ -32,9 +32,12 @@ Figma → Extractor → Normalizer → Pattern Engine → Rules → Validator �
 - `CHANGELOG.md` — project history
 
 ## Getting Started
-1. Read `dsr_spec_v3.md`.
-2. Use `.codex/PHASES.md` to see active work.
-3. Follow block files under `.codex/blocks/`.
+
+1. **[Quick Start Guide](docs/quick-start.md)** — 5-minute setup and first validation
+2. **[Ruleset Configuration](docs/ruleset-guide.md)** — Customize validation rules
+3. **[Example Project](examples/pilot-project/)** — Working integration example
+4. Read `dsr_spec_v3.md` for technical specification
+5. Use `.codex/PHASES.md` to see active work
 
 ## CLI (v0)
 ```bash

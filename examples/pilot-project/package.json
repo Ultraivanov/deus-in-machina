@@ -1,0 +1,15 @@
+{
+  "name": "dsr-pilot-project",
+  "version": "1.0.0",
+  "description": "Example project demonstrating DSR validation and fix loop",
+  "private": true,
+  "scripts": {
+    "validate": "dsr validate --input src/ --ruleset default",
+    "validate:strict": "dsr validate --input src/ --ruleset strict",
+    "fix": "dsr fix --input src/ --output dist/fixed --max-iterations 3",
+    "clean": "rm -rf dist/fixed/*"
+  },
+  "devDependencies": {
+    "deus-in-machina": "file:../.."
+  }
+}

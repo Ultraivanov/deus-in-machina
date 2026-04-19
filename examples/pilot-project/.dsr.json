@@ -1,0 +1,25 @@
+{
+  "ruleset": {
+    "name": "pilot-project",
+    "description": "Custom rules for pilot project example",
+    "extends": "default",
+    "tokens": {
+      "severity": "error",
+      "requireSemantic": true,
+      "allowRawValues": false
+    },
+    "spacing": {
+      "severity": "warn",
+      "enforceGrid": true,
+      "gridSize": 8
+    },
+    "patterns": {
+      "severity": "warn",
+      "minConfidence": 0.7
+    },
+    "layout": {
+      "severity": "info",
+      "maxDepth": 8
+    }
+  }
+}

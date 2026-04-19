@@ -5,8 +5,9 @@ DSR is a runtime layer that enforces and structures design systems rather than g
 
 ## Status
 - Phase 4 complete (I-01 through I-06 done).
-- Phase 5 in progress: A-03 block complete — Ruleset tuning + configuration.
-- End-to-end runtime now includes normalizer, pattern engine, validator, fix loop with fixtures, and configurable rulesets (default/strict/relaxed profiles).
+- **Phase 5 complete** — Alpha Pilot: Figma export ingestion, CLI pipeline, ruleset tuning, pilot docs.
+- End-to-end runtime includes normalizer, pattern engine, validator, fix loop, configurable rulesets, and pilot documentation.
+- **Ready for Phase 6** — Beta Stabilization.
 
 ## Current Spec (v3)
 Focus areas:

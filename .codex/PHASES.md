@@ -19,10 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | A-04                                     |
-| Title      | Pilot docs + onboarding                  |
-| Status     | pending                                  |
-| File       | `.codex/blocks/A-04.md`                  |
+| Block ID   | —                                        |
+| Title      | —                                        |
+| Status     | —                                        |
+| File       | —                                        |
+
+> Phase 5 complete. Ready for Phase 6.
 
 ---
 
@@ -87,7 +89,7 @@
 | A-01  | Real Figma export ingestion             | done    |
 | A-02  | End-to-end CLI pipeline on real project | done |
 | A-03  | Ruleset tuning + configuration          | done |
-| A-04  | Pilot docs + onboarding                 | pending |
+| A-04  | Pilot docs + onboarding                 | done |
 
 ## Phase 6 — Beta Stabilization
 > Goal: harden runtime reliability and prepare broader adoption
@@ -111,7 +113,7 @@
 
 ## Project Status
 
-Phase 5 in progress. `A-03` complete, `A-04` active.
+Phase 5 complete — Alpha Pilot finished. Ready for Phase 6 — Beta Stabilization.
 
 ---
 

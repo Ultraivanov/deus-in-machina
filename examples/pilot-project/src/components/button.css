@@ -1,0 +1,30 @@
+/* Button Component - Contains intentional violations for DSR demo */
+
+.btn-primary {
+  /* VIOLATION: Raw hex color instead of token */
+  background-color: #FF5733;
+  color: #FFFFFF;
+  
+  /* VIOLATION: 10px is not on 8pt grid */
+  padding: 10px 20px;
+  
+  /* COMPLIANT: 16px is on 8pt grid */
+  margin: 16px;
+  
+  /* COMPLIANT: Border radius */
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  /* VIOLATION: Another raw color */
+  background-color: #3366FF;
+  color: #FFFFFF;
+  
+  /* VIOLATION: 5px is not on 8pt grid */
+  padding: 5px 15px;
+  
+  /* COMPLIANT: 8px is on 8pt grid */
+  margin: 8px;
+}
