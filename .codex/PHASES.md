@@ -24,7 +24,7 @@
 | Status     | —                                        |
 | File       | —                                        |
 
-> Phase 5 complete. Ready for Phase 6.
+> Phase 4 complete (I-01 through I-07 done). Ready for Phase 6 — Beta Stabilization.
 
 ---
 
@@ -80,6 +80,7 @@
 | I-04  | Pattern engine implementation        | done        |
 | I-05  | Validator implementation             | done        |
 | I-06  | Fix loop + pipeline integration      | done        |
+| I-07  | Figma Bidirectional Variables Sync   | done        |
 
 ## Phase 5 — Alpha Pilot
 > Goal: validate runtime with real Figma exports and end-to-end CLI workflows
@@ -113,7 +114,9 @@
 
 ## Project Status
 
-Phase 5 complete — Alpha Pilot finished. Ready for Phase 6 — Beta Stabilization.
+Phase 4 complete — All implementation blocks done (I-01 through I-07).
+Phase 5 (Alpha Pilot) complete.
+Ready for Phase 6 — Beta Stabilization.
 
 ---
 

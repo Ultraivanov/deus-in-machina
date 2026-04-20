@@ -10,7 +10,9 @@ const COMMANDS = new Set([
   "generate_ui",
   "validate",
   "fix",
-  "loop"
+  "loop",
+  "export-variables",
+  "import-variables"
 ]);
 
 export function run(argv) {
@@ -102,6 +104,8 @@ function printUsage() {
   console.log("  validate --code <ui.html> --rules <rules.json> [--out <path>]");
   console.log("  fix --code <ui.html> --errors <errors.json> [--out <path>]");
   console.log("  loop --spec <execution.json> --rules <rules.json> [--out <path>]");
+  console.log("  export-variables --file <fileKey> [--out <path>] [--color-mode hex]");
+  console.log("  import-variables --file <fileKey> --input <tokens.json> [--collection <name>]");
   console.log("Flags:");
   console.log("  --out <path>         Write output to file");
   console.log("  --format json|yaml   Output format (default: json)");
