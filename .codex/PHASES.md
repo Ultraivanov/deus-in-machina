@@ -98,7 +98,7 @@
 | ID    | Block                                   | Status      |
 |-------|-----------------------------------------|-------------|
 | B-01  | Robust error handling + recovery paths  | done        |
-| B-02  | Performance baselines + profiling       | pending     |
+| B-02  | Performance baselines + profiling       | in-progress |
 | B-03  | Configurable rule packs + severity      | pending     |
 | B-04  | Observability + telemetry review        | pending     |
 
