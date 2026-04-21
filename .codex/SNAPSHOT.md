@@ -6,8 +6,9 @@ DSR is a runtime layer that enforces and structures design systems rather than g
 ## Status
 - **Phase 4 complete** — All implementation blocks (I-01 through I-07).
 - **Phase 5 complete** — Alpha Pilot: Figma export ingestion, CLI pipeline, ruleset tuning, pilot docs.
-- **Phase 6 active** — Beta Stabilization: B-01 Error handling (T1-T5 complete).
-- **New:** Comprehensive error handling with retry logic, structured logging, and input validation.
+- **Phase 6 active** — Beta Stabilization:
+  - B-01 complete — Error handling with retry logic and structured logging
+  - B-02 active — Performance baselines + profiling
 - End-to-end runtime includes normalizer, pattern engine, validator, fix loop, rulesets, and bidirectional Figma sync.
 
 ## Current Spec (v3)

@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | —                                        |
-| Title      | —                                        |
-| Status     | —                                        |
-| File       | —                                        |
+| Block ID   | B-02                                     |
+| Title      | Performance baselines + profiling        |
+| Status     | pending                                  |
+| File       | `.codex/blocks/B-02.md`                  |
 
-> B-01 complete. Ready for B-02 — Performance baselines.
+> Phase 6 — Beta Stabilization in progress (B-02 active).
 
 ---
 
@@ -115,8 +115,8 @@
 ## Project Status
 
 Phase 6 — Beta Stabilization active.
+Current: B-02 — Performance baselines + profiling.
 B-01 complete — Robust error handling + recovery paths.
-Ready for B-02 — Performance baselines + profiling.
 
 Phase 4 complete (I-01 through I-07).
 Phase 5 (Alpha Pilot) complete.
