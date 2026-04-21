@@ -95,12 +95,12 @@
 ## Phase 6 — Beta Stabilization
 > Goal: harden runtime reliability and prepare broader adoption
 
-| ID    | Block                                   | Status  |
-|-------|-----------------------------------------|---------|
-| B-01  | Robust error handling + recovery paths  | pending |
-| B-02  | Performance baselines + profiling       | pending |
-| B-03  | Configurable rule packs + severity      | pending |
-| B-04  | Observability + telemetry review        | pending |
+| ID    | Block                                   | Status      |
+|-------|-----------------------------------------|-------------|
+| B-01  | Robust error handling + recovery paths  | in-progress |
+| B-02  | Performance baselines + profiling       | pending     |
+| B-03  | Configurable rule packs + severity      | pending     |
+| B-04  | Observability + telemetry review        | pending     |
 
 ## Phase 7 — Release
 > Goal: production-ready release and support readiness
