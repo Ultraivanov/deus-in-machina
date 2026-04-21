@@ -356,15 +356,246 @@ export function createPerfLogger(logPath) {
   return { log, close };
 }
 
+/**
+ * @typedef {Object} MemorySnapshot
+ * @property {number} timestamp
+ * @property {number} heapUsed
+ * @property {number} heapTotal
+ * @property {number} external
+ * @property {number} rss
+ * @property {string} [label]
+ */
+
+/**
+ * @typedef {Object} MemoryProfile
+ * @property {MemorySnapshot[]} snapshots
+ * @property {number} peakHeapUsed
+ * @property {number} peakRss
+ * @property {number} totalGrowth
+ * @property {number} durationMs
+ */
+
+/**
+ * Create a memory profiler for detailed memory analysis
+ * @returns {{start: Function, snapshot: Function, stop: Function, getProfile: Function}}
+ */
+export function createMemoryProfiler() {
+  const snapshots = [];
+  let startTime = null;
+  let isRunning = false;
+
+  function start(label = 'start') {
+    if (isRunning) return;
+    isRunning = true;
+    startTime = performance.now();
+
+    // Force GC if available for clean start
+    if (global.gc) {
+      global.gc();
+    }
+
+    snapshots.push({
+      ...getMemoryMetrics(),
+      label,
+    });
+  }
+
+  function snapshot(label = `snapshot-${snapshots.length}`) {
+    if (!isRunning) return;
+    snapshots.push({
+      ...getMemoryMetrics(),
+      label,
+    });
+  }
+
+  function stop(label = 'end') {
+    if (!isRunning) return;
+    isRunning = false;
+
+    snapshots.push({
+      ...getMemoryMetrics(),
+      label,
+    });
+
+    return getProfile();
+  }
+
+  function getProfile() {
+    if (snapshots.length < 2) {
+      return {
+        snapshots,
+        peakHeapUsed: 0,
+        peakRss: 0,
+        totalGrowth: 0,
+        durationMs: 0,
+      };
+    }
+
+    const peakHeapUsed = Math.max(...snapshots.map(s => s.heapUsed));
+    const peakRss = Math.max(...snapshots.map(s => s.rss));
+    const first = snapshots[0];
+    const last = snapshots[snapshots.length - 1];
+    const totalGrowth = last.heapUsed - first.heapUsed;
+    const durationMs = last.timestamp - first.timestamp;
+
+    return {
+      snapshots,
+      peakHeapUsed,
+      peakRss,
+      totalGrowth,
+      durationMs,
+    };
+  }
+
+  return { start, snapshot, stop, getProfile };
+}
+
+/**
+ * Check memory limits and throw if exceeded
+ * @param {number} currentBytes
+ * @param {Object} limits
+ * @param {number} [limits.maxHeapBytes]
+ * @param {number} [limits.maxRssBytes]
+ * @param {string} [context]
+ */
+export function checkMemoryLimits(currentBytes, limits, context = '') {
+  const { maxHeapBytes, maxRssBytes } = limits;
+  const metrics = getMemoryMetrics();
+
+  if (maxHeapBytes && metrics.heapUsed > maxHeapBytes) {
+    throw makeError(
+      ErrorCodes.MEMORY_LIMIT_EXCEEDED,
+      `Memory limit exceeded: ${formatBytes(metrics.heapUsed)} > ${formatBytes(maxHeapBytes)}${context ? ` (${context})` : ''}`,
+      {
+        limit: maxHeapBytes,
+        used: metrics.heapUsed,
+        context,
+      }
+    );
+  }
+
+  if (maxRssBytes && metrics.rss > maxRssBytes) {
+    throw makeError(
+      ErrorCodes.MEMORY_LIMIT_EXCEEDED,
+      `RSS memory limit exceeded: ${formatBytes(metrics.rss)} > ${formatBytes(maxRssBytes)}${context ? ` (${context})` : ''}`,
+      {
+        limit: maxRssBytes,
+        used: metrics.rss,
+        context,
+      }
+    );
+  }
+}
+
+/**
+ * Create a memory limit enforcer
+ * @param {Object} limits
+ * @param {number} [limits.maxHeapBytes]
+ * @param {number} [limits.maxRssBytes]
+ * @param {number} [limits.checkIntervalMs=1000]
+ * @returns {{start: Function, stop: Function}}
+ */
+export function createMemoryLimitEnforcer(limits) {
+  const { maxHeapBytes, maxRssBytes, checkIntervalMs = 1000 } = limits;
+  let intervalId = null;
+  let isRunning = false;
+
+  function check() {
+    try {
+      checkMemoryLimits(0, { maxHeapBytes, maxRssBytes }, 'enforcer');
+    } catch (err) {
+      // Log and re-throw to stop execution
+      logError(err);
+      throw err;
+    }
+  }
+
+  function start() {
+    if (isRunning) return;
+    isRunning = true;
+    intervalId = setInterval(check, checkIntervalMs);
+  }
+
+  function stop() {
+    if (!isRunning) return;
+    isRunning = false;
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
+
+  return { start, stop };
+}
+
+/**
+ * Profile memory usage of an async function
+ * @param {string} name
+ * @param {Function} fn
+ * @param {...any} args
+ * @returns {Promise<{result: any, profile: MemoryProfile}>}
+ */
+export async function profileMemory(name, fn, ...args) {
+  const profiler = createMemoryProfiler();
+  profiler.start(`${name}-start`);
+
+  let result;
+  let error;
+
+  try {
+    result = await fn(...args);
+    profiler.snapshot(`${name}-completed`);
+  } catch (err) {
+    error = err;
+    profiler.snapshot(`${name}-error`);
+  }
+
+  const profile = profiler.stop(`${name}-end`);
+
+  if (error) {
+    throw error;
+  }
+
+  return { result, profile };
+}
+
+/**
+ * Print memory profile report
+ * @param {MemoryProfile} profile
+ * @param {Object} [options]
+ * @param {boolean} [options.verbose=false]
+ */
+export function printMemoryProfile(profile, options = {}) {
+  const { verbose = false } = options;
+
+  console.log('\n📊 Memory Profile');
+  console.log(`   Duration: ${formatDuration(profile.durationMs)}`);
+  console.log(`   Peak Heap: ${formatBytes(profile.peakHeapUsed)}`);
+  console.log(`   Peak RSS: ${formatBytes(profile.peakRss)}`);
+  console.log(`   Growth: ${profile.totalGrowth >= 0 ? '+' : ''}${formatBytes(profile.totalGrowth)}`);
+
+  if (verbose && profile.snapshots.length > 0) {
+    console.log('\n   Snapshots:');
+    profile.snapshots.forEach((s, i) => {
+      console.log(`     ${i + 1}. ${s.label}: heap=${formatBytes(s.heapUsed)}, rss=${formatBytes(s.rss)}`);
+    });
+  }
+}
+
 export default {
   getMemoryMetrics,
   formatBytes,
   formatDuration,
   benchmark,
   profile,
+  profileMemory,
   createMonitor,
+  createMemoryProfiler,
+  createMemoryLimitEnforcer,
   checkBudget,
+  checkMemoryLimits,
   printBenchmark,
+  printMemoryProfile,
   compareBenchmarks,
   createPerfLogger,
 };

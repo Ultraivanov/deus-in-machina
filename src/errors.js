@@ -52,6 +52,10 @@ export const ErrorCodes = {
   FILE_READ_ERROR: 'FILE_READ_ERROR',
   FILE_WRITE_ERROR: 'FILE_WRITE_ERROR',
   JSON_PARSE_ERROR: 'JSON_PARSE_ERROR',
+
+  // Performance errors
+  MEMORY_LIMIT_EXCEEDED: 'MEMORY_LIMIT_EXCEEDED',
+  TIMEOUT_EXCEEDED: 'TIMEOUT_EXCEEDED',
 };
 
 /**
@@ -87,6 +91,9 @@ export const ErrorMessages = {
   [ErrorCodes.FILE_READ_ERROR]: 'Failed to read file',
   [ErrorCodes.FILE_WRITE_ERROR]: 'Failed to write file',
   [ErrorCodes.JSON_PARSE_ERROR]: 'Failed to parse JSON',
+
+  [ErrorCodes.MEMORY_LIMIT_EXCEEDED]: 'Memory limit exceeded',
+  [ErrorCodes.TIMEOUT_EXCEEDED]: 'Operation timed out',
 };
 
 /**
