@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | B-01                                     |
-| Title      | Robust error handling + recovery paths   |
-| Status     | pending                                  |
-| File       | `.codex/blocks/B-01.md`                  |
+| Block ID   | —                                        |
+| Title      | —                                        |
+| Status     | —                                        |
+| File       | —                                        |
 
-> Phase 6 — Beta Stabilization in progress.
+> B-01 complete. Ready for B-02 — Performance baselines.
 
 ---
 
@@ -97,7 +97,7 @@
 
 | ID    | Block                                   | Status      |
 |-------|-----------------------------------------|-------------|
-| B-01  | Robust error handling + recovery paths  | in-progress |
+| B-01  | Robust error handling + recovery paths  | done        |
 | B-02  | Performance baselines + profiling       | pending     |
 | B-03  | Configurable rule packs + severity      | pending     |
 | B-04  | Observability + telemetry review        | pending     |
@@ -115,7 +115,8 @@
 ## Project Status
 
 Phase 6 — Beta Stabilization active.
-Current block: B-01 Robust error handling + recovery paths.
+B-01 complete — Robust error handling + recovery paths.
+Ready for B-02 — Performance baselines + profiling.
 
 Phase 4 complete (I-01 through I-07).
 Phase 5 (Alpha Pilot) complete.
