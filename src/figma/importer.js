@@ -4,6 +4,8 @@
  * Supports: colors, numbers, strings, booleans, aliases, multi-mode
  */
 
+import { ErrorCodes, makeError, logError } from '../errors.js';
+
 /**
  * @typedef {Object} ImportConfig
  * @property {string} mode - "create" | "update" | "sync"
@@ -27,6 +29,15 @@
  * @returns {{value: any, type: string, description: string}|null}
  */
 export function parseTokenValue(token) {
+  // Validate input
+  if (!token || typeof token !== 'object') {
+    throw makeError(
+      ErrorCodes.INVALID_TOKEN_FORMAT,
+      'Invalid token: expected object',
+      { received: typeof token }
+    );
+  }
+
   // DTCG format ($value, $type, $description)
   if (token.$value !== undefined) {
     return {
@@ -124,21 +135,44 @@ export function parseColor(color) {
     color = color.trim();
 
     // Hex format
-    const hexRegex = /^#([A-Fa-f0-9]{3,8})$/;
-    if (hexRegex.test(color)) {
-      let hex = color.substring(1);
+    const hexToRgb = (hex) => {
+      // Remove # if present
+      hex = hex.replace(/^#/, '');
 
-      // Expand 3-char hex
+      let r, g, b, a = 1;
+
+      // Expand 3-char to 6-char (RGB -> RRGGBB)
       if (hex.length === 3) {
-        hex = hex.split('').map((c) => c + c).join('');
+        hex = hex.split('').map(c => c + c).join('');
+      }
+      // Expand 4-char to 8-char (RGBA -> RRGGBBAA)
+      else if (hex.length === 4) {
+        hex = hex.split('').map(c => c + c).join('');
       }
 
-      const r = parseInt(hex.substring(0, 2), 16) / 255;
-      const g = parseInt(hex.substring(2, 4), 16) / 255;
-      const b = parseInt(hex.substring(4, 6), 16) / 255;
-      const a = hex.length === 8 ? Math.round((parseInt(hex.substring(6, 8), 16) / 255) * 10000) / 10000 : 1;
+      if (hex.length === 6) {
+        r = parseInt(hex.substring(0, 2), 16) / 255;
+        g = parseInt(hex.substring(2, 4), 16) / 255;
+        b = parseInt(hex.substring(4, 6), 16) / 255;
+      } else if (hex.length === 8) {
+        r = parseInt(hex.substring(0, 2), 16) / 255;
+        g = parseInt(hex.substring(2, 4), 16) / 255;
+        b = parseInt(hex.substring(4, 6), 16) / 255;
+        a = Math.round((parseInt(hex.substring(6, 8), 16) / 255) * 10000) / 10000;
+      } else {
+        throw makeError(
+          ErrorCodes.INVALID_COLOR_FORMAT,
+          `Invalid hex color format: ${hex}`,
+          { expectedFormats: ['#RRGGBB', '#RRGGBBAA', '#RGB', '#RGBA'] }
+        );
+      }
 
       return { r, g, b, a };
+    };
+
+    const hexRegex = /^#([A-Fa-f0-9]{3,8})$/;
+    if (hexRegex.test(color)) {
+      return hexToRgb(color);
     }
 
     // RGB format
@@ -222,7 +256,11 @@ export function convertToFigmaValue(value, type, variableMap = null) {
     case 'color': {
       const parsed = parseColor(value);
       if (!parsed) {
-        throw new Error(`Invalid color value: ${value}`);
+        throw makeError(
+          ErrorCodes.INVALID_COLOR_FORMAT,
+          `Invalid hex color format: ${value}`,
+          { expectedFormats: ['#RRGGBB', '#RRGGBBAA'] }
+        );
       }
       return parsed;
     }
@@ -321,7 +359,14 @@ export async function importTokensToFigma(tokens, collectionName, config = {}) {
 
     const modeId = collection?.modes[0]?.modeId;
     if (!modeId && !dryRun) {
-      throw new Error('No mode available in collection');
+      logError(
+        makeError(
+          ErrorCodes.VARIABLE_EXPORT_ERROR,
+          `ModeId ${modeId} not found in collection ${collection.id}`
+        ),
+        { modeId, collectionId: collection.id }
+      );
+      return [];
     }
 
     // Build variable map for alias resolution
@@ -463,9 +508,10 @@ export async function importTokensToFigma(tokens, collectionName, config = {}) {
 export async function importTokensToFigmaAPI(fileKey, apiKey, tokens, collectionName, config = {}) {
   // REST API has limited variable support - mainly for reading
   // Writing variables requires Plugin API or newer REST endpoints
-  throw new Error(
-    'Figma REST API does not support creating variables. ' +
-    'Use the Figma Plugin API or import manually via plugin.'
+  throw makeError(
+    ErrorCodes.NOT_IMPLEMENTED,
+    'Figma REST API does not support creating variables. Use the Figma Plugin API or import manually via plugin.',
+    { suggestion: 'Use importTokensToFigma() in a Figma plugin context' }
   );
 }
 

@@ -4,6 +4,8 @@
  * Supports: colors, numbers, strings, booleans, aliases, multi-mode
  */
 
+import { ErrorCodes, makeError, withRetry } from '../errors.js';
+
 /**
  * @typedef {Object} ExportConfig
  * @property {string} colorMode - "hex" | "rgba-css" | "rgba-object" | "hsla-css" | "hsla-object"
@@ -42,7 +44,27 @@ function getTokenKeys(useDTCGKeys) {
  * @returns {string|Object} Normalized color
  */
 export function normalizeColor(color, colorMode = 'hex') {
+  // Validate input
+  if (!color || typeof color !== 'object') {
+    throw makeError(
+      ErrorCodes.INVALID_COLOR_FORMAT,
+      'Invalid color input: expected object with r, g, b properties',
+      { received: typeof color }
+    );
+  }
+
   const { r, g, b, a = 1 } = color;
+
+  // Validate RGB values are in range [0, 1]
+  if (typeof r !== 'number' || r < 0 || r > 1 ||
+      typeof g !== 'number' || g < 0 || g > 1 ||
+      typeof b !== 'number' || b < 0 || b > 1) {
+    throw makeError(
+      ErrorCodes.INVALID_COLOR_FORMAT,
+      'Invalid color values: r, g, b must be numbers in range [0, 1]',
+      { r, g, b }
+    );
+  }
 
   switch (colorMode) {
     case 'hex': {
@@ -101,7 +123,11 @@ export function normalizeColor(color, colorMode = 'hex') {
     }
 
     default:
-      throw new Error(`Unsupported color mode: ${colorMode}`);
+      throw makeError(
+        ErrorCodes.INVALID_COLOR_FORMAT,
+        `Unsupported color mode: ${colorMode}`,
+        { supportedModes: ['hex', 'rgba-css', 'rgba-object', 'hsla-css', 'hsla-object'] }
+      );
   }
 }
 
@@ -334,27 +360,107 @@ export async function exportVariablesToDTCG(variables, collections, config = {})
  * @param {ExportConfig} config - Export configuration
  * @returns {Promise<Object>} DTCG tokens
  */
-export async function exportFromFigmaAPI(fileKey, apiKey, config = {}) {
-  // Fetch file data from Figma API
-  const response = await fetch(`https://api.figma.com/v1/files/${fileKey}/variables`, {
-    headers: {
-      'X-Figma-Token': apiKey,
-    },
-  });
+export const exportFromFigmaAPI = withRetry(
+  async function(fileKey, apiKey, config = {}) {
+    // Validate inputs
+    if (!fileKey) {
+      throw makeError(ErrorCodes.INVALID_INPUT, 'Missing required parameter: fileKey');
+    }
+    if (!apiKey) {
+      throw makeError(ErrorCodes.FIGMA_AUTH_ERROR, 'Missing Figma API key');
+    }
 
-  if (!response.ok) {
-    throw new Error(`Figma API error: ${response.status} ${response.statusText}`);
-  }
+    // Fetch file data from Figma API
+    let response;
+    try {
+      response = await fetch(`https://api.figma.com/v1/files/${fileKey}/variables`, {
+        headers: {
+          'X-Figma-Token': apiKey,
+        },
+      });
+    } catch (err) {
+      throw makeError(
+        ErrorCodes.FIGMA_API_ERROR,
+        `Network error connecting to Figma API: ${err.message}`,
+        { fileKey }
+      );
+    }
 
-  const data = await response.json();
+    // Handle HTTP errors
+    if (!response.ok) {
+      let errorCode = ErrorCodes.FIGMA_API_ERROR;
+      let message = `Figma API error: ${response.status} ${response.statusText}`;
 
-  // Transform to DTCG format
-  return exportVariablesToDTCG(
-    data.meta?.variables || [],
-    data.meta?.variableCollections || [],
-    config
-  );
-}
+      if (response.status === 401) {
+        errorCode = ErrorCodes.FIGMA_AUTH_ERROR;
+        message = 'Figma authentication failed. Check your API token.';
+      } else if (response.status === 403) {
+        errorCode = ErrorCodes.FIGMA_AUTH_ERROR;
+        message = 'Access denied to Figma file. Check permissions.';
+      } else if (response.status === 404) {
+        errorCode = ErrorCodes.FIGMA_NOT_FOUND;
+        message = `Figma file not found: ${fileKey}`;
+      } else if (response.status === 429) {
+        errorCode = ErrorCodes.FIGMA_RATE_LIMIT;
+        message = 'Figma API rate limit exceeded.';
+      } else if (response.status >= 500) {
+        errorCode = ErrorCodes.FIGMA_API_ERROR;
+        message = `Figma API server error: ${response.status}`;
+      }
+
+      throw makeError(errorCode, message, {
+        fileKey,
+        status: response.status,
+        statusText: response.statusText,
+      });
+    }
+
+    // Parse response
+    let data;
+    try {
+      data = await response.json();
+    } catch (err) {
+      throw makeError(
+        ErrorCodes.JSON_PARSE_ERROR,
+        `Failed to parse Figma API response: ${err.message}`
+      );
+    }
+
+    // Check for API-level errors in response
+    if (data.err) {
+      throw makeError(
+        ErrorCodes.FIGMA_API_ERROR,
+        `Figma API error: ${data.err}`,
+        { fileKey, status: data.status }
+      );
+    }
+
+    // Validate required data structure
+    if (!data.meta) {
+      throw makeError(
+        ErrorCodes.FIGMA_API_ERROR,
+        'Invalid Figma API response: missing meta data',
+        { fileKey }
+      );
+    }
+
+    // Transform to DTCG format
+    try {
+      return exportVariablesToDTCG(
+        data.meta.variables || [],
+        data.meta.variableCollections || [],
+        config
+      );
+    } catch (err) {
+      throw makeError(
+        ErrorCodes.VARIABLE_EXPORT_ERROR,
+        `Failed to export variables: ${err.message}`,
+        { fileKey }
+      );
+    }
+  },
+  { maxRetries: 3, baseDelay: 1000 }
+);
 
 export default {
   exportVariablesToDTCG,

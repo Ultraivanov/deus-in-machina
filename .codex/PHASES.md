@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | —                                        |
-| Title      | —                                        |
-| Status     | —                                        |
-| File       | —                                        |
+| Block ID   | B-01                                     |
+| Title      | Robust error handling + recovery paths   |
+| Status     | pending                                  |
+| File       | `.codex/blocks/B-01.md`                  |
 
-> Phase 4 complete (I-01 through I-07 done). Ready for Phase 6 — Beta Stabilization.
+> Phase 6 — Beta Stabilization in progress.
 
 ---
 
@@ -114,9 +114,11 @@
 
 ## Project Status
 
-Phase 4 complete — All implementation blocks done (I-01 through I-07).
+Phase 6 — Beta Stabilization active.
+Current block: B-01 Robust error handling + recovery paths.
+
+Phase 4 complete (I-01 through I-07).
 Phase 5 (Alpha Pilot) complete.
-Ready for Phase 6 — Beta Stabilization.
 
 ---
 

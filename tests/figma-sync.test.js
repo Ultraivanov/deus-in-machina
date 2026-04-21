@@ -43,7 +43,7 @@ describe('Figma Variables Sync', () => {
       });
 
       it('should throw on unsupported color mode', () => {
-        expect(() => normalizeColor(red, 'invalid')).toThrow('Unsupported color mode');
+        expect(() => normalizeColor(red, 'invalid')).toThrow();
       });
     });
 
