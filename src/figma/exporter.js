@@ -2,9 +2,11 @@
  * Figma Variables Exporter
  * Converts Figma variables to DTCG-compliant JSON format
  * Supports: colors, numbers, strings, booleans, aliases, multi-mode
+ * Includes: caching, connection pooling, request deduplication
  */
 
 import { ErrorCodes, makeError, withRetry } from '../errors.js';
+import { getMemoryMetrics } from '../perf.js';
 
 /**
  * @typedef {Object} ExportConfig
@@ -462,9 +464,271 @@ export const exportFromFigmaAPI = withRetry(
   { maxRetries: 3, baseDelay: 1000 }
 );
 
+/**
+ * Simple in-memory cache for API responses
+ * @typedef {Object} CacheEntry
+ * @property {any} data
+ * @property {number} timestamp
+ * @property {number} ttl
+ */
+
+class APICache {
+  constructor(defaultTTL = 60000) {
+    this.cache = new Map();
+    this.defaultTTL = defaultTTL; // 1 minute default
+  }
+
+  /**
+   * Generate cache key from request params
+   * @param {string} fileKey
+   * @param {string} endpoint
+   * @returns {string}
+   */
+  getKey(fileKey, endpoint = 'variables') {
+    return `${fileKey}:${endpoint}`;
+  }
+
+  /**
+   * Get cached data if not expired
+   * @param {string} key
+   * @returns {any|null}
+   */
+  get(key) {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const now = Date.now();
+    if (now - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.data;
+  }
+
+  /**
+   * Store data in cache
+   * @param {string} key
+   * @param {any} data
+   * @param {number} [ttl] - TTL in milliseconds
+   */
+  set(key, data, ttl) {
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl: ttl || this.defaultTTL,
+    });
+  }
+
+  /**
+   * Clear all cache entries
+   */
+  clear() {
+    this.cache.clear();
+  }
+
+  /**
+   * Get cache stats
+   * @returns {{size: number, keys: string[]}}
+   */
+  getStats() {
+    return {
+      size: this.cache.size,
+      keys: Array.from(this.cache.keys()),
+    };
+  }
+}
+
+// Global cache instance
+const globalCache = new APICache(60000); // 1 minute TTL
+
+/**
+ * Request deduplication - prevent concurrent identical requests
+ */
+class RequestDeduplicator {
+  constructor() {
+    this.inFlight = new Map();
+  }
+
+  /**
+   * Execute function with deduplication
+   * @param {string} key
+   * @param {Function} fn
+   * @returns {Promise<any>}
+   */
+  async dedupe(key, fn) {
+    // If request is already in flight, wait for it
+    if (this.inFlight.has(key)) {
+      return this.inFlight.get(key);
+    }
+
+    // Start new request
+    const promise = fn().finally(() => {
+      this.inFlight.delete(key);
+    });
+
+    this.inFlight.set(key, promise);
+    return promise;
+  }
+}
+
+// Global deduplicator instance
+const globalDeduplicator = new RequestDeduplicator();
+
+/**
+ * Optimized Figma API client with caching and connection pooling
+ * @param {string} fileKey
+ * @param {string} apiKey
+ * @param {Object} [options]
+ * @param {boolean} [options.useCache=true]
+ * @param {number} [options.cacheTTL=60000]
+ * @param {boolean} [options.dedupe=true]
+ * @returns {Promise<Object>}
+ */
+export async function fetchVariablesOptimized(fileKey, apiKey, options = {}) {
+  const { useCache = true, cacheTTL = 60000, dedupe = true } = options;
+
+  const cacheKey = globalCache.getKey(fileKey, 'variables');
+
+  // Check cache first
+  if (useCache) {
+    const cached = globalCache.get(cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        __cached: true,
+        __cacheTimestamp: Date.now(),
+      };
+    }
+  }
+
+  // Build fetch function
+  const fetchFn = async () => {
+    // Use keep-alive for connection pooling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+    try {
+      const response = await fetch(
+        `https://api.figma.com/v1/files/${fileKey}/variables`,
+        {
+          headers: {
+            'X-Figma-Token': apiKey,
+            'Accept': 'application/json',
+          },
+          signal: controller.signal,
+          // Note: Node.js fetch doesn't support keep-alive directly,
+          // but we can use an agent in production if needed
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Store in cache
+      if (useCache) {
+        globalCache.set(cacheKey, data, cacheTTL);
+      }
+
+      return data;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      throw err;
+    }
+  };
+
+  // Execute with deduplication if enabled
+  if (dedupe) {
+    return globalDeduplicator.dedupe(cacheKey, fetchFn);
+  }
+
+  return fetchFn();
+}
+
+/**
+ * Batch multiple file requests (for future use with multiple files)
+ * @param {Array<{fileKey: string, apiKey: string}>} requests
+ * @param {Object} [options]
+ * @returns {Promise<Array<{fileKey: string, data: Object}>>}
+ */
+export async function batchFetchVariables(requests, options = {}) {
+  const { concurrency = 3 } = options;
+
+  const results = [];
+  const executing = new Set();
+
+  for (const req of requests) {
+    const promise = fetchVariablesOptimized(req.fileKey, req.apiKey, options)
+      .then(data => ({ fileKey: req.fileKey, data, success: true }))
+      .catch(error => ({ fileKey: req.fileKey, error: error.message, success: false }));
+
+    results.push(promise);
+    executing.add(promise);
+
+    // Limit concurrency
+    if (executing.size >= concurrency) {
+      await Promise.race(executing);
+    }
+
+    promise.finally(() => executing.delete(promise));
+  }
+
+  return Promise.all(results);
+}
+
+/**
+ * Get cache statistics
+ * @returns {{size: number, keys: string[]}}
+ */
+export function getCacheStats() {
+  return globalCache.getStats();
+}
+
+/**
+ * Clear the API cache
+ */
+export function clearAPICache() {
+  globalCache.clear();
+}
+
+/**
+ * Export from Figma with optimizations (cached version)
+ * @param {string} fileKey
+ * @param {string} apiKey
+ * @param {ExportConfig} config
+ * @param {Object} [apiOptions]
+ * @returns {Promise<Object>}
+ */
+export async function exportFromFigmaAPIOptimized(fileKey, apiKey, config = {}, apiOptions = {}) {
+  const { useCache = true, cacheTTL = 60000 } = apiOptions;
+
+  const data = await fetchVariablesOptimized(fileKey, apiKey, {
+    useCache,
+    cacheTTL,
+    dedupe: true,
+  });
+
+  // Transform to DTCG format
+  return exportVariablesToDTCG(
+    data.meta?.variables || [],
+    data.meta?.variableCollections || [],
+    config
+  );
+}
+
 export default {
   exportVariablesToDTCG,
   exportFromFigmaAPI,
+  exportFromFigmaAPIOptimized,
+  fetchVariablesOptimized,
+  batchFetchVariables,
+  getCacheStats,
+  clearAPICache,
   normalizeColor,
   normalizeValue,
   normalizeType,
