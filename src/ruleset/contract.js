@@ -1,5 +1,9 @@
 /**
- * @typedef {'error' | 'warn' | 'info'} Severity
+ * @typedef {'error' | 'warn' | 'info' | 'ignore'} Severity
+ * - error: Block release, must be fixed
+ * - warn: Warning, should be reviewed
+ * - info: Informational, optional attention
+ * - ignore: Disabled, no validation
  */
 
 /**

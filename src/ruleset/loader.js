@@ -3,6 +3,7 @@
 
 import { normalizeRuleset, DEFAULT_RULESET } from './defaults.js';
 import { DEFAULT_RULESET_NAME } from './contract.js';
+import { hasPreset, getPreset, listPresets, PRESETS } from './presets.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -18,8 +19,10 @@ function getProfilePath(name) {
 }
 
 /**
- * @param {string} [name]
- * @param {PartialRulesetConfig} [customConfig]
+ * Load a ruleset by name
+ * Checks presets first, then file system profiles
+ * @param {string} [name] - Preset name or profile name
+ * @param {PartialRulesetConfig} [customConfig] - Optional custom config overrides
  * @returns {Promise<RulesetConfig>}
  */
 export async function loadRuleset(
@@ -30,10 +33,19 @@ export async function loadRuleset(
     return normalizeRuleset(customConfig);
   }
 
+  // Check cache first
   if (profileCache.has(name)) {
     return /** @type {RulesetConfig} */ (profileCache.get(name));
   }
 
+  // Check presets (strict, relaxed, minimal, a11y, performance)
+  if (hasPreset(name)) {
+    const preset = getPreset(name);
+    profileCache.set(name, preset);
+    return preset;
+  }
+
+  // Try to load from file system
   try {
     const profilePath = getProfilePath(name);
     const content = readFileSync(profilePath, 'utf-8');
@@ -72,7 +84,25 @@ export function clearRulesetCache() {
   profileCache.clear();
 }
 
-/** @returns {string[]} */
+/**
+ * Get all available ruleset profiles
+ * Includes both presets and file-based profiles
+ * @returns {string[]}
+ */
 export function getAvailableProfiles() {
-  return ['default', 'strict', 'relaxed'];
+  const presets = listPresets();
+  const fileProfiles = ['default']; // default is always available
+  return [...new Set([...presets, ...fileProfiles])];
+}
+
+/**
+ * Check if a ruleset name is valid (preset or file profile)
+ * @param {string} name
+ * @returns {boolean}
+ */
+export function isValidRuleset(name) {
+  if (hasPreset(name)) return true;
+  if (name === 'default') return true;
+  // Could add file existence check here
+  return false;
 }
