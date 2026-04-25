@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | R-01                                     |
-| Title      | Release packaging + versioned artifacts  |
+| Block ID   | R-03                                     |
+| Title      | Support + maintenance plan               |
 | Status     | pending                                  |
-| File       | `.codex/blocks/R-01.md`                  |
+| File       | `.codex/blocks/R-03.md`                  |
 
-> Phase 7 — Release in progress (R-01 active).
+> Phase 7 — Release in progress (R-03 active).
 
 ---
 
@@ -107,17 +107,18 @@
 
 | ID    | Block                                   | Status  |
 |-------|-----------------------------------------|---------|
-| R-01  | Release packaging + versioned artifacts | pending |
-| R-02  | Public docs + examples                  | pending |
-| R-03  | Support + maintenance plan              | pending |
+| R-01  | Release packaging + versioned artifacts | done        |
+| R-02  | Public docs + examples                  | done        |
+| R-03  | Support + maintenance plan              | active    |
 ---
 
 ## Project Status
 
 Phase 6 — Beta Stabilization complete.
 Phase 7 — Release active.
-Current: R-01 — Release packaging + versioned artifacts.
-B-02 complete — Performance baselines + profiling.
+Current: R-03 — Support + maintenance plan.
+R-02 complete — Public docs + examples.
+R-01 complete — Release packaging + versioned artifacts.
 B-01 complete — Robust error handling + recovery paths.
 
 Phase 4 complete (I-01 through I-07).
