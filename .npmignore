@@ -1,0 +1,44 @@
+# Tests
+tests/
+*.test.js
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+*.tar.gz
+
+# CI/CD
+.github/
+.vscode/
+
+# Development
+.eslintrc
+.prettierrc
+.editorconfig
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Cache
+.cache/
+.npm/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation build
+docs/_build/
+
+# Temporary files
+tmp/
+temp/

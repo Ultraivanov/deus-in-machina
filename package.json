@@ -3,20 +3,65 @@
   "version": "0.1.0",
   "description": "Design System Runtime (DSR) — enforcement + structure + runtime for design systems",
   "type": "module",
+  "main": "src/index.js",
   "bin": {
     "dsr": "bin/dsr.js"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "docs/",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "dsr": "node bin/dsr.js",
     "start": "node bin/dsr.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "node scripts/build.js",
+    "version:bump": "node scripts/version.js bump",
+    "version:get": "node scripts/version.js get",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "design-system",
+    "figma",
+    "tokens",
+    "dtcg",
+    "validation",
+    "runtime",
+    "cli"
+  ],
+  "author": "Dmitry Ivanov <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ultraivanov/deus-in-machina.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ultraivanov/deus-in-machina/issues"
+  },
+  "homepage": "https://github.com/Ultraivanov/deus-in-machina#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./config": "./src/config.js",
+    "./errors": "./src/errors.js",
+    "./logger": "./src/logger.js",
+    "./metrics": "./src/metrics.js",
+    "./telemetry": "./src/telemetry.js",
+    "./debug": "./src/debug.js",
+    "./health": "./src/health.js",
+    "./ruleset": "./src/ruleset/index.js",
+    "./figma": "./src/figma/index.js",
+    "./streaming": "./src/streaming.js",
+    "./perf": "./src/perf.js"
   },
   "devDependencies": {
     "vitest": "^1.0.0"
-  },
-  "license": "MIT",
-  "engines": {
-    "node": ">=18"
   }
 }
