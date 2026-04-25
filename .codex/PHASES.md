@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | B-03                                     |
-| Title      | Configurable rule packs + severity       |
+| Block ID   | B-04                                     |
+| Title      | Observability + telemetry review           |
 | Status     | pending                                  |
-| File       | `.codex/blocks/B-03.md`                  |
+| File       | `.codex/blocks/B-04.md`                  |
 
-> Phase 6 — Beta Stabilization in progress (B-03 active).
+> Phase 6 — Beta Stabilization in progress (B-04 active).
 
 ---
 
@@ -99,7 +99,7 @@
 |-------|-----------------------------------------|-------------|
 | B-01  | Robust error handling + recovery paths  | done        |
 | B-02  | Performance baselines + profiling       | done        |
-| B-03  | Configurable rule packs + severity      | pending     |
+| B-03  | Configurable rule packs + severity      | done        |
 | B-04  | Observability + telemetry review        | pending     |
 
 ## Phase 7 — Release
@@ -115,7 +115,8 @@
 ## Project Status
 
 Phase 6 — Beta Stabilization active.
-Current: B-03 — Configurable rule packs + severity.
+Current: B-04 — Observability + telemetry review.
+B-03 complete — Configurable rule packs + severity.
 B-02 complete — Performance baselines + profiling.
 B-01 complete — Robust error handling + recovery paths.
 
