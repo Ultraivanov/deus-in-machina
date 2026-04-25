@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | R-03                                     |
-| Title      | Support + maintenance plan               |
-| Status     | pending                                  |
-| File       | `.codex/blocks/R-03.md`                  |
+| Block ID   | —                                        |
+| Title      | —                                        |
+| Status     | —                                        |
+| File       | —                                        |
 
-> Phase 7 — Release in progress (R-03 active).
+> Phase 7 — Release **COMPLETE**. DSR v0.1.0 is ready.
 
 ---
 
@@ -109,15 +109,18 @@
 |-------|-----------------------------------------|---------|
 | R-01  | Release packaging + versioned artifacts | done        |
 | R-02  | Public docs + examples                  | done        |
-| R-03  | Support + maintenance plan              | active    |
+| R-03  | Support + maintenance plan              | done        |
 ---
 
 ## Project Status
 
-Phase 6 — Beta Stabilization complete.
-Phase 7 — Release active.
-Current: R-03 — Support + maintenance plan.
-R-02 complete — Public docs + examples.
+🎉 **Phase 7 — Release COMPLETE**. DSR v0.1.0 is ready for production!
+
+All phases complete:
+- Phase 4 (I-01..I-07) — Implementation
+- Phase 5 (Alpha Pilot) — Validation
+- Phase 6 (Beta Stabilization) — Hardening
+- Phase 7 (Release) — Production ready
 R-01 complete — Release packaging + versioned artifacts.
 B-01 complete — Robust error handling + recovery paths.
 
