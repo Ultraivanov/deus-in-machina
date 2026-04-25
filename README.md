@@ -1,93 +1,268 @@
-# Deus In Machina (DIM)
+# Deus In Machina (DIM) — Design System Runtime
 
-Design System Runtime (DSR) — enforcement + structure + runtime for design systems. The focus is on **token normalization**, **pattern inference**, and **UI validation** with a fix loop.
+[![npm version](https://img.shields.io/npm/v/deus-in-machina.svg)](https://www.npmjs.com/package/deus-in-machina)
+[![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D%2018-brightgreen.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Overview
-- Not a design generator.
-- Not a design tool.
-- A runtime that enforces structure and consistency across design system usage.
+**Design System Runtime (DSR)** — A runtime layer that enforces structure and consistency across design systems. Bridge the gap between Figma designs and code implementation with automated token normalization, pattern detection, and validation.
 
-## Core Capabilities
-- Token normalization: raw Figma data → semantic tokens.
-- Pattern inference: detect reusable UI structures.
-- Validation engine: lint UI against rules.
-- Correction loop: generate fix instructions and re-validate.
+## What is DSR?
 
-## Pipeline
+DSR is not a design generator. It's a runtime that:
+
+- **Normalizes** raw Figma data into semantic DTCG-compliant tokens
+- **Detects** reusable UI patterns across your designs
+- **Validates** implementation against design system rules
+- **Corrects** issues with automated fix suggestions
+
+Think of it as a linter + compiler for your design system.
+
+## Key Features
+
+🎨 **Bidirectional Figma Sync**
+- Export Figma Variables to DTCG JSON
+- Import DTCG tokens back to Figma
+- Color normalization (hex, rgba, hsla)
+- Multi-mode support (light/dark themes)
+
+🧩 **Pattern Inference**
+- Detect reusable UI structures
+- Identify component patterns
+- Suggest semantic improvements
+
+✅ **Validation Engine**
+- 6 rule categories (tokens, spacing, patterns, layout, a11y, performance)
+- 5 built-in presets (strict, relaxed, minimal, a11y, performance)
+- Custom rule pack creation
+
+⚡ **Performance**
+- API response caching with TTL
+- Request deduplication
+- Batch operations with concurrency control
+- Streaming for large files
+
+📊 **Observability**
+- Structured logging (6 levels)
+- Metrics collection
+- Opt-in telemetry
+- Health checks (K8s probes)
+
+## Quick Start
+
+### Installation
+
+```bash
+npm install -g deus-in-machina
+```
+
+### Export Figma Variables
+
+```bash
+export FIGMA_API_KEY=your_token_here
+
+dsr export-variables \
+  --file AbCdEf123 \
+  --out tokens.json \
+  --color-mode hex
+```
+
+### Validate Tokens
+
+```bash
+dsr validate \
+  --input tokens.json \
+  --ruleset strict
+```
+
+### Import Back to Figma
+
+```bash
+dsr import-variables \
+  --file AbCdEf123 \
+  --input tokens.json \
+  --collection "Design Tokens"
+```
+
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [Installation](docs/installation.md) | Setup and configuration |
+| [Quick Start](docs/quick-start.md) | 5-minute tutorial |
+| [Rule Packs](docs/rule-packs.md) | Validation rules and presets |
+| [Performance](docs/performance.md) | Optimization and monitoring |
+| [Observability](docs/observability.md) | Logging, metrics, telemetry |
+| [Error Handling](docs/error-handling.md) | Troubleshooting guide |
+
+## API Usage
+
+### Programmatic API
+
+```javascript
+import { exportFromFigmaAPI, exportVariablesToDTCG } from 'deus-in-machina/figma';
+import { validateUI } from 'deus-in-machina';
+import { loadRuleset } from 'deus-in-machina/ruleset';
+
+// Export from Figma
+const data = await exportFromFigmaAPI(fileKey, apiKey);
+const tokens = exportVariablesToDTCG(
+  data.meta.variables,
+  data.meta.variableCollections
+);
+
+// Validate
+const ruleset = await loadRuleset('strict');
+const result = await validateUI({
+  code: JSON.stringify(tokens),
+  rulesetName: 'strict'
+});
+
+console.log(result.summary);
+// { errors: 0, warnings: 2, infos: 5 }
+```
+
+### Using Presets
+
+```javascript
+import { loadRuleset, extendPreset } from 'deus-in-machina/ruleset';
+
+// Use built-in preset
+const strict = await loadRuleset('strict');
+
+// Create custom ruleset
+const custom = extendPreset('relaxed', {
+  name: 'my-team',
+  tokens: { severity: 'error' }
+});
+```
+
+## CLI Reference
+
+```bash
+dsr <command> [options]
+
+Commands:
+  export-variables   Export Figma Variables to JSON
+  import-variables   Import JSON to Figma Variables
+  sync-variables     Bidirectional sync
+  validate           Validate tokens against rules
+  health             Check system health
+  benchmark          Run performance benchmarks
+
+Options:
+  --help             Show help
+  --version          Show version
+  --verbose          Enable verbose output
+```
+
+## Architecture
+
+```
 Figma → Extractor → Normalizer → Pattern Engine → Rules → Validator → Fix Loop
+                           ↓
+                    DTCG Tokens
+                           ↓
+                    Code Implementation
+```
 
-## MCP Toolchain
-- `extract_figma_context`
-- `normalize_tokens`
-- `build_landing_spec`
-- `generate_ui`
-- `validate_ui`
-- `fix_ui`
-- `loop_until_valid`
+### Core Modules
 
-## Repo Layout
-- `dsr_spec_v3.md` — source specification
-- `.codex/` — project state and protocols
-- `README_RU.md` — Russian README
-- `CHANGELOG.md` — project history
+| Module | Purpose |
+|--------|---------|
+| `src/figma/` | Figma API integration |
+| `src/ruleset/` | Validation rules and presets |
+| `src/validator.js` | UI linting engine |
+| `src/patterns.js` | Pattern detection |
+| `src/fix-loop.js` | Automated corrections |
+| `src/perf.js` | Performance utilities |
+| `src/logger.js` | Structured logging |
+| `src/metrics.js` | Metrics collection |
+| `src/telemetry.js` | Usage analytics |
+| `src/health.js` | Health checks |
 
-## Getting Started
+## Development
 
-1. **[Quick Start Guide](docs/quick-start.md)** — 5-minute setup and first validation
-2. **[Ruleset Configuration](docs/ruleset-guide.md)** — Customize validation rules
-3. **[Example Project](examples/pilot-project/)** — Working integration example
-4. Read `dsr_spec_v3.md` for technical specification
-5. Use `.codex/PHASES.md` to see active work
+### Setup
 
-## CLI (v0)
 ```bash
+git clone https://github.com/Ultraivanov/deus-in-machina.git
+cd deus-in-machina
 npm install
-node bin/dsr.js --help
+npm test
 ```
 
-Examples:
-```bash
-node bin/dsr.js extract --file AbCdEf123 --out context.json
-node bin/dsr.js normalize --input context.json --out normalized.json
-```
-
-Note: the public CLI currently exposes the command surface, but the reproducible
-Alpha verification flow runs through the fixture scripts below.
-
-## Reproducible Alpha Fixture Run
-Run the end-to-end pipeline on the committed real-export fixture and compare the
-generated outputs against checked-in snapshots.
+### Running Tests
 
 ```bash
-npm install
-node scripts/run-e2e-pipeline.js
-node scripts/compare-e2e-pipeline.js
+# All tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Specific file
+npm test -- tests/figma-sync.test.js
 ```
 
-Generated artifacts are written to:
-- `examples/fixtures/pipeline-run/context.json`
-- `examples/fixtures/pipeline-run/normalized.json`
-- `examples/fixtures/pipeline-run/patterns.json`
-- `examples/fixtures/pipeline-run/validation.json`
-- `examples/fixtures/pipeline-run/fix-loop.json`
+### Building
 
-Expected snapshots are stored in:
-- `examples/fixtures/pipeline-expected/context.json`
-- `examples/fixtures/pipeline-expected/normalized.json`
-- `examples/fixtures/pipeline-expected/patterns.json`
-- `examples/fixtures/pipeline-expected/validation.json`
-- `examples/fixtures/pipeline-expected/fix-loop.json`
+```bash
+npm run build
+```
 
-The fixture source for this run is:
-- `examples/fixtures/figma-export/section-form.input.json`
-- `examples/fixtures/figma-export/section-form.code.txt`
+### Version Management
 
-Expected result:
-- `run-e2e-pipeline.js` writes five JSON artifacts into `pipeline-run`
-- `compare-e2e-pipeline.js` returns `"pass": true`
+```bash
+# Bump version
+npm run version:bump minor
+
+# Get current version
+npm run version:get
+```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Roadmap
+
+- [x] Token normalization
+- [x] Pattern inference
+- [x] Validation engine
+- [x] Figma bidirectional sync
+- [x] Performance optimization
+- [x] Observability suite
+- [ ] GitHub Actions marketplace integration
+- [ ] VS Code extension
+- [ ] Web UI dashboard
+
+## Stats
+
+- **233 tests** across 9 test suites
+- **60+ source files**
+- **15 completed blocks** (Phase 4-6 + R-01)
+- **6 documentation guides**
 
 ## Status
-Active development. Phase 5 (Alpha Pilot) in progress.
+
+**Phase 7 — Release** (in progress)
+
+- ✅ R-01: Release packaging
+- ⏳ R-02: Public docs + examples
+- ⏳ R-03: Support + maintenance plan
+
+See `.codex/PHASES.md` for full project status.
+
+## Support
+
+- 📖 [Documentation](docs/)
+- 🐛 [Issues](https://github.com/Ultraivanov/deus-in-machina/issues)
+- 💬 [Discussions](https://github.com/Ultraivanov/deus-in-machina/discussions)
 
 ## License
-MIT. See `LICENSE`.
+
+MIT © Dmitry Ivanov. See [LICENSE](LICENSE) for details.
+
+---
+
+**[⬆ Back to top](#deus-in-machina-dim--design-system-runtime)**
