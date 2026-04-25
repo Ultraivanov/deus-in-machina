@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | B-04                                     |
-| Title      | Observability + telemetry review           |
+| Block ID   | R-01                                     |
+| Title      | Release packaging + versioned artifacts  |
 | Status     | pending                                  |
-| File       | `.codex/blocks/B-04.md`                  |
+| File       | `.codex/blocks/R-01.md`                  |
 
-> Phase 6 — Beta Stabilization in progress (B-04 active).
+> Phase 7 — Release in progress (R-01 active).
 
 ---
 
@@ -100,7 +100,7 @@
 | B-01  | Robust error handling + recovery paths  | done        |
 | B-02  | Performance baselines + profiling       | done        |
 | B-03  | Configurable rule packs + severity      | done        |
-| B-04  | Observability + telemetry review        | pending     |
+| B-04  | Observability + telemetry review        | done        |
 
 ## Phase 7 — Release
 > Goal: production-ready release and support readiness
@@ -114,9 +114,9 @@
 
 ## Project Status
 
-Phase 6 — Beta Stabilization active.
-Current: B-04 — Observability + telemetry review.
-B-03 complete — Configurable rule packs + severity.
+Phase 6 — Beta Stabilization complete.
+Phase 7 — Release active.
+Current: R-01 — Release packaging + versioned artifacts.
 B-02 complete — Performance baselines + profiling.
 B-01 complete — Robust error handling + recovery paths.
 
