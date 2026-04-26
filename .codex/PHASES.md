@@ -10,21 +10,21 @@
 
 | Field      | Value                                   |
 |------------|-----------------------------------------|
-| Phase      | Phase 5 — Alpha Pilot                   |
-| Goal       | Validate runtime with real Figma exports and end-to-end CLI workflows |
-| Started    | 2026-04-09                              |
+| Phase      | Phase 8 — Post-Release Stabilization    |
+| Goal       | Restore runtime correctness after release and add smoke verification for package, CLI, and fixture workflows |
+| Started    | 2026-04-26                              |
 | Target     | TBD                                     |
 
 ## Active Block
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | —                                        |
-| Title      | —                                        |
-| Status     | —                                        |
+| Block ID   | PS-01                                    |
+| Title      | Runtime verification + smoke gates       |
+| Status     | pending                                  |
 | File       | —                                        |
 
-> Phase 7 — Release **COMPLETE**. DSR v0.1.0 is ready.
+> Release is complete, but post-release defects block reliable package usage and smoke validation.
 
 ---
 
@@ -33,33 +33,33 @@
 ### Phase 1 — Foundation & Spec Lock
 > Goal: codify v3 models, rules, and contracts
 
-| ID    | Block                                   | Status      |
-|-------|-----------------------------------------|-------------|
-| P1-01 | Token model + mapping rules             | done        |
-| P1-02 | Pattern inference heuristics v1          | done        |
-| P1-03 | Validation rules + severity model        | done        |
-| P1-04 | Correction flow + fix instruction format | done        |
-| P1-05 | Data contracts + examples                | done        |
+| ID    | Block                                   | Status |
+|-------|-----------------------------------------|--------|
+| P1-01 | Token model + mapping rules             | done   |
+| P1-02 | Pattern inference heuristics v1         | done   |
+| P1-03 | Validation rules + severity model       | done   |
+| P1-04 | Correction flow + fix instruction format| done   |
+| P1-05 | Data contracts + examples               | done   |
 
 ### Phase 2 — MVP Runtime
 > Goal: runnable pipeline with test vectors
 
-| ID    | Block                                  | Status  |
-|-------|----------------------------------------|---------|
-| P2-01 | Extractor interface contract           | done        |
-| P2-02 | Normalizer implementation stub         | done        |
-| P2-03 | Pattern engine implementation stub     | done        |
-| P2-04 | Validator implementation stub          | done        |
-| P2-05 | CLI/runner for pipeline execution      | done        |
+| ID    | Block                              | Status |
+|-------|------------------------------------|--------|
+| P2-01 | Extractor interface contract       | done   |
+| P2-02 | Normalizer implementation stub     | done   |
+| P2-03 | Pattern engine implementation stub | done   |
+| P2-04 | Validator implementation stub      | done   |
+| P2-05 | CLI/runner for pipeline execution  | done   |
 
 ### Phase 3 — Moat Layer
 > Goal: cross-project learning and pattern growth
 
-| ID    | Block                              | Status  |
-|-------|------------------------------------|---------|
-| P3-01 | Pattern clustering across projects | done        |
-| P3-02 | Pattern library auto-growth        | done        |
-| P3-03 | Learning from usage signals        | done        |
+| ID    | Block                              | Status |
+|-------|------------------------------------|--------|
+| P3-01 | Pattern clustering across projects | done   |
+| P3-02 | Pattern library auto-growth        | done   |
+| P3-03 | Learning from usage signals        | done   |
 
 ---
 
@@ -72,61 +72,66 @@
 ## Phase 4 — Implementation & Pilot
 > Goal: runnable MVP and real-world validation
 
-| ID    | Block                                | Status      |
-|-------|--------------------------------------|-------------|
-| I-01  | Runtime scaffold + CLI skeleton      | done        |
-| I-02  | Extractor adapter (Figma input)      | done        |
-| I-03  | Normalizer implementation            | done        |
-| I-04  | Pattern engine implementation        | done        |
-| I-05  | Validator implementation             | done        |
-| I-06  | Fix loop + pipeline integration      | done        |
-| I-07  | Figma Bidirectional Variables Sync   | done        |
+| ID    | Block                              | Status |
+|-------|------------------------------------|--------|
+| I-01  | Runtime scaffold + CLI skeleton    | done   |
+| I-02  | Extractor adapter (Figma input)    | done   |
+| I-03  | Normalizer implementation          | done   |
+| I-04  | Pattern engine implementation      | done   |
+| I-05  | Validator implementation           | done   |
+| I-06  | Fix loop + pipeline integration    | done   |
+| I-07  | Figma Bidirectional Variables Sync | done   |
 
 ## Phase 5 — Alpha Pilot
 > Goal: validate runtime with real Figma exports and end-to-end CLI workflows
 
-| ID    | Block                                   | Status  |
-|-------|-----------------------------------------|---------|
-| A-01  | Real Figma export ingestion             | done    |
-| A-02  | End-to-end CLI pipeline on real project | done |
-| A-03  | Ruleset tuning + configuration          | done |
-| A-04  | Pilot docs + onboarding                 | done |
+| ID    | Block                                   | Status |
+|-------|-----------------------------------------|--------|
+| A-01  | Real Figma export ingestion             | done   |
+| A-02  | End-to-end CLI pipeline on real project | done   |
+| A-03  | Ruleset tuning + configuration          | done   |
+| A-04  | Pilot docs + onboarding                 | done   |
 
 ## Phase 6 — Beta Stabilization
 > Goal: harden runtime reliability and prepare broader adoption
 
-| ID    | Block                                   | Status      |
-|-------|-----------------------------------------|-------------|
-| B-01  | Robust error handling + recovery paths  | done        |
-| B-02  | Performance baselines + profiling       | done        |
-| B-03  | Configurable rule packs + severity      | done        |
-| B-04  | Observability + telemetry review        | done        |
+| ID    | Block                                   | Status |
+|-------|-----------------------------------------|--------|
+| B-01  | Robust error handling + recovery paths  | done   |
+| B-02  | Performance baselines + profiling       | done   |
+| B-03  | Configurable rule packs + severity      | done   |
+| B-04  | Observability + telemetry review        | done   |
 
 ## Phase 7 — Release
 > Goal: production-ready release and support readiness
 
-| ID    | Block                                   | Status  |
-|-------|-----------------------------------------|---------|
-| R-01  | Release packaging + versioned artifacts | done        |
-| R-02  | Public docs + examples                  | done        |
-| R-03  | Support + maintenance plan              | done        |
+| ID    | Block                                   | Status |
+|-------|-----------------------------------------|--------|
+| R-01  | Release packaging + versioned artifacts | done   |
+| R-02  | Public docs + examples                  | done   |
+| R-03  | Support + maintenance plan              | done   |
+
+## Phase 8 — Post-Release Stabilization
+> Goal: fix release regressions, add smoke verification, and refactor unstable runtime paths
+
+| ID    | Block                                           | Status  |
+|-------|-------------------------------------------------|---------|
+| PS-01 | Runtime verification + smoke gates              | pending |
+| PS-02 | Package entrypoint and export surface repair    | pending |
+| PS-03 | Async workflow refactor for runners and CLI     | pending |
+| PS-04 | Post-release docs sync + regression checklist   | pending |
+
 ---
 
 ## Project Status
 
-🎉 **Phase 7 — Release COMPLETE**. DSR v0.1.0 is ready for production!
+Release is complete, but post-release stabilization is required before the package can be considered operational in real usage.
 
-All phases complete:
-- Phase 4 (I-01..I-07) — Implementation
-- Phase 5 (Alpha Pilot) — Validation
-- Phase 6 (Beta Stabilization) — Hardening
-- Phase 7 (Release) — Production ready
-R-01 complete — Release packaging + versioned artifacts.
-B-01 complete — Robust error handling + recovery paths.
-
-Phase 4 complete (I-01 through I-07).
-Phase 5 (Alpha Pilot) complete.
+Known confirmed issues:
+- package import path is broken (`src/index.js` missing)
+- validator/fix-loop smoke runners fail after async API changes
+- some generated smoke artifacts serialize unresolved promises as `{}`
 
 ---
 
-_Last updated: 2026-04-19_
+_Last updated: 2026-04-26_
