@@ -21,8 +21,8 @@
 |------------|------------------------------------------|
 | Block ID   | PS-01                                    |
 | Title      | Runtime verification + smoke gates       |
-| Status     | pending                                  |
-| File       | —                                        |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/PS-01.md`                 |
 
 > Release is complete, but post-release defects block reliable package usage and smoke validation.
 
@@ -116,7 +116,7 @@
 
 | ID    | Block                                           | Status  |
 |-------|-------------------------------------------------|---------|
-| PS-01 | Runtime verification + smoke gates              | pending |
+| PS-01 | Runtime verification + smoke gates              | in-progress |
 | PS-02 | Package entrypoint and export surface repair    | pending |
 | PS-03 | Async workflow refactor for runners and CLI     | pending |
 | PS-04 | Post-release docs sync + regression checklist   | pending |
