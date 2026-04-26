@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "matrixVersion": 1,
+  "generatedAt": "2026-04-26T12:45:00.000Z",
+  "source": "docs/release-smoke-matrix.json",
+  "summary": {
+    "total": 6,
+    "passed": 1,
+    "failed": 5
+  },
+  "checks": [
+    {
+      "id": "package-entrypoint-import",
+      "category": "package",
+      "title": "Package entrypoint resolves",
+      "command": "node -e import('./src/index.js').then(() => console.log('ok')).catch((error) => { console.error(error.message); process.exit(1); })",
+      "expectedExitCode": 0,
+      "exitCode": 1,
+      "passed": false,
+      "startedAt": "2026-04-26T12:45:00.000Z",
+      "durationMs": 18.512,
+      "stdoutExcerpt": "",
+      "stderrExcerpt": "Cannot find module '/workspace/src/index.js' imported from /workspace/[eval]",
+      "expectedBehavior": "The published root entrypoint resolves without module-not-found errors.",
+      "knownStatus": "failing",
+      "failureReason": "package.json points to src/index.js, but only src/index.ts exists."
+    },
+    {
+      "id": "cli-help",
+      "category": "cli",
+      "title": "CLI help renders",
+      "command": "node bin/dsr.js --help",
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "passed": true,
+      "startedAt": "2026-04-26T12:45:00.020Z",
+      "durationMs": 9.134,
+      "stdoutExcerpt": "Deus In Machina (DSR) CLI v0",
+      "stderrExcerpt": "",
+      "expectedBehavior": "CLI prints usage information and exits successfully.",
+      "knownStatus": "passing",
+      "failureReason": null
+    }
+  ]
+}
