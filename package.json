@@ -20,6 +20,8 @@
     "start": "node bin/dsr.js",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "build": "node scripts/build.js",
     "version:bump": "node scripts/version.js bump",
     "version:get": "node scripts/version.js get",
@@ -62,6 +64,8 @@
     "./perf": "./src/perf.js"
   },
   "devDependencies": {
-    "vitest": "^1.0.0"
+    "vitest": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0"
   }
 }
