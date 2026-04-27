@@ -3,20 +3,56 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Buildrail Companion</title>
+    <title>DSR Web Panel — Design System Runtime</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="app">
-      <header class="topbar">
-        <div class="brand">Buildrail</div>
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-icon">◆</span>
+          <span class="brand-text">DSR</span>
+        </div>
         <nav class="nav">
-          <a href="#/state" data-link>State</a>
-          <a href="#/next" data-link>Next Step</a>
+          <a href="#dashboard" class="nav-item active" data-link>
+            <span class="icon">📊</span> Dashboard
+          </a>
+          <a href="#tokens" class="nav-item" data-link>
+            <span class="icon">🎨</span> Tokens
+          </a>
+          <a href="#validation" class="nav-item" data-link>
+            <span class="icon">✓</span> Validation
+          </a>
+          <a href="#patterns" class="nav-item" data-link>
+            <span class="icon">🔍</span> Patterns
+          </a>
+          <a href="#figma" class="nav-item" data-link>
+            <span class="icon">🎭</span> Figma Sync
+          </a>
+          <a href="#health" class="nav-item" data-link>
+            <span class="icon">💚</span> Health
+          </a>
+          <a href="#settings" class="nav-item" data-link>
+            <span class="icon">⚙️</span> Settings
+          </a>
         </nav>
-      </header>
+      </aside>
 
-      <main class="content" id="app"></main>
+      <main class="main">
+        <header class="topbar">
+          <h1 id="page-title">Dashboard</h1>
+          <div class="actions">
+            <button class="btn btn-secondary" id="refresh-btn">Refresh</button>
+            <button class="btn btn-primary" id="export-btn">Export</button>
+          </div>
+        </header>
+
+        <div class="content" id="app">
+          <!-- Dynamic content loads here -->
+        </div>
+      </main>
     </div>
 
     <script type="module" src="app.js"></script>

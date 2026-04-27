@@ -1,16 +1,17 @@
 {
   "version": 2,
+  "name": "dsr-web-panel",
   "builds": [
     {
-      "src": "bin/dsr.js",
-      "use": "@vercel/node"
+      "src": "ui/index.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "bin/dsr.js"
+      "dest": "/ui/$1"
     }
   ],
-  "outputDirectory": "dist"
+  "outputDirectory": "ui"
 }
