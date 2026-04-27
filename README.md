@@ -47,6 +47,14 @@ Think of it as a linter + compiler for your design system.
 - Opt-in telemetry
 - Health checks (K8s probes)
 
+🌐 **Web Panel** (NEW)
+- Browser-based dashboard for DSR
+- Real-time token browser
+- Validation results viewer
+- Figma sync status
+- System health monitoring
+- Deployable to Vercel
+
 ## Quick Start
 
 ### Installation
@@ -82,6 +90,37 @@ dsr import-variables \
   --input tokens.json \
   --collection "Design Tokens"
 ```
+
+## Web Panel
+
+DSR includes a modern web dashboard for visual token management and monitoring.
+
+### Features
+
+- 📊 **Dashboard** — Overview of tokens, validation status, system health
+- 🎨 **Token Browser** — View collections, sync status, export/import
+- ✅ **Validation Results** — See errors, warnings with fix actions
+- 🔍 **Pattern Detection** — Browse detected UI patterns
+- 🎭 **Figma Sync** — Monitor sync status and history
+- 💚 **Health Monitor** — Component health and response times
+- ⚙️ **Settings** — Configure rulesets and telemetry
+
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Ultraivanov/deus-in-machina)
+
+Or manually:
+
+```bash
+# Clone repository
+git clone https://github.com/Ultraivanov/deus-in-machina.git
+cd deus-in-machina
+
+# Deploy to Vercel
+npx vercel --prod
+```
+
+The web panel will be available at `https://your-project.vercel.app`
 
 ## Documentation
 

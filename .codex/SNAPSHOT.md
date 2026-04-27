@@ -18,6 +18,9 @@ DSR is a runtime layer that enforces and structures design systems rather than g
 
 🎉 **DSR v0.1.0 is production ready!**
 - End-to-end runtime includes normalizer, pattern engine, validator, fix loop, rulesets, and bidirectional Figma sync.
+- **Web Panel** — Browser dashboard for token management and monitoring
+- **294 tests** — Comprehensive test coverage (60+ new tests added)
+- **Vercel Ready** — One-click deployment of web interface
 
 ## Current Spec (v3)
 Focus areas:
@@ -33,6 +36,7 @@ Focus areas:
 - `tokens` map (semantic token -> value)
 - `patterns` list (name, confidence, structure)
 - `validation` report (valid, errors, severity)
+- `web panel` dashboard (browser-based management UI)
 
 ## Non-Goals
 - Not a design generator.
@@ -43,4 +47,4 @@ Focus areas:
 - Defining sufficient validation rules without over-restricting design work.
 - Pattern inference accuracy and false positives in varied layouts.
 
-_Last updated: 2026-04-19_
+_Last updated: 2026-04-27_
