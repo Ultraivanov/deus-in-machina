@@ -1,17 +1,7 @@
 {
   "version": 2,
   "name": "dsr-web-panel",
-  "builds": [
-    {
-      "src": "ui/index.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/ui/$1"
-    }
-  ],
-  "outputDirectory": "ui"
+  "buildCommand": "cp -r ui public",
+  "outputDirectory": "public",
+  "installCommand": "echo 'No install needed'"
 }
