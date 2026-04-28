@@ -10,21 +10,21 @@
 
 | Field      | Value                                   |
 |------------|-----------------------------------------|
-| Phase      | Phase 9 — v0.2.0 Enterprise Foundation  |
-| Goal       | Multi-tenant architecture for teams (15+ users) |
-| Started    | 2026-04-29                              |
-| Target     | 2026-05-20                              |
+| Phase      | Phase 8 — Post-Release Stabilization    |
+| Goal       | Fix release regressions and restore reliable runtime/package behavior |
+| Started    | 2026-04-26                              |
+| Target     | TBD                                     |
 
 ## Active Block
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | E-02                                     |
-| Title      | Workspaces + Environment Isolation       |
-| Status     | in-progress                              |
-| File       | `.codex/blocks/E-02.md`                  |
+| Block ID   | PS-02                                    |
+| Title      | Package entrypoint and export surface repair |
+| Status     | pending                                  |
+| File       | -                                        |
 
-> Environment isolation: dev/staging/prod workspaces with separate token sets and configurations.
+> Canonical track is post-release stabilization until package/runtime regressions are fixed.
 
 ---
 
@@ -116,7 +116,7 @@
 
 | ID    | Block                                           | Status  |
 |-------|-------------------------------------------------|---------|
-| PS-01 | Runtime verification + smoke gates              | in-progress |
+| PS-01 | Runtime verification + smoke gates              | done |
 | PS-02 | Package entrypoint and export surface repair    | pending |
 | PS-03 | Async workflow refactor for runners and CLI     | pending |
 | PS-04 | Post-release docs sync + regression checklist   | pending |
@@ -125,12 +125,13 @@
 
 ## Project Status
 
-Release is complete, but post-release stabilization is required before the package can be considered operational in real usage.
+Release is complete, but post-release stabilization is the canonical active track until runtime/package regressions are fixed.
 
 Known confirmed issues:
 - package import path is broken (`src/index.js` missing)
 - validator/fix-loop smoke runners fail after async API changes
 - some generated smoke artifacts serialize unresolved promises as `{}`
+- `PS-01` completed: smoke matrix, runner, baseline, and triage are now documented
 
 ---
 
@@ -140,7 +141,7 @@ Known confirmed issues:
 | ID    | Block                                   | Status |
 |-------|-----------------------------------------|--------|
 | E-01  | Organizations + User Management         | done |
-| E-02  | Workspaces + Environment Isolation      | in-progress |
+| E-02  | Workspaces + Environment Isolation      | pending |
 | E-03  | API Keys + Access Management            | pending |
 
 _Last updated: 2026-04-29_
