@@ -22,6 +22,12 @@ DSR is a runtime layer that enforces and structures design systems rather than g
 - **294 tests** — Comprehensive test coverage (60+ new tests added)
 - **Vercel Ready** — One-click deployment of web interface
 
+🚀 **DSR v0.2.0 in development** — Enterprise Foundation
+- Phase 9 active: Multi-tenant architecture for teams (15+ users)
+- Block E-01: Organizations + User Management
+- PostgreSQL backend, JWT auth, role-based access
+- Target: 2026-05-20
+
 ## Current Spec (v3)
 Focus areas:
 - Token Normalization Engine: strict semantic token mapping from raw Figma variables/styles.
@@ -37,6 +43,8 @@ Focus areas:
 - `patterns` list (name, confidence, structure)
 - `validation` report (valid, errors, severity)
 - `web panel` dashboard (browser-based management UI)
+- `organizations` multi-tenant workspace isolation (v0.2.0)
+- `api keys` programmatic access management (v0.2.0)
 
 ## Non-Goals
 - Not a design generator.
@@ -47,4 +55,4 @@ Focus areas:
 - Defining sufficient validation rules without over-restricting design work.
 - Pattern inference accuracy and false positives in varied layouts.
 
-_Last updated: 2026-04-27_
+_Last updated: 2026-04-29_

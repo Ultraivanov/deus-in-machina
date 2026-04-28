@@ -10,21 +10,21 @@
 
 | Field      | Value                                   |
 |------------|-----------------------------------------|
-| Phase      | Phase 8 — Post-Release Stabilization    |
-| Goal       | Restore runtime correctness after release and add smoke verification for package, CLI, and fixture workflows |
-| Started    | 2026-04-26                              |
-| Target     | TBD                                     |
+| Phase      | Phase 9 — v0.2.0 Enterprise Foundation  |
+| Goal       | Multi-tenant architecture for teams (15+ users) |
+| Started    | 2026-04-29                              |
+| Target     | 2026-05-20                              |
 
 ## Active Block
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | PS-01                                    |
-| Title      | Runtime verification + smoke gates       |
+| Block ID   | E-01                                     |
+| Title      | Organizations + User Management          |
 | Status     | in-progress                              |
-| File       | `.codex/blocks/PS-01.md`                 |
+| File       | `.codex/blocks/E-01.md`                  |
 
-> Release is complete, but post-release defects block reliable package usage and smoke validation.
+> Enterprise foundation: orgs, invites, roles, and API key scaffolding for multi-user adoption.
 
 ---
 
@@ -134,4 +134,13 @@ Known confirmed issues:
 
 ---
 
-_Last updated: 2026-04-26_
+## Phase 9 — v0.2.0 Enterprise Foundation
+> Goal: Multi-tenant architecture for teams (15+ users)
+
+| ID    | Block                                   | Status |
+|-------|-----------------------------------------|--------|
+| E-01  | Organizations + User Management         | in-progress |
+| E-02  | Workspaces + Environment Isolation      | pending |
+| E-03  | API Keys + Access Management            | pending |
+
+_Last updated: 2026-04-29_
