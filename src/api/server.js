@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { checkDatabaseHealth } from '../db/config.js';
 import authRoutes from './routes/auth.js';
 import orgRoutes from './routes/organizations.js';
+import tokenRoutes from './routes/tokens.js';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.get('/health', async (req, res) => {
 // API version prefix
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/orgs', orgRoutes);
+app.use('/api/v1/orgs/:orgId/tokens', tokenRoutes);
 
 // API root
 app.use('/api/v1', (req, res) => {

@@ -19,12 +19,12 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | E-01                                     |
-| Title      | Organizations + User Management          |
+| Block ID   | E-02                                     |
+| Title      | Workspaces + Environment Isolation       |
 | Status     | in-progress                              |
-| File       | `.codex/blocks/E-01.md`                  |
+| File       | `.codex/blocks/E-02.md`                  |
 
-> Enterprise foundation: orgs, invites, roles, and API key scaffolding for multi-user adoption.
+> Environment isolation: dev/staging/prod workspaces with separate token sets and configurations.
 
 ---
 
@@ -139,8 +139,8 @@ Known confirmed issues:
 
 | ID    | Block                                   | Status |
 |-------|-----------------------------------------|--------|
-| E-01  | Organizations + User Management         | in-progress |
-| E-02  | Workspaces + Environment Isolation      | pending |
+| E-01  | Organizations + User Management         | done |
+| E-02  | Workspaces + Environment Isolation      | in-progress |
 | E-03  | API Keys + Access Management            | pending |
 
 _Last updated: 2026-04-29_
