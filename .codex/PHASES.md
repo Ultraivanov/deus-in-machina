@@ -21,8 +21,8 @@
 |------------|------------------------------------------|
 | Block ID   | PS-02                                    |
 | Title      | Package entrypoint and export surface repair |
-| Status     | pending                                  |
-| File       | -                                        |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/PS-02.md`                 |
 
 > Canonical track is post-release stabilization until package/runtime regressions are fixed.
 
@@ -117,7 +117,7 @@
 | ID    | Block                                           | Status  |
 |-------|-------------------------------------------------|---------|
 | PS-01 | Runtime verification + smoke gates              | done |
-| PS-02 | Package entrypoint and export surface repair    | pending |
+| PS-02 | Package entrypoint and export surface repair    | in-progress |
 | PS-03 | Async workflow refactor for runners and CLI     | pending |
 | PS-04 | Post-release docs sync + regression checklist   | pending |
 
