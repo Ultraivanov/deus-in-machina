@@ -25,7 +25,13 @@
     "build": "node scripts/build.js",
     "version:bump": "node scripts/version.js bump",
     "version:get": "node scripts/version.js get",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "db:up": "docker-compose up -d postgres redis",
+    "db:down": "docker-compose down",
+    "db:logs": "docker-compose logs -f postgres",
+    "db:migrate": "psql postgresql://dsr:dsr_dev_password@localhost:5432/dsr_dev -f",
+    "api:dev": "node --watch src/api/server.js",
+    "api:start": "node src/api/server.js"
   },
   "keywords": [
     "design-system",
@@ -62,6 +68,16 @@
     "./figma": "./src/figma/index.js",
     "./streaming": "./src/streaming.js",
     "./perf": "./src/perf.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.22.4",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "vitest": "^1.0.0",
