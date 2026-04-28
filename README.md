@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/deus-in-machina.svg)](https://www.npmjs.com/package/deus-in-machina)
 [![Node.js >= 18](https://img.shields.io/badge/node-%3E%3D%2018-brightgreen.svg)](https://nodejs.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
 **Design System Runtime (DSR)** — A runtime layer that enforces structure and consistency across design systems. Bridge the gap between Figma designs and code implementation with automated token normalization, pattern detection, and validation.
 
@@ -300,7 +300,9 @@ See `.codex/PHASES.md` for full project status.
 
 ## License
 
-MIT © Dmitry Ivanov. See [LICENSE](LICENSE) for details.
+Proprietary. All rights reserved. Use, copying, modification, redistribution,
+or derivative work requires prior explicit written permission from Dmitry Ivanov.
+See [LICENSE](LICENSE) for details.
 
 ---
 

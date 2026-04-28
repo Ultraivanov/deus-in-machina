@@ -43,7 +43,7 @@
     "cli"
   ],
   "author": "Dmitry Ivanov <your.email@example.com>",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "repository": {
     "type": "git",
     "url": "https://github.com/Ultraivanov/deus-in-machina.git"

@@ -12,7 +12,8 @@ DSR (Design System Runtime) is a runtime layer that enforces structure and consi
 
 ### Is DSR free?
 
-Yes, DSR is open source and free under the MIT license.
+No. DSR is proprietary software. Any use, copying, modification, redistribution,
+or derivative work requires prior explicit written permission from the copyright holder.
 
 ### What are the requirements?
 
