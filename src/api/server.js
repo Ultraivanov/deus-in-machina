@@ -6,6 +6,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { checkDatabaseHealth } from '../db/config.js';
+import authRoutes from './routes/auth.js';
+import orgRoutes from './routes/organizations.js';
 
 dotenv.config();
 
@@ -39,13 +41,25 @@ app.get('/health', async (req, res) => {
 });
 
 // API version prefix
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/orgs', orgRoutes);
+
+// API root
 app.use('/api/v1', (req, res) => {
   res.json({ 
     message: 'DSR API v0.2.0',
     endpoints: [
-      '/auth/* - Authentication',
-      '/orgs/* - Organizations',
-      '/workspaces/* - Workspaces'
+      'POST   /api/v1/auth/register  - Create account + organization',
+      'POST   /api/v1/auth/login     - Login with email/password',
+      'POST   /api/v1/auth/refresh    - Refresh access token',
+      'POST   /api/v1/auth/logout    - Logout',
+      'GET    /api/v1/auth/me        - Get current user (requires auth)',
+      'GET    /api/v1/orgs           - List my organizations (requires auth)',
+      'GET    /api/v1/orgs/:orgId    - Get organization details (requires auth)',
+      'GET    /api/v1/orgs/:orgId/members - List members (requires auth)',
+      'POST   /api/v1/orgs/:orgId/invite - Invite member (requires admin)',
+      'PATCH  /api/v1/orgs/:orgId/members/:userId - Update role (requires owner)',
+      'DELETE /api/v1/orgs/:orgId/members/:userId - Remove member (requires admin)'
     ],
     status: 'Enterprise Foundation - in development'
   });
