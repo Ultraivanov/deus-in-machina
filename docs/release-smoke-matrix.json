@@ -14,8 +14,8 @@
       ],
       "expectedExitCode": 0,
       "expectedBehavior": "The published root entrypoint resolves without module-not-found errors.",
-      "knownStatus": "failing",
-      "failureReason": "package.json points to src/index.js, but only src/index.ts exists."
+      "knownStatus": "passing",
+      "failureReason": null
     },
     {
       "id": "cli-help",

@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | PS-02                                    |
-| Title      | Package entrypoint and export surface repair |
-| Status     | in-progress                              |
-| File       | `.codex/blocks/PS-02.md`                 |
+| Block ID   | -                                        |
+| Title      | -                                        |
+| Status     | done                                     |
+| File       | -                                        |
 
 > Canonical track is post-release stabilization until package/runtime regressions are fixed.
 
@@ -117,7 +117,7 @@
 | ID    | Block                                           | Status  |
 |-------|-------------------------------------------------|---------|
 | PS-01 | Runtime verification + smoke gates              | done |
-| PS-02 | Package entrypoint and export surface repair    | in-progress |
+| PS-02 | Package entrypoint and export surface repair    | done |
 | PS-03 | Async workflow refactor for runners and CLI     | pending |
 | PS-04 | Post-release docs sync + regression checklist   | pending |
 
@@ -128,10 +128,10 @@
 Release is complete, but post-release stabilization is the canonical active track until runtime/package regressions are fixed.
 
 Known confirmed issues:
-- package import path is broken (`src/index.js` missing)
 - validator/fix-loop smoke runners fail after async API changes
 - some generated smoke artifacts serialize unresolved promises as `{}`
 - `PS-01` completed: smoke matrix, runner, baseline, and triage are now documented
+- `PS-02` completed: package root entrypoint now resolves and packaged export surface verifies successfully
 
 ---
 
@@ -144,4 +144,4 @@ Known confirmed issues:
 | E-02  | Workspaces + Environment Isolation      | pending |
 | E-03  | API Keys + Access Management            | pending |
 
-_Last updated: 2026-04-29_
+_Last updated: 2026-04-30_

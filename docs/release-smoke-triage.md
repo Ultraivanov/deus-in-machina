@@ -15,14 +15,24 @@ Summary from baseline run:
 - failing: `4`
 - suspicious pass-with-regression: `1`
 
+## Current Status After `PS-02`
+
+- `package-entrypoint-import` is now passing after the root JS entrypoint repair.
+- `npm pack --dry-run` succeeds and includes `/Users/dmitryivanov/Documents/DSR-Design System Runtime/src/index.js` in the package contents.
+- Remaining smoke failures are still:
+  - `validator-vectors`
+  - `loop-vectors`
+  - `pipeline-compare`
+- Those remaining failures are all part of `PS-03`, not `PS-02`.
+
 ## Failing Checks
 
 ### `package-entrypoint-import`
 
-- Status: failing
-- Symptom: import of `./src/index.js` fails with module-not-found
-- Root cause: [`package.json`](/Users/dmitryivanov/Documents/DSR-Design System Runtime/package.json) exports `./src/index.js`, but the repository currently ships [`src/index.ts`](/Users/dmitryivanov/Documents/DSR-Design System Runtime/src/index.ts)
-- Repair block: `PS-02`
+- Status: resolved
+- Symptom before fix: import of `./src/index.js` failed with module-not-found
+- Resolution: [`src/index.js`](/Users/dmitryivanov/Documents/DSR-Design System Runtime/src/index.js) now exists and exports the package root runtime surface
+- Repair block: `PS-02` complete
 
 ### `validator-vectors`
 
