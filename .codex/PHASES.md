@@ -19,10 +19,10 @@
 
 | Field      | Value                                    |
 |------------|------------------------------------------|
-| Block ID   | -                                        |
-| Title      | -                                        |
-| Status     | done                                     |
-| File       | -                                        |
+| Block ID   | PS-03                                    |
+| Title      | Async workflow refactor for runners and CLI |
+| Status     | in-progress                              |
+| File       | `.codex/blocks/PS-03.md`                 |
 
 > Canonical track is post-release stabilization until package/runtime regressions are fixed.
 
@@ -118,7 +118,7 @@
 |-------|-------------------------------------------------|---------|
 | PS-01 | Runtime verification + smoke gates              | done |
 | PS-02 | Package entrypoint and export surface repair    | done |
-| PS-03 | Async workflow refactor for runners and CLI     | pending |
+| PS-03 | Async workflow refactor for runners and CLI     | in-progress |
 | PS-04 | Post-release docs sync + regression checklist   | pending |
 
 ---
